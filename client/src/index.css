@@ -4,10 +4,13 @@
 
 /* --- Tailwind theme: light (default) + dark variant colors --- */
 @theme inline {
-  /* BTC orange (same in both modes) */
-  --color-btc-orange: #f7931a;
-  --color-btc-orange-dark: #c47613;
-  --color-btc-orange-light: #f9a94b;
+  /* Accent (fuchsia) – use accent-* in UI; btc-orange kept for compatibility */
+  --color-accent: #d946ef;
+  --color-accent-dark: #c026d3;
+  --color-accent-light: #e879f9;
+  --color-btc-orange: #d946ef;   /* fuchsia-500 */
+  --color-btc-orange-dark: #c026d3;   /* fuchsia-600 */
+  --color-btc-orange-light: #e879f9;   /* fuchsia-400 */
 
   /* Surface */
   --color-surface: #f5f5f7;
@@ -101,6 +104,12 @@ a:hover {
     bg-transparent text-fg dark:text-fg-dark
     hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
 }
+.btn-ghost-accent {
+  @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
+    disabled:opacity-50 disabled:cursor-not-allowed
+    border border-accent bg-accent/10 text-black dark:text-white
+    hover:bg-accent/20;
+}
 .btn-ghost-sm {
   @apply rounded-lg border border-current/30 bg-transparent px-3 py-1.5 text-sm font-medium
     opacity-90 hover:opacity-100 hover:bg-current/10 transition-colors cursor-pointer;
@@ -113,6 +122,17 @@ a:hover {
     bg-surface-light dark:bg-surface-light-dark
     text-fg dark:text-fg-dark
     focus:outline-none focus:ring-2 focus:ring-btc-orange;
+}
+
+/* Hide number input spinner (Chrome, Safari, Edge) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Hide number input spinner (Firefox) */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 /* Inline text that looks like a link (dotted underline, hover solid) */
@@ -170,4 +190,89 @@ a:hover {
 /* Chart legend toggle button */
 .legend-btn {
   @apply flex items-center gap-1.5 text-xs cursor-pointer select-none transition-opacity;
+}
+
+/* --- Semantic utilities (standalone dark-mode pairs) --- */
+.text-body {
+  @apply text-fg dark:text-fg-dark;
+}
+.text-muted-standalone {
+  @apply text-muted dark:text-muted-dark;
+}
+.border-default {
+  @apply border-border dark:border-border-dark;
+}
+.bg-surface-subtle {
+  @apply bg-surface-light dark:bg-surface-light-dark;
+}
+
+/* Alert / banner wrappers */
+.banner-danger {
+  @apply relative overflow-hidden rounded-xl border-l-4 border-l-danger dark:border-l-danger-dark
+    bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20
+    text-danger dark:text-danger-dark shadow-sm;
+}
+.banner-success {
+  @apply relative overflow-hidden rounded-xl border-l-4 border-l-success dark:border-l-success-dark
+    bg-success/10 dark:bg-success-dark/10 border border-success/20 dark:border-success-dark/20
+    text-success dark:text-success-dark shadow-sm;
+}
+.banner-icon {
+  @apply shrink-0 flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold text-white leading-none;
+}
+.banner-icon-danger {
+  @apply bg-danger dark:bg-danger-dark;
+}
+.banner-icon-success {
+  @apply bg-success dark:bg-success-dark;
+}
+
+/* Toggle switch (track + thumb) */
+.switch {
+  @apply relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors
+    focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark;
+}
+.switch-thumb {
+  @apply pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition translate-x-0.5;
+}
+.switch-thumb-on {
+  @apply translate-x-5;
+}
+.switch-thumb-off {
+  @apply translate-x-0.5;
+}
+
+/* Radio and range inputs */
+.input-radio {
+  @apply rounded-full border-border dark:border-border-dark text-accent focus:ring-accent;
+}
+.input-range {
+  @apply w-full h-2 rounded-lg appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
+}
+
+/* Status pills / badges */
+.badge-success {
+  @apply text-[10px] bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium;
+}
+.badge-warning {
+  @apply text-[10px] bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium;
+}
+
+/* Documentation page */
+.doc-body {
+  @apply text-fg dark:text-fg-dark text-sm leading-relaxed;
+}
+.code-inline {
+  @apply px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-light-dark text-xs;
+}
+
+/* Status dots (connection indicator) */
+.status-dot {
+  @apply inline-block w-2 h-2 rounded-full;
+}
+.status-dot-danger {
+  @apply bg-danger dark:bg-danger-dark;
+}
+.status-dot-success {
+  @apply bg-success dark:bg-success-dark animate-pulse;
 }

@@ -12,7 +12,7 @@ function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="tooltip-card">
-      <div className="text-muted dark:text-muted-dark text-xs mb-1">{formatTime(label)}</div>
+      <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
       {payload.map((entry) => (
         <div key={entry.dataKey} style={{ color: entry.color }}>
           {entry.name}: {entry.value?.toFixed(2)} GH/s
@@ -48,7 +48,7 @@ function ClickableLegend({ series, hidden, onToggle }) {
               className="inline-block w-3 h-0.5 rounded-full"
               style={{ backgroundColor: s.color }}
             />
-            <span className="text-muted dark:text-muted-dark">{s.name}</span>
+            <span className="text-muted-standalone">{s.name}</span>
           </button>
         );
       })}
@@ -73,7 +73,7 @@ export default function HashrateChart({ history }) {
   if (!history || history.length < 2) {
     return (
       <div className="card h-72 flex items-center justify-center">
-        <span className="text-muted dark:text-muted-dark text-sm">Collecting hashrate data...</span>
+        <span className="text-muted-standalone text-sm">Collecting hashrate data...</span>
       </div>
     );
   }

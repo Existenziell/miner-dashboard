@@ -93,12 +93,12 @@ export default function App() {
   const efficiency = computeEfficiency(miner);
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark">
+    <div className="min-h-screen bg-surface dark:bg-surface-dark text-body">
       {/* Header */}
-      <header className="border-b border-border dark:border-border-dark bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-default bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold text-fg dark:text-fg-dark">NerdQaxe++ Solo Mining Dashboard</h1>
+            <h1 className="text-xl font-bold text-body">NerdQaxe++ Solo Mining Dashboard</h1>
             <nav className="flex gap-1">
               {TABS.map((tab) => (
                 <button
@@ -117,14 +117,14 @@ export default function App() {
             <ThemeToggle mode={themeMode} onCycle={cycleTheme} />
             {minerError ? (
               <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark">
-                <span className="inline-block w-2 h-2 rounded-full bg-danger dark:bg-danger-dark" />
+                <span className="status-dot status-dot-danger" />
                 Miner offline
               </span>
             ) : minerLoading ? (
-              <span className="text-muted dark:text-muted-dark">Connecting...</span>
+              <span className="text-muted-standalone">Connecting...</span>
             ) : (
               <span className="flex items-center gap-1.5 text-success dark:text-success-dark">
-                <span className="inline-block w-2 h-2 rounded-full bg-success dark:bg-success-dark animate-pulse" />
+                <span className="status-dot status-dot-success" />
                 Connected
               </span>
             )}
@@ -242,7 +242,7 @@ export default function App() {
 
             {/* Row 5: Bitcoin Network */}
             <div>
-              <h2 className="text-lg font-semibold text-muted dark:text-muted-dark mb-3">Bitcoin Network</h2>
+              <h2 className="text-lg font-semibold text-muted-standalone mb-3">Bitcoin Network</h2>
               <NetworkStatus data={network} />
             </div>
           </>
@@ -250,8 +250,8 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border dark:border-border-dark mt-8 py-4">
-        <div className="max-w-7xl mx-auto px-4 text-center text-muted dark:text-muted-dark text-xs">
+      <footer className="border-t border-default mt-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 text-center text-muted-standalone text-xs">
           NerdQaxe++ Solo Mining Dashboard
         </div>
       </footer>

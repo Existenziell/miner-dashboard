@@ -22,7 +22,7 @@ export default function SharesCard({ data }) {
         </div>
         <div>
           <div className="stat-label">Rejected</div>
-          <div className="text-fg dark:text-fg-dark text-xl font-bold">{formatNumber(rejected)}</div>
+          <div className="text-body text-xl font-bold">{formatNumber(rejected)}</div>
         </div>
         <div>
           <div className="stat-label">Reject Rate</div>
@@ -30,31 +30,31 @@ export default function SharesCard({ data }) {
         </div>
         <div>
           <div className="stat-label">Best Diff (All-time)</div>
-          <div className="text-fg dark:text-fg-dark text-lg font-bold">{formatBestDiff(data.bestDiff)}</div>
+          <div className="text-body text-lg font-bold">{formatBestDiff(data.bestDiff)}</div>
         </div>
         <div>
           <div className="stat-label">Best Diff (Session)</div>
-          <div className="text-fg dark:text-fg-dark text-lg font-bold">{formatBestDiff(data.bestSessionDiff)}</div>
+          <div className="text-body text-lg font-bold">{formatBestDiff(data.bestSessionDiff)}</div>
         </div>
         <div>
           <div className="stat-label">Pool Difficulty</div>
-          <div className="text-fg dark:text-fg-dark text-lg font-semibold">{formatNumber(data.poolDifficulty)}</div>
+          <div className="text-body text-lg font-semibold">{formatNumber(data.poolDifficulty)}</div>
         </div>
         <div>
           <div className="stat-label">Ping RTT</div>
-          <div className="text-fg dark:text-fg-dark text-lg font-semibold">
+          <div className="text-body text-lg font-semibold">
             {data.lastpingrtt != null ? `${data.lastpingrtt.toFixed(1)} ms` : '--'}
           </div>
         </div>
         <div>
           <div className="stat-label">Ping Loss</div>
-          <div className="text-fg dark:text-fg-dark text-lg font-semibold">
+          <div className="text-body text-lg font-semibold">
             {data.recentpingloss != null ? `${data.recentpingloss}%` : '--'}
           </div>
         </div>
         <div>
           <div className="stat-label">Block Found</div>
-          <div className={`text-lg font-bold ${data.foundBlocks || data.blockFound ? 'text-success dark:text-success-dark' : 'text-muted dark:text-muted-dark'}`}>
+          <div className={`text-lg font-bold ${data.foundBlocks || data.blockFound ? 'text-success dark:text-success-dark' : 'text-muted-standalone'}`}>
             {data.foundBlocks || data.totalFoundBlocks || data.blockFound ? `${data.totalFoundBlocks ?? data.foundBlocks ?? 'YES!'}` : 'Not yet'}
           </div>
         </div>
@@ -62,9 +62,9 @@ export default function SharesCard({ data }) {
 
       {/* Duplicate HW nonces */}
       {data.duplicateHWNonces > 0 && (
-        <div className="mt-4 pt-3 border-t border-border dark:border-border-dark">
+        <div className="mt-4 pt-3 border-t border-default">
           <div className="text-sm">
-            <span className="text-muted dark:text-muted-dark">Duplicate HW Nonces:</span>{' '}
+            <span className="text-muted-standalone">Duplicate HW Nonces:</span>{' '}
             <span className="text-warning dark:text-warning-dark font-medium">{data.duplicateHWNonces}</span>
           </div>
         </div>

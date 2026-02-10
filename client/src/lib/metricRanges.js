@@ -93,7 +93,8 @@ function fanSpeedColor(fanspeedPct) {
   return 'text-danger';
 }
 
-const DEFAULT_COLOR = 'text-btc-orange';
+/** Tailwind text class for accent (fuchsia) when metric has no range-based color */
+const DEFAULT_ACCENT_COLOR = 'text-accent';
 
 /**
  * Returns the Tailwind color class for a metric given miner data.
@@ -102,26 +103,26 @@ const DEFAULT_COLOR = 'text-btc-orange';
  * @param {number} [efficiency] - Precomputed efficiency (J/TH) when metric === 'efficiency'
  */
 export function getMetricColor(miner, metric, efficiency = null) {
-  if (!miner) return DEFAULT_COLOR;
+  if (!miner) return DEFAULT_ACCENT_COLOR;
 
   switch (metric) {
     case 'temp':
-      return tempColor(miner.temp) ?? DEFAULT_COLOR;
+      return tempColor(miner.temp) ?? DEFAULT_ACCENT_COLOR;
     case 'hashrate':
       return hashrateColor(miner.hashRate, miner.expectedHashrate);
     case 'power':
-      return powerColor(miner.power) ?? DEFAULT_COLOR;
+      return powerColor(miner.power) ?? DEFAULT_ACCENT_COLOR;
     case 'efficiency':
-      return efficiencyColor(efficiency ?? (miner.power != null && miner.hashRate ? miner.power / (miner.hashRate / 1000) : null)) ?? DEFAULT_COLOR;
+      return efficiencyColor(efficiency ?? (miner.power != null && miner.hashRate ? miner.power / (miner.hashRate / 1000) : null)) ?? DEFAULT_ACCENT_COLOR;
     case 'current':
-      return currentColor(miner.current != null ? miner.current / 1000 : null) ?? DEFAULT_COLOR;
+      return currentColor(miner.current != null ? miner.current / 1000 : null) ?? DEFAULT_ACCENT_COLOR;
     case 'frequency':
-      return frequencyColor(miner.frequency) ?? DEFAULT_COLOR;
+      return frequencyColor(miner.frequency) ?? DEFAULT_ACCENT_COLOR;
     case 'voltage':
-      return voltageColor(miner.coreVoltageActual, miner.coreVoltage) ?? DEFAULT_COLOR;
+      return voltageColor(miner.coreVoltageActual, miner.coreVoltage) ?? DEFAULT_ACCENT_COLOR;
     case 'fanRpm':
-      return fanSpeedColor(miner.fanspeed) ?? DEFAULT_COLOR;
+      return fanSpeedColor(miner.fanspeed) ?? DEFAULT_ACCENT_COLOR;
     default:
-      return DEFAULT_COLOR;
+      return DEFAULT_ACCENT_COLOR;
   }
 }

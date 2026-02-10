@@ -1,7 +1,7 @@
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (
     <div className="flex justify-between items-start gap-4 py-1">
-      <span className="text-muted dark:text-muted-dark text-xs shrink-0">{label}</span>
+      <span className="text-muted-standalone text-xs shrink-0">{label}</span>
       {href ? (
         <a
           href={href}
@@ -14,7 +14,7 @@ function SettingRow({ label, value, highlight, truncate, href }) {
         </a>
       ) : (
         <span
-          className={`text-sm text-right ${highlight ? 'text-btc-orange font-medium' : 'text-fg dark:text-fg-dark'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
+          className={`text-sm text-right ${highlight ? 'text-accent font-medium' : 'text-body'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
           title={truncate ? String(value) : undefined}
         >
           {value}
@@ -115,7 +115,7 @@ export default function MinerSettings({ data }) {
         <div className="flex items-center gap-2 mb-2">
           <span className="label font-semibold">Primary Pool</span>
           {!isUsingFallback && (
-            <span className="text-[10px] bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium">ACTIVE</span>
+            <span className="badge-success">ACTIVE</span>
           )}
         </div>
         <div className="space-y-0.5">
@@ -128,11 +128,11 @@ export default function MinerSettings({ data }) {
       </div>
 
       {/* Fallback Pool */}
-      <div className="pt-3 border-t border-border dark:border-border-dark">
+      <div className="pt-3 border-t border-default">
         <div className="flex items-center gap-2 mb-2">
           <span className="label font-semibold">Fallback Pool</span>
           {isUsingFallback && (
-            <span className="text-[10px] bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium">ACTIVE</span>
+            <span className="badge-warning">ACTIVE</span>
           )}
         </div>
         <div className="space-y-0.5">

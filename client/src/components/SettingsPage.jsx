@@ -6,7 +6,7 @@ function Field({ label, children, hint }) {
     <div className="flex flex-col gap-1">
       <label className="label">{label}</label>
       {children}
-      {hint && <p className="text-muted dark:text-muted-dark text-xs">{hint}</p>}
+      {hint && <p className="text-muted-standalone text-xs">{hint}</p>}
     </div>
   );
 }
@@ -201,7 +201,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
 
   if (!miner) {
     return (
-      <div className="card p-8 text-center text-muted dark:text-muted-dark">
+      <div className="card p-8 text-center text-muted-standalone">
         Connect to the miner to change settings.
       </div>
     );
@@ -276,27 +276,19 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               />
             </Field>
             <Field label="Fan mode">
-              <div className="flex gap-4 items-center">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="fanMode"
-                    checked={fanAuto}
-                    onChange={() => setFanAuto(true)}
-                    className="rounded-full border-border dark:border-border-dark text-btc-orange focus:ring-btc-orange"
-                  />
-                  <span className="text-sm text-fg dark:text-fg-dark">Auto (PID)</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="fanMode"
-                    checked={!fanAuto}
-                    onChange={() => setFanAuto(false)}
-                    className="rounded-full border-border dark:border-border-dark text-btc-orange focus:ring-btc-orange"
-                  />
-                  <span className="text-sm text-fg dark:text-fg-dark">Manual</span>
-                </label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-body">Manual</span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={fanAuto}
+                  aria-label="Fan mode"
+                  onClick={() => setFanAuto((v) => !v)}
+                  className={`switch ${fanAuto ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                >
+                  <span className={`switch-thumb ${fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                </button>
+                <span className="text-sm text-body">Auto (PID)</span>
               </div>
             </Field>
             {fanAuto ? (
@@ -318,9 +310,9 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   max={100}
                   value={manualFanSpeed}
                   onChange={(e) => setManualFanSpeed(Number(e.target.value))}
-                  className="w-full h-2 rounded-lg appearance-none bg-surface-light dark:bg-surface-light-dark accent-btc-orange"
+                  className="input-range"
                 />
-                <span className="text-sm text-fg dark:text-fg-dark">{manualFanSpeed}%</span>
+                <span className="text-sm text-body">{manualFanSpeed}%</span>
               </Field>
             )}
           </div>
@@ -337,17 +329,11 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   role="switch"
                   aria-checked={autoScreenOff}
                   onClick={() => setAutoScreenOff((v) => !v)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-btc-orange focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark ${
-                    autoScreenOff ? 'bg-btc-orange border-btc-orange' : 'bg-surface-light dark:bg-surface-light-dark border-border dark:border-border-dark'
-                  }`}
+                  className={`switch ${autoScreenOff ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
                 >
-                  <span
-                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition translate-x-0.5 ${
-                      autoScreenOff ? 'translate-x-5' : 'translate-x-0.5'
-                    }`}
-                  />
+                  <span className={`switch-thumb ${autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-fg dark:text-fg-dark">{autoScreenOff ? 'On' : 'Off'}</span>
+                <span className="text-sm text-body">{autoScreenOff ? 'On' : 'Off'}</span>
               </div>
             </Field>
             <Field label="Flip screen" hint="Rotate display 180°.">
@@ -357,17 +343,11 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   role="switch"
                   aria-checked={flipScreen}
                   onClick={() => setFlipScreen((v) => !v)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-btc-orange focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark ${
-                    flipScreen ? 'bg-btc-orange border-btc-orange' : 'bg-surface-light dark:bg-surface-light-dark border-border dark:border-border-dark'
-                  }`}
+                  className={`switch ${flipScreen ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
                 >
-                  <span
-                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition translate-x-0.5 ${
-                      flipScreen ? 'translate-x-5' : 'translate-x-0.5'
-                    }`}
-                  />
+                  <span className={`switch-thumb ${flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-fg dark:text-fg-dark">{flipScreen ? 'On' : 'Off'}</span>
+                <span className="text-sm text-body">{flipScreen ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>
@@ -376,7 +356,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
         {/* Restart & Shutdown */}
         <div className="card">
           <h3 className="card-title">Restart & Shutdown</h3>
-          <p className="text-muted dark:text-muted-dark text-sm mb-4">
+          <p className="text-muted-standalone text-sm mb-4">
             Restart reconnects the miner after a short disconnect. Shutdown stops the miner until you power it on again.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -384,7 +364,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               type="button"
               onClick={handleRestart}
               disabled={restarting || shuttingDown}
-              className="btn-danger"
+              className="btn-ghost-accent"
             >
               {restarting ? 'Restarting…' : 'Restart miner'}
             </button>
@@ -392,7 +372,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               type="button"
               onClick={handleShutdown}
               disabled={restarting || shuttingDown}
-              className="btn-danger"
+              className="btn-ghost-accent"
             >
               {shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
             </button>
@@ -407,18 +387,18 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               <button
                 type="button"
                 onClick={handleReset}
-                className="link-text text-fg dark:text-fg-dark"
+                className="link-text text-body"
               >
                 Reset
               </button>
             </div>
-            <ul className="text-sm text-fg dark:text-fg-dark space-y-1">
+            <ul className="text-sm text-body space-y-1">
               {changes.map((c) => (
                 <li key={c.label}>
-                  <span className="text-muted dark:text-muted-dark">{c.label}:</span>{' '}
+                  <span className="text-muted-standalone">{c.label}:</span>{' '}
                   <span className="line-through opacity-75">{c.from}</span>
                   <span className="mx-1">→</span>
-                  <span className="text-btc-orange font-medium">{c.to}</span>
+                  <span className="text-accent font-medium">{c.to}</span>
                 </li>
               ))}
             </ul>

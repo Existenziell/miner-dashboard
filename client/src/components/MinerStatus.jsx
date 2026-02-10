@@ -6,7 +6,7 @@ function ItemGrid({ items }) {
       {items.map((item) => (
         <div key={item.label}>
           <div className="stat-label">{item.label}</div>
-          <div className="text-fg dark:text-fg-dark text-sm font-medium mt-0.5 truncate" title={String(item.value)}>
+          <div className="text-body text-sm font-medium mt-0.5 truncate" title={String(item.value)}>
             {item.value}
           </div>
         </div>
@@ -38,8 +38,8 @@ export default function MinerStatus({ data }) {
 
   return (
     <div className="card">
-      <h2 className="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
-        <span className="inline-block w-2 h-2 rounded-full bg-success animate-pulse" />
+      <h2 className="text-lg font-semibold text-body mb-4 flex items-center gap-2">
+        <span className="status-dot status-dot-success" />
         NerdQaxe++ Miner
       </h2>
 
