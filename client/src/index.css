@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* --- Raw theme variables (swapped by .dark class) --- */
+:root {
+  --c-surface: #f5f5f7;
+  --c-surface-light: #e5e5ea;
+  --c-surface-card: #ffffff;
+  --c-surface-hover: #ededf0;
+  --c-text-primary: #1a1a2e;
+  --c-text-secondary: #6b6b80;
+  --c-success: #16a34a;
+  --c-danger: #dc2626;
+  --c-warning: #ca8a04;
+  --c-chart-grid: #d1d5db;
+  --c-chart-axis: #9ca3af;
+  --c-border: rgba(0, 0, 0, 0.08);
+  --c-tooltip-bg: #ffffff;
+  --c-tooltip-border: rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --c-surface: #1a1a2e;
+  --c-surface-light: #222244;
+  --c-surface-card: #16213e;
+  --c-surface-hover: #1a2744;
+  --c-text-primary: #e0e0e0;
+  --c-text-secondary: #a0a0b0;
+  --c-success: #4ade80;
+  --c-danger: #f87171;
+  --c-warning: #fbbf24;
+  --c-chart-grid: #333366;
+  --c-chart-axis: #666688;
+  --c-border: rgba(255, 255, 255, 0.05);
+  --c-tooltip-bg: #16213e;
+  --c-tooltip-border: rgba(255, 255, 255, 0.1);
+}
+
+/* --- Register as Tailwind theme tokens --- */
+@theme inline {
+  --color-btc-orange: #f7931a;
+  --color-btc-orange-dark: #c47613;
+  --color-btc-orange-light: #f9a94b;
+  --color-surface: var(--c-surface);
+  --color-surface-light: var(--c-surface-light);
+  --color-surface-card: var(--c-surface-card);
+  --color-surface-hover: var(--c-surface-hover);
+  --color-text-primary: var(--c-text-primary);
+  --color-text-secondary: var(--c-text-secondary);
+  --color-success: var(--c-success);
+  --color-danger: var(--c-danger);
+  --color-warning: var(--c-warning);
+}
+
+/* Smooth transitions when switching themes */
+html {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
