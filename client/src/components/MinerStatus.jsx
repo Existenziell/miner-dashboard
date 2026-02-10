@@ -5,8 +5,8 @@ function ItemGrid({ items }) {
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-6 gap-y-3">
       {items.map((item) => (
         <div key={item.label}>
-          <div className="text-text-secondary text-xs uppercase tracking-wide">{item.label}</div>
-          <div className="text-text-primary text-sm font-medium mt-0.5 truncate" title={String(item.value)}>
+          <div className="stat-label">{item.label}</div>
+          <div className="text-fg dark:text-fg-dark text-sm font-medium mt-0.5 truncate" title={String(item.value)}>
             {item.value}
           </div>
         </div>
@@ -37,8 +37,8 @@ export default function MinerStatus({ data }) {
   ];
 
   return (
-    <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
-      <h2 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+    <div className="card">
+      <h2 className="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
         <span className="inline-block w-2 h-2 rounded-full bg-success animate-pulse" />
         NerdQaxe++ Miner
       </h2>

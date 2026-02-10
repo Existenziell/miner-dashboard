@@ -1,7 +1,7 @@
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (
     <div className="flex justify-between items-start gap-4 py-1">
-      <span className="text-text-secondary text-xs shrink-0">{label}</span>
+      <span className="text-muted dark:text-muted-dark text-xs shrink-0">{label}</span>
       {href ? (
         <a
           href={href}
@@ -14,7 +14,7 @@ function SettingRow({ label, value, highlight, truncate, href }) {
         </a>
       ) : (
         <span
-          className={`text-sm text-right ${highlight ? 'text-btc-orange font-medium' : 'text-text-primary'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
+          className={`text-sm text-right ${highlight ? 'text-btc-orange font-medium' : 'text-fg dark:text-fg-dark'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
           title={truncate ? String(value) : undefined}
         >
           {value}
@@ -107,15 +107,15 @@ export default function MinerSettings({ data }) {
   const poolData = data.stratum?.pools?.[0];
 
   return (
-    <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
-      <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Pool & Settings</h3>
+    <div className="card">
+      <h3 className="card-title">Pool & Settings</h3>
 
       {/* Primary Pool */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-semibold text-text-secondary uppercase">Primary Pool</span>
+          <span className="label font-semibold">Primary Pool</span>
           {!isUsingFallback && (
-            <span className="text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium">ACTIVE</span>
+            <span className="text-[10px] bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium">ACTIVE</span>
           )}
         </div>
         <div className="space-y-0.5">
@@ -128,11 +128,11 @@ export default function MinerSettings({ data }) {
       </div>
 
       {/* Fallback Pool */}
-      <div className="pt-3 border-t border-[var(--c-border)]">
+      <div className="pt-3 border-t border-border dark:border-border-dark">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-semibold text-text-secondary uppercase">Fallback Pool</span>
+          <span className="label font-semibold">Fallback Pool</span>
           {isUsingFallback && (
-            <span className="text-[10px] bg-warning/20 text-warning px-1.5 py-0.5 rounded font-medium">ACTIVE</span>
+            <span className="text-[10px] bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium">ACTIVE</span>
           )}
         </div>
         <div className="space-y-0.5">

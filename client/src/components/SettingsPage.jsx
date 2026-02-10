@@ -4,9 +4,9 @@ import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from 
 function Field({ label, children, hint }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-text-secondary text-xs font-medium uppercase tracking-wide">{label}</label>
+      <label className="label">{label}</label>
       {children}
-      {hint && <p className="text-text-secondary text-xs">{hint}</p>}
+      {hint && <p className="text-muted dark:text-muted-dark text-xs">{hint}</p>}
     </div>
   );
 }
@@ -201,7 +201,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
 
   if (!miner) {
     return (
-      <div className="bg-surface-card rounded-xl p-8 border border-[var(--c-border)] text-center text-text-secondary">
+      <div className="card p-8 text-center text-muted dark:text-muted-dark">
         Connect to the miner to change settings.
       </div>
     );
@@ -211,21 +211,15 @@ export default function SettingsPage({ miner, onSaved, onError }) {
     <div className="space-y-6">
       {/* Toast */}
       {message && (
-        <div
-          className={`rounded-lg px-4 py-3 text-sm ${
-            message.type === 'success'
-              ? 'bg-success/15 text-success border border-success/30'
-              : 'bg-danger/15 text-danger border border-danger/30'
-          }`}
-        >
+        <div className={message.type === 'success' ? 'toast-success' : 'toast-danger'}>
           {message.text}
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* ASIC */}
-        <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
-          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">ASIC</h3>
+        <div className="card">
+          <h3 className="card-title">ASIC</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field
               label="Frequency (MHz)"
@@ -234,7 +228,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(Number(e.target.value))}
-                className="w-full rounded-lg border border-[var(--c-border)] bg-surface-light px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-btc-orange"
+                className="input"
               >
                 {frequencyOptions.map((f) => {
                   const tag = getFreqTag(f);
@@ -251,7 +245,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               <select
                 value={coreVoltage}
                 onChange={(e) => setCoreVoltage(Number(e.target.value))}
-                className="w-full rounded-lg border border-[var(--c-border)] bg-surface-light px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-btc-orange"
+                className="input"
               >
                 {voltageOptions.map((v) => {
                   const tag = getVoltTag(v);
@@ -268,8 +262,8 @@ export default function SettingsPage({ miner, onSaved, onError }) {
         </div>
 
         {/* Temperature & Fan */}
-        <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
-          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Temperature & Fan</h3>
+        <div className="card">
+          <h3 className="card-title">Temperature & Fan</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Overheat limit (°C)" hint="Miner shuts down above this temperature.">
               <input
@@ -278,7 +272,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                 max={80}
                 value={overheatTemp}
                 onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
-                className="w-full rounded-lg border border-[var(--c-border)] bg-surface-light px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-btc-orange"
+                className="input"
               />
             </Field>
             <Field label="Fan mode">
@@ -289,9 +283,9 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                     name="fanMode"
                     checked={fanAuto}
                     onChange={() => setFanAuto(true)}
-                    className="rounded-full border-[var(--c-border)] text-btc-orange focus:ring-btc-orange"
+                    className="rounded-full border-border dark:border-border-dark text-btc-orange focus:ring-btc-orange"
                   />
-                  <span className="text-sm text-text-primary">Auto (PID)</span>
+                  <span className="text-sm text-fg dark:text-fg-dark">Auto (PID)</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -299,9 +293,9 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                     name="fanMode"
                     checked={!fanAuto}
                     onChange={() => setFanAuto(false)}
-                    className="rounded-full border-[var(--c-border)] text-btc-orange focus:ring-btc-orange"
+                    className="rounded-full border-border dark:border-border-dark text-btc-orange focus:ring-btc-orange"
                   />
-                  <span className="text-sm text-text-primary">Manual</span>
+                  <span className="text-sm text-fg dark:text-fg-dark">Manual</span>
                 </label>
               </div>
             </Field>
@@ -313,7 +307,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   max={75}
                   value={pidTargetTemp}
                   onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
-                  className="w-full rounded-lg border border-[var(--c-border)] bg-surface-light px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-btc-orange"
+                  className="input"
                 />
               </Field>
             ) : (
@@ -324,17 +318,17 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   max={100}
                   value={manualFanSpeed}
                   onChange={(e) => setManualFanSpeed(Number(e.target.value))}
-                  className="w-full h-2 rounded-lg appearance-none bg-surface-light accent-btc-orange"
+                  className="w-full h-2 rounded-lg appearance-none bg-surface-light dark:bg-surface-light-dark accent-btc-orange"
                 />
-                <span className="text-sm text-text-primary">{manualFanSpeed}%</span>
+                <span className="text-sm text-fg dark:text-fg-dark">{manualFanSpeed}%</span>
               </Field>
             )}
           </div>
         </div>
 
         {/* Display */}
-        <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
-          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Display</h3>
+        <div className="card">
+          <h3 className="card-title">Display</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Automatic screen shutdown" hint="Turn off miner display after inactivity.">
               <div className="flex items-center gap-2">
@@ -343,8 +337,8 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   role="switch"
                   aria-checked={autoScreenOff}
                   onClick={() => setAutoScreenOff((v) => !v)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-btc-orange focus:ring-offset-2 focus:ring-offset-surface ${
-                    autoScreenOff ? 'bg-btc-orange border-btc-orange' : 'bg-surface-light border-[var(--c-border)]'
+                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-btc-orange focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark ${
+                    autoScreenOff ? 'bg-btc-orange border-btc-orange' : 'bg-surface-light dark:bg-surface-light-dark border-border dark:border-border-dark'
                   }`}
                 >
                   <span
@@ -353,7 +347,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                     }`}
                   />
                 </button>
-                <span className="text-sm text-text-primary">{autoScreenOff ? 'On' : 'Off'}</span>
+                <span className="text-sm text-fg dark:text-fg-dark">{autoScreenOff ? 'On' : 'Off'}</span>
               </div>
             </Field>
             <Field label="Flip screen" hint="Rotate display 180°.">
@@ -363,8 +357,8 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   role="switch"
                   aria-checked={flipScreen}
                   onClick={() => setFlipScreen((v) => !v)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-btc-orange focus:ring-offset-2 focus:ring-offset-surface ${
-                    flipScreen ? 'bg-btc-orange border-btc-orange' : 'bg-surface-light border-[var(--c-border)]'
+                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-btc-orange focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark ${
+                    flipScreen ? 'bg-btc-orange border-btc-orange' : 'bg-surface-light dark:bg-surface-light-dark border-border dark:border-border-dark'
                   }`}
                 >
                   <span
@@ -373,16 +367,16 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                     }`}
                   />
                 </button>
-                <span className="text-sm text-text-primary">{flipScreen ? 'On' : 'Off'}</span>
+                <span className="text-sm text-fg dark:text-fg-dark">{flipScreen ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>
         </div>
 
         {/* Restart & Shutdown */}
-        <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
-          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-4">Restart & Shutdown</h3>
-          <p className="text-text-secondary text-sm mb-4">
+        <div className="card">
+          <h3 className="card-title">Restart & Shutdown</h3>
+          <p className="text-muted dark:text-muted-dark text-sm mb-4">
             Restart reconnects the miner after a short disconnect. Shutdown stops the miner until you power it on again.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -390,7 +384,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               type="button"
               onClick={handleRestart}
               disabled={restarting || shuttingDown}
-              className="cursor-pointer px-5 py-2.5 rounded-lg border border-danger bg-danger/10 text-danger font-medium text-sm hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="btn-danger"
             >
               {restarting ? 'Restarting…' : 'Restart miner'}
             </button>
@@ -398,7 +392,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               type="button"
               onClick={handleShutdown}
               disabled={restarting || shuttingDown}
-              className="cursor-pointer px-5 py-2.5 rounded-lg border border-danger bg-danger/10 text-danger font-medium text-sm hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="btn-danger"
             >
               {shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
             </button>
@@ -407,21 +401,21 @@ export default function SettingsPage({ miner, onSaved, onError }) {
 
         {/* Pending changes */}
         {hasChanges && (
-          <div className="rounded-xl border border-btc-orange/50 bg-btc-orange/10 p-4">
+          <div className="highlight-box">
             <div className="flex items-center justify-between gap-2 mb-2">
-              <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Pending changes</p>
+              <p className="label font-semibold">Pending changes</p>
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-xs text-text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                className="link-text text-fg dark:text-fg-dark"
               >
                 Reset
               </button>
             </div>
-            <ul className="text-sm text-text-primary space-y-1">
+            <ul className="text-sm text-fg dark:text-fg-dark space-y-1">
               {changes.map((c) => (
                 <li key={c.label}>
-                  <span className="text-text-secondary">{c.label}:</span>{' '}
+                  <span className="text-muted dark:text-muted-dark">{c.label}:</span>{' '}
                   <span className="line-through opacity-75">{c.from}</span>
                   <span className="mx-1">→</span>
                   <span className="text-btc-orange font-medium">{c.to}</span>
@@ -436,7 +430,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
           <button
             type="submit"
             disabled={saving || !hasChanges}
-            className="px-5 py-2.5 rounded-lg bg-btc-orange text-white font-medium text-sm hover:bg-btc-orange-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary"
           >
             {saving ? 'Saving…' : 'Save settings'}
           </button>
