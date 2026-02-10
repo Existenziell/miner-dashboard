@@ -59,9 +59,3 @@ Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
 ```
 
 The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
-
-## Future
-
-- Run your own Bitcoin node and point `MEMPOOL_API` to a local mempool instance
-- Add settings controls (frequency, voltage, fan speed)
-- Multiple miner support
