@@ -13,6 +13,7 @@ import MinerSettings from './components/MinerSettings';
 import NetworkStatus from './components/NetworkStatus';
 import ThemeToggle from './components/ThemeToggle';
 import SettingsPage from './components/SettingsPage';
+import DocumentationPage from './components/DocumentationPage';
 import AlertBanner from './components/AlertBanner';
 
 function computeEfficiency(miner) {
@@ -25,22 +26,22 @@ function computeEfficiency(miner) {
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'settings', label: 'Settings' },
+  { id: 'docs', label: 'Docs' },
 ];
 
 function getTabFromUrl() {
   if (typeof window === 'undefined') return 'dashboard';
   const params = new URLSearchParams(window.location.search);
   const t = params.get('tab');
-  return t === 'settings' ? 'settings' : 'dashboard';
+  if (t === 'settings') return 'settings';
+  if (t === 'docs') return 'docs';
+  return 'dashboard';
 }
 
 function setTabInUrl(tab) {
   const url = new URL(window.location.href);
-  if (tab === 'dashboard') {
-    url.searchParams.delete('tab');
-  } else {
-    url.searchParams.set('tab', tab);
-  }
+  if (tab === 'dashboard') url.searchParams.delete('tab');
+  else url.searchParams.set('tab', tab);
   const newUrl = url.search ? `${url.pathname}?${url.searchParams}` : url.pathname;
   window.history.replaceState({ tab }, '', newUrl);
 }
@@ -147,6 +148,8 @@ export default function App() {
 
         {activeTab === 'settings' ? (
           <SettingsPage miner={miner} onSaved={refetch} />
+        ) : activeTab === 'docs' ? (
+          <DocumentationPage />
         ) : (
           <>
         {/* Row 1: Miner Identity */}
