@@ -7,21 +7,14 @@ export default function AlertBanner({ alerts, onRequestPermission, onDismiss }) 
   return (
     <div
       role="alert"
-      className={`relative overflow-hidden rounded-xl border-l-4 shadow-sm ${
-        isCritical
-          ? 'border-l-red-500 bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-300'
-          : 'border-l-amber-500 bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-200'
-      }`}
+      className="relative overflow-hidden rounded-xl border-l-4 border-l-red-500 bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-300 shadow-sm"
     >
       <div className="p-4 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0">
           <span
-            className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold"
+            className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold text-white leading-none"
+            style={{ backgroundColor: 'var(--c-danger)' }}
             aria-hidden
-            style={{
-              backgroundColor: isCritical ? 'var(--c-danger)' : 'var(--c-warning)',
-              color: 'white',
-            }}
           >
             !
           </span>
@@ -45,7 +38,7 @@ export default function AlertBanner({ alerts, onRequestPermission, onDismiss }) 
             <button
               type="button"
               onClick={onRequestPermission}
-              className="text-xs font-medium underline underline-offset-2 opacity-90 hover:opacity-100 transition-opacity"
+              className="text-xs font-medium opacity-90 hover:opacity-100 transition-opacity text-current underline decoration-dotted underline-offset-2 hover:decoration-solid"
             >
               Enable browser alerts
             </button>

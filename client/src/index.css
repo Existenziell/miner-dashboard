@@ -37,7 +37,7 @@
   --c-tooltip-border: rgba(255, 255, 255, 0.1);
 }
 
-/* --- Register as Tailwind theme tokens --- */
+/* --- Register as Tailwind theme tokens (Tailwind v4 @theme; IDE may warn, build is correct) --- */
 @theme inline {
   --color-btc-orange: #f7931a;
   --color-btc-orange-dark: #c47613;
@@ -56,4 +56,16 @@
 /* Smooth transitions when switching themes */
 html {
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Links: normal text color, dotted underline, solid on hover */
+a {
+  color: var(--c-text-primary);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-style 0.15s ease;
+}
+a:hover {
+  text-decoration-style: solid;
 }

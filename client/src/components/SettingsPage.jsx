@@ -275,9 +275,9 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               <input
                 type="number"
                 min={50}
-                max={95}
+                max={80}
                 value={overheatTemp}
-                onChange={(e) => setOverheatTemp(Number(e.target.value))}
+                onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
                 className="w-full rounded-lg border border-[var(--c-border)] bg-surface-light px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-btc-orange"
               />
             </Field>
@@ -312,7 +312,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
                   min={40}
                   max={75}
                   value={pidTargetTemp}
-                  onChange={(e) => setPidTargetTemp(Number(e.target.value))}
+                  onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
                   className="w-full rounded-lg border border-[var(--c-border)] bg-surface-light px-3 py-2 text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-btc-orange"
                 />
               </Field>
@@ -390,7 +390,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               type="button"
               onClick={handleRestart}
               disabled={restarting || shuttingDown}
-              className="px-5 py-2.5 rounded-lg border border-[var(--c-border)] bg-surface-light text-text-primary font-medium text-sm hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="cursor-pointer px-5 py-2.5 rounded-lg border border-danger bg-danger/10 text-danger font-medium text-sm hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {restarting ? 'Restarting…' : 'Restart miner'}
             </button>
@@ -398,7 +398,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               type="button"
               onClick={handleShutdown}
               disabled={restarting || shuttingDown}
-              className="px-5 py-2.5 rounded-lg border border-[var(--c-border)] bg-surface-light text-text-primary font-medium text-sm hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="cursor-pointer px-5 py-2.5 rounded-lg border border-danger bg-danger/10 text-danger font-medium text-sm hover:bg-danger/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
             </button>
@@ -413,7 +413,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-xs text-btc-orange hover:text-btc-orange-dark underline underline-offset-2"
+                className="text-xs text-text-primary underline decoration-dotted underline-offset-2 hover:decoration-solid"
               >
                 Reset
               </button>

@@ -26,7 +26,7 @@ export default function NetworkStatus({ data }) {
       {/* Block Height */}
       <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
         <div className="text-text-secondary text-xs uppercase tracking-wide mb-1">Block Height</div>
-        <div className="text-2xl font-bold text-btc-orange">{formatNumber(blockHeight)}</div>
+        <div className="text-2xl font-bold text-text-primary">{formatNumber(blockHeight)}</div>
         {halvingPct != null && (
           <div className="mt-2">
             <div className="flex justify-between text-xs text-text-secondary mb-1">
@@ -52,30 +52,30 @@ export default function NetworkStatus({ data }) {
         <div className="text-2xl font-bold text-text-primary">
           {formatDifficulty(networkDifficulty)}
         </div>
-        <div className="text-sm mt-1">
-          <span className="text-text-secondary">Next adjustment: </span>
-          <span className={diffChange > 0 ? 'text-danger' : 'text-success'}>{diffChangeStr}</span>
-        </div>
         {diffProgressPct != null && (
           <div className="mt-1.5">
             <div className="flex justify-between text-xs text-text-secondary mb-1">
               <span>Retarget</span>
               <span>{diffProgressPct.toFixed(1)}% ({formatNumber(difficulty?.remainingBlocks)} left)</span>
             </div>
-            <div className="w-full bg-surface-light rounded-full h-1">
+            <div className="w-full bg-surface-light rounded-full h-1.5">
               <div
-                className="bg-text-secondary rounded-full h-1 transition-all"
+                className="bg-btc-orange rounded-full h-1.5 transition-all"
                 style={{ width: `${Math.min(diffProgressPct, 100)}%` }}
               />
             </div>
           </div>
         )}
+        <div className="text-xs mt-1">
+          <span className="text-text-secondary">Next adjustment: </span>
+          <span className={diffChange > 0 ? 'text-danger' : 'text-success'}>{diffChangeStr}</span>
+        </div>
       </div>
 
       {/* BTC Price */}
       <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
         <div className="text-text-secondary text-xs uppercase tracking-wide mb-1">BTC Price</div>
-        <div className="text-2xl font-bold text-btc-orange">{formatPrice(prices?.USD)}</div>
+        <div className="text-2xl font-bold text-text-primary">{formatPrice(prices?.USD)}</div>
         {prices?.EUR && (
           <div className="text-sm text-text-secondary mt-1">
             EUR {formatNumber(prices.EUR)}

@@ -6,7 +6,11 @@ export default function SharesCard({ data }) {
   const accepted = data.sharesAccepted ?? 0;
   const rejected = data.sharesRejected ?? 0;
   const total = accepted + rejected;
-  const rejectRate = total > 0 ? ((rejected / total) * 100).toFixed(2) : '0.00';
+  const rejectRatePct = total > 0 ? (rejected / total) * 100 : 0;
+  const rejectRate = total > 0 ? rejectRatePct.toFixed(2) : '0.00';
+  // Reject rate colour: green < 0.1%, orange 0.1–1%, red > 1%
+  const rejectRateColor =
+    rejectRatePct < 0.1 ? 'text-success' : rejectRatePct <= 1 ? 'text-warning' : 'text-danger';
 
   return (
     <div className="bg-surface-card rounded-xl p-5 border border-[var(--c-border)]">
@@ -14,23 +18,23 @@ export default function SharesCard({ data }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <div className="text-text-secondary text-xs">Accepted</div>
-          <div className="text-success text-xl font-bold">{formatNumber(accepted)}</div>
+          <div className="text-xl font-bold">{formatNumber(accepted)}</div>
         </div>
         <div>
           <div className="text-text-secondary text-xs">Rejected</div>
-          <div className="text-danger text-xl font-bold">{formatNumber(rejected)}</div>
+          <div className="text-text-primary text-xl font-bold">{formatNumber(rejected)}</div>
         </div>
         <div>
           <div className="text-text-secondary text-xs">Reject Rate</div>
-          <div className="text-text-primary text-xl font-semibold">{rejectRate}%</div>
+          <div className={`${rejectRateColor} text-xl font-semibold`}>{rejectRate}%</div>
         </div>
         <div>
           <div className="text-text-secondary text-xs">Best Diff (All-time)</div>
-          <div className="text-btc-orange text-lg font-bold">{formatBestDiff(data.bestDiff)}</div>
+          <div className="text-text-primary text-lg font-bold">{formatBestDiff(data.bestDiff)}</div>
         </div>
         <div>
           <div className="text-text-secondary text-xs">Best Diff (Session)</div>
-          <div className="text-btc-orange-light text-lg font-bold">{formatBestDiff(data.bestSessionDiff)}</div>
+          <div className="text-text-primary text-lg font-bold">{formatBestDiff(data.bestSessionDiff)}</div>
         </div>
         <div>
           <div className="text-text-secondary text-xs">Pool Difficulty</div>

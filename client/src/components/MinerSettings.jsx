@@ -7,7 +7,7 @@ function SettingRow({ label, value, highlight, truncate, href }) {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className={`text-sm text-right text-btc-orange hover:text-btc-orange-light underline underline-offset-2 ${truncate ? 'truncate max-w-[250px]' : ''}`}
+          className={`text-sm text-right ${truncate ? 'truncate max-w-[250px]' : ''}`}
           title={truncate ? String(value) : undefined}
         >
           {value}
