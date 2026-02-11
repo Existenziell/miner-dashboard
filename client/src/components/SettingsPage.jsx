@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
+import { useMiner } from '../context/MinerContext';
 
 function Field({ label, children, hint }) {
   return (
@@ -11,7 +12,8 @@ function Field({ label, children, hint }) {
   );
 }
 
-export default function SettingsPage({ miner, onSaved, onError }) {
+export default function SettingsPage({ onError }) {
+  const { data: miner, refetch } = useMiner();
   const [asic, setAsic] = useState(null);
   const [saving, setSaving] = useState(false);
   const [restarting, setRestarting] = useState(false);
@@ -160,7 +162,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
         flipscreen: flipScreen,
       });
       setMessage({ type: 'success', text: 'Settings saved.' });
-      onSaved?.();
+      refetch();
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);
@@ -176,7 +178,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
     try {
       await restartMiner();
       setMessage({ type: 'success', text: 'Miner restarting…' });
-      onSaved?.();
+      refetch();
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
     } finally {
@@ -191,7 +193,7 @@ export default function SettingsPage({ miner, onSaved, onError }) {
     try {
       await shutdownMiner();
       setMessage({ type: 'success', text: 'Miner shutting down…' });
-      onSaved?.();
+      refetch();
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
     } finally {

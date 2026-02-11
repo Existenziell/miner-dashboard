@@ -1,4 +1,5 @@
 import { formatUptime, formatResetReason } from '../lib/formatters';
+import { useMiner } from '../context/MinerContext';
 
 function ItemGrid({ items }) {
   return (
@@ -15,7 +16,8 @@ function ItemGrid({ items }) {
   );
 }
 
-export default function MinerStatus({ data }) {
+export default function MinerStatus() {
+  const { data } = useMiner();
   if (!data) return null;
 
   const deviceItems = [
@@ -38,16 +40,21 @@ export default function MinerStatus({ data }) {
 
   return (
     <div className="card">
-      <h2 className="text-lg font-semibold text-body mb-4 flex items-center gap-2">
-        <span className="status-dot status-dot-success" />
-        NerdQaxe++ Miner
-      </h2>
+      <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
+        <h2 className="text-lg font-semibold text-body flex items-center gap-2">
+          <span className="status-dot status-dot-success" />
+          NerdQaxe++ Miner
+        </h2>
+      </div>
 
       <section className="mb-5">
         <ItemGrid items={deviceItems} />
       </section>
 
-      <section className="mt-8">
+      <hr className="border-border dark:border-border-dark my-6" />
+
+      <section>
+        <div className="stat-label mb-2">Network</div>
         <ItemGrid items={networkItems} />
       </section>
     </div>

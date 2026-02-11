@@ -1,3 +1,5 @@
+import { useMiner } from '../context/MinerContext';
+
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (
     <div className="flex justify-between items-start gap-4 py-1">
@@ -98,7 +100,8 @@ function poolName(stratumHost) {
   return parts.length >= 2 ? parts[parts.length - 2] : base;
 }
 
-export default function MinerSettings({ data }) {
+export default function MinerSettings() {
+  const { data } = useMiner();
   if (!data) return null;
 
   const isUsingFallback = data.stratum?.usingFallback ?? data.isUsingFallbackStratum === 1;

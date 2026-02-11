@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useMinerData } from './hooks/useMinerData';
+import { useMiner } from './context/MinerContext';
 import { useNetworkData } from './hooks/useNetworkData';
-import { useTheme } from './hooks/useTheme';
 import { useAlerts } from './hooks/useAlerts';
 import { formatHashrate, formatTemp, formatPower } from './lib/formatters';
 import { getMetricColor, DEFAULT_EXPECTED_HASHRATE_GH } from './lib/metricRanges';
+import { getTabFromUrl, setTabInUrl } from './lib/tabUrl';
+import { computeEfficiency } from './lib/minerMetrics';
 import MinerStatus from './components/MinerStatus';
 import StatCard from './components/StatCard';
 import HashrateChart from './components/HashrateChart';
@@ -12,45 +13,20 @@ import TemperatureChart from './components/TemperatureChart';
 import SharesCard from './components/SharesCard';
 import MinerSettings from './components/MinerSettings';
 import NetworkStatus from './components/NetworkStatus';
-import ThemeToggle from './components/ThemeToggle';
+import Header from './components/Header';
 import SettingsPage from './components/SettingsPage';
 import DocumentationPage from './components/DocumentationPage';
 import AlertBanner from './components/AlertBanner';
 import BlockFoundBanner from './components/BlockFoundBanner';
-
-function computeEfficiency(miner) {
-  if (!miner?.power || !miner?.hashRate || miner.hashRate === 0) return null;
-  const thps = miner.hashRate / 1000;
-  if (thps === 0) return null;
-  return miner.power / thps; // J/TH (since W / TH/s = J/TH)
-}
-
-const TABS = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'settings', label: 'Settings' },
-  { id: 'docs', label: 'Docs' },
-];
-
-function getTabFromUrl() {
-  if (typeof window === 'undefined') return 'dashboard';
-  const params = new URLSearchParams(window.location.search);
-  const t = params.get('tab');
-  if (t === 'settings') return 'settings';
-  if (t === 'docs') return 'docs';
-  return 'dashboard';
-}
-
-function setTabInUrl(tab) {
-  const url = new URL(window.location.href);
-  if (tab === 'dashboard') url.searchParams.delete('tab');
-  else url.searchParams.set('tab', tab);
-  const newUrl = url.search ? `${url.pathname}?${url.searchParams}` : url.pathname;
-  window.history.replaceState({ tab }, '', newUrl);
-}
+import Footer from './components/Footer';
 
 export default function App() {
-  const [activeTab, setActiveTabState] = useState(getTabFromUrl);
+ 
+  const { data: miner, error: minerError } = useMiner();
+  const { data: network, error: networkError } = useNetworkData(60_000);
+  const { activeAlerts, dismissAlerts } = useAlerts(miner);
 
+  const [activeTab, setActiveTabState] = useState(getTabFromUrl);
   const setActiveTab = useCallback((tab) => {
     setActiveTabState(tab);
     setTabInUrl(tab);
@@ -61,14 +37,6 @@ export default function App() {
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
-
-  const { data: miner, error: minerError, loading: minerLoading, history, refetch } = useMinerData(
-    10_000,
-    activeTab === 'settings'
-  );
-  const { data: network, error: networkError } = useNetworkData(60_000);
-  const { mode: themeMode, cycle: cycleTheme } = useTheme();
-  const { activeAlerts, dismissAlerts } = useAlerts(miner);
 
   const [blockFoundVisible, setBlockFoundVisible] = useState(false);
   const prevBlockCountRef = useRef(null);
@@ -94,43 +62,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-surface dark:bg-surface-dark text-body">
-      {/* Header */}
-      <header className="border-b border-default bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold text-body">NerdQaxe++ Solo Mining Dashboard</h1>
-            <nav className="flex gap-1">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  aria-current={activeTab === tab.id ? 'page' : undefined}
-                  className={`btn-tab ${activeTab === tab.id ? 'btn-tab-active' : 'btn-tab-inactive'}`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-          <div className="flex items-center gap-4 text-sm">
-            <ThemeToggle mode={themeMode} onCycle={cycleTheme} />
-            {minerError ? (
-              <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark">
-                <span className="status-dot status-dot-danger" />
-                Miner offline
-              </span>
-            ) : minerLoading ? (
-              <span className="text-muted-standalone">Connecting...</span>
-            ) : (
-              <span className="flex items-center gap-1.5 text-success dark:text-success-dark">
-                <span className="status-dot status-dot-success" />
-                Connected
-              </span>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Block found success notification (stays until dismissed) */}
@@ -164,13 +96,13 @@ export default function App() {
         )}
 
         {activeTab === 'settings' ? (
-          <SettingsPage miner={miner} onSaved={refetch} />
+          <SettingsPage />
         ) : activeTab === 'docs' ? (
           <DocumentationPage />
         ) : (
           <>
             {/* Row 1: Miner Identity */}
-            <MinerStatus data={miner} />
+            <MinerStatus />
 
             {/* Row 2: Key Metrics - 8 stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -228,16 +160,16 @@ export default function App() {
               />
             </div>
 
-            {/* Row 3: Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <HashrateChart history={history} />
-              <TemperatureChart history={history} />
+            {/* Row 3: Charts (full width, stacked: Hashrate then Temp+Power) */}
+            <div className="grid grid-cols-1 gap-4">
+              <HashrateChart />
+              <TemperatureChart />
             </div>
 
             {/* Row 4: Mining Details */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <SharesCard data={miner} />
-              <MinerSettings data={miner} />
+              <SharesCard />
+              <MinerSettings />
             </div>
 
             {/* Row 5: Bitcoin Network */}
@@ -249,12 +181,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-default mt-8 py-4">
-        <div className="max-w-7xl mx-auto px-4 text-center text-muted-standalone text-xs">
-          NerdQaxe++ Solo Mining Dashboard
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

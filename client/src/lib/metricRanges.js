@@ -1,3 +1,5 @@
+import { computeEfficiency } from './minerMetrics';
+
 /**
  * Metric range settings:
  *
@@ -10,7 +12,7 @@
  * | Input Current     | ≤7.75 A      | 7.76–8 A     | >8 A         |
  * | ASIC Frequency    | ≤90% of max  | 91–95% of max| >95% of max  |
  * | ASIC Voltage      | 20 mV of set | 21–50 mV off | >50 mV off   |
- * | Fan Speed         | ≥50% of max  | 30–50%       | <30%         |
+ * | Fan Speed         | <50% of max  | 50–70%       | >70% of max   |
  *
  * Returns Tailwind color classes: text-success (green), text-warning (orange), text-danger (red).
  * Expected hashrate default: 6000 GH/s (6 TH/s) when miner does not report it.
@@ -84,12 +86,11 @@ function voltageColor(actualMv, setMv) {
   return 'text-danger';
 }
 
-const FAN_PCT_GREEN_MIN = 50;
-const FAN_PCT_ORANGE_MIN = 30;
+const FAN_PCT_ORANGE_MAX = 70; // green <50%, orange 50–70%, red >70%
 function fanSpeedColor(fanspeedPct) {
   if (fanspeedPct == null) return null;
-  if (fanspeedPct >= FAN_PCT_GREEN_MIN) return 'text-success';
-  if (fanspeedPct >= FAN_PCT_ORANGE_MIN) return 'text-warning';
+  if (fanspeedPct < 50) return 'text-success';
+  if (fanspeedPct <= FAN_PCT_ORANGE_MAX) return 'text-warning';
   return 'text-danger';
 }
 
@@ -113,7 +114,7 @@ export function getMetricColor(miner, metric, efficiency = null) {
     case 'power':
       return powerColor(miner.power) ?? DEFAULT_ACCENT_COLOR;
     case 'efficiency':
-      return efficiencyColor(efficiency ?? (miner.power != null && miner.hashRate ? miner.power / (miner.hashRate / 1000) : null)) ?? DEFAULT_ACCENT_COLOR;
+      return efficiencyColor(efficiency ?? computeEfficiency(miner)) ?? DEFAULT_ACCENT_COLOR;
     case 'current':
       return currentColor(miner.current != null ? miner.current / 1000 : null) ?? DEFAULT_ACCENT_COLOR;
     case 'frequency':

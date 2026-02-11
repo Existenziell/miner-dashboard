@@ -1,6 +1,8 @@
 import { formatNumber, formatBestDiff } from '../lib/formatters';
+import { useMiner } from '../context/MinerContext';
 
-export default function SharesCard({ data }) {
+export default function SharesCard() {
+  const { data } = useMiner();
   if (!data) return null;
 
   const accepted = data.sharesAccepted ?? 0;

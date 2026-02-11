@@ -1,7 +1,11 @@
 const BASE = '';
 
-export async function fetchMinerInfo() {
-  const res = await fetch(`${BASE}/api/miner/info`);
+export async function fetchMinerInfo(opts = {}) {
+  const { ts, cur } = opts;
+  const url = new URL(`${BASE}/api/miner/info`, window.location.origin);
+  if (ts != null) url.searchParams.set('ts', String(ts));
+  if (cur != null) url.searchParams.set('cur', String(cur));
+  const res = await fetch(url.pathname + url.search);
   if (!res.ok) throw new Error(`Miner API error: ${res.status}`);
   return res.json();
 }

@@ -1,10 +1,25 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchMinerInfo } from '../lib/api';
 
-const MAX_HISTORY = 360; // ~1 hour at 10s intervals
+const CHART_HISTORY_KEY = 'minerDashboard_chartHistory';
+const MAX_HISTORY = 500; // cap for in-memory and localStorage
 const POINTS_1M = 6;   // 1 min at 10s
 const POINTS_10M = 60;
 const POINTS_1H = 360;
+
+function loadStoredHistory() {
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(CHART_HISTORY_KEY) : null;
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return [];
+    const first = parsed[0];
+    if (first == null || typeof first.time !== 'number') return [];
+    return parsed.length > MAX_HISTORY ? parsed.slice(-MAX_HISTORY) : parsed;
+  } catch {
+    return [];
+  }
+}
 
 function rollingAvg(buffer, key, n, nextVal) {
   const slice = buffer.slice(-(n - 1));
@@ -17,11 +32,14 @@ export function useMinerData(intervalMs = 10_000, pausePolling = false) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const historyRef = useRef([]);
+  const historyRef = useRef(loadStoredHistory());
 
   const poll = useCallback(async () => {
     try {
-      const info = await fetchMinerInfo();
+      const cur = Date.now();
+      const last = historyRef.current.length ? historyRef.current[historyRef.current.length - 1] : null;
+      const ts = last ? last.time : 0;
+      const info = await fetchMinerInfo({ ts, cur });
       setData(info);
       setError(null);
 
@@ -34,7 +52,7 @@ export function useMinerData(intervalMs = 10_000, pausePolling = false) {
       const hashRate_1h = info.hashRate_1h ?? rollingAvg(buf, 'hashRate', POINTS_1H, instant);
       const hashRate_1d = info.hashRate_1d; // miner-only; we don't have 24h of data to derive
 
-      historyRef.current = [
+      const next = [
         ...buf,
         {
           time: Date.now(),
@@ -49,6 +67,10 @@ export function useMinerData(intervalMs = 10_000, pausePolling = false) {
           fanspeed: info.fanspeed,
         },
       ];
+      historyRef.current = next;
+      try {
+        localStorage.setItem(CHART_HISTORY_KEY, JSON.stringify(next));
+      } catch { /* ignore localStorage */ }
     } catch (err) {
       setError(err.message);
     } finally {

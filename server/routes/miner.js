@@ -4,10 +4,14 @@ const router = Router();
 
 const MINER_IP = () => process.env.MINER_IP || '192.168.1.3';
 
-// Proxy GET /api/miner/info -> miner's /api/system/info
-router.get('/info', async (_req, res) => {
+// Proxy GET /api/miner/info -> miner's /api/system/info (optional query: ts, cur)
+router.get('/info', async (req, res) => {
   try {
-    const response = await fetch(`http://${MINER_IP()}/api/system/info`);
+    const { ts, cur } = req.query;
+    const url = new URL(`http://${MINER_IP()}/api/system/info`);
+    if (ts != null) url.searchParams.set('ts', String(ts));
+    if (cur != null) url.searchParams.set('cur', String(cur));
+    const response = await fetch(url.toString());
     if (!response.ok) {
       return res.status(response.status).json({ error: 'Miner API error', status: response.status });
     }
