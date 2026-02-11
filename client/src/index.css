@@ -265,6 +265,19 @@ input[type="number"] {
 .code-inline {
   @apply px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-light-dark text-xs;
 }
+.doc-page .doc-body {
+  @apply text-base leading-relaxed;
+}
+.doc-page .code-inline {
+  @apply text-sm;
+}
+.doc-page table th,
+.doc-page table td {
+  @apply p-3;
+}
+.doc-page table {
+  @apply text-base;
+}
 
 /* Status dots (connection indicator) */
 .status-dot {
