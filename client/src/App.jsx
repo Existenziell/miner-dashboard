@@ -55,10 +55,9 @@ export default function App() {
           <DocumentationPage />
         ) : (
           <>
-            {/* Row 1: Miner Identity */}
             <MinerStatus />
 
-            {/* Row 2: Key Metrics - 8 stat cards */}
+            {/* Key Metrics - 8 stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard
                 label="Hashrate"
@@ -114,20 +113,17 @@ export default function App() {
               />
             </div>
 
-            {/* Row 3: Charts (full width, stacked: Hashrate, Temperature, Power) */}
             <div className="grid grid-cols-1 gap-4">
               <HashrateChart />
               <TemperatureChart />
               <PowerChart />
             </div>
 
-            {/* Row 4: Mining Details */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <SharesCard />
               <MinerSettings />
             </div>
 
-            {/* Row 5: Bitcoin Network */}
             <div>
               <h2 className="text-lg font-semibold text-muted-standalone mb-3">Bitcoin Network</h2>
               <NetworkStatus data={network} />

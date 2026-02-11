@@ -1,4 +1,5 @@
 import { useMiner } from '../context/MinerContext';
+import { getPoolInfo } from '../lib/poolUtils';
 
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (
@@ -25,81 +26,6 @@ function SettingRow({ label, value, highlight, truncate, href }) {
     </div>
   );
 }
-
-/**
- * Known pool domain-to-name mappings.
- * Keys are matched against the base domain (without subdomain prefixes).
- */
-const POOL_NAMES = {
-  'viabtc.io':      'ViaBTC',
-  'ckpool.org':     'CKPool',
-  'pool.bitcoin.com': 'Bitcoin.com',
-  'braiins.com':    'Braiins',
-  'slushpool.com':  'Braiins (Slush)',
-  'antpool.com':    'AntPool',
-  'f2pool.com':     'F2Pool',
-  'foundryusapool.com': 'Foundry USA',
-  'luxor.tech':     'Luxor',
-  'ocean.xyz':      'OCEAN',
-  'kano.is':        'Kano',
-  'poolin.com':     'Poolin',
-  'public-pool.io': 'Public Pool',
-  'solo.d-central.tech': 'D-Central Solo',
-};
-
-/** Extract the base domain from a stratum URL, stripping common prefixes. */
-function baseDomain(stratumHost) {
-  if (!stratumHost) return null;
-  return stratumHost
-    .replace(/^stratum\+tcp:\/\//, '')
-    .replace(/^stratum2\+tcp:\/\//, '')
-    .replace(/^(btc|stratum|solo|eu|us|eusolo|na|asia|ausolo)\./i, '');
-}
-
-/**
- * Stratum base domain → official pool website URL.
- * Stratum hosts (e.g. btc.viabtc.io) often differ from the pool’s real site.
- */
-const POOL_WEB_URLS = {
-  'viabtc.io':  'https://www.viabtc.com',
-  'ckpool.org': 'https://eusolo.ckpool.org/',
-  'bitcoin.com': 'https://www.bitcoin.com',
-  'braiins.com': 'https://braiins.com',
-  'slushpool.com': 'https://slushpool.com',
-  'antpool.com': 'https://www.antpool.com',
-  'f2pool.com': 'https://www.f2pool.com',
-  'foundryusapool.com': 'https://www.foundrydigital.com',
-  'luxor.tech': 'https://www.luxor.tech',
-  'ocean.xyz': 'https://ocean.xyz',
-  'kano.is': 'https://kano.is',
-  'poolin.com': 'https://www.poolin.com',
-  'public-pool.io': 'https://web.public-pool.io',
-  'd-central.tech': 'https://d-central.tech',
-};
-
-/** Resolve the pool’s official website from the stratum host; null if unknown. */
-function poolWebUrl(stratumHost) {
-  const base = baseDomain(stratumHost);
-  if (!base) return null;
-  for (const [domain, url] of Object.entries(POOL_WEB_URLS)) {
-    if (base === domain || base.endsWith(`.${domain}`)) return url;
-  }
-  return null;
-}
-
-/** Derive a human-friendly pool name from the stratum host. */
-function poolName(stratumHost) {
-  const base = baseDomain(stratumHost);
-  if (!base) return null;
-  // Check known mappings
-  for (const [domain, name] of Object.entries(POOL_NAMES)) {
-    if (base === domain || base.endsWith(`.${domain}`)) return name;
-  }
-  // Fallback: capitalise the first part of the domain
-  const parts = base.split('.');
-  return parts.length >= 2 ? parts[parts.length - 2] : base;
-}
-
 export default function MinerSettings() {
   const { data } = useMiner();
   if (!data) return null;
@@ -108,6 +34,9 @@ export default function MinerSettings() {
 
   // Get pool-specific data if available
   const poolData = data.stratum?.pools?.[0];
+
+  const primary = getPoolInfo(data.stratumURL);
+  const fallback = getPoolInfo(data.fallbackStratumURL);
 
   return (
     <div className="card">
@@ -122,7 +51,7 @@ export default function MinerSettings() {
           )}
         </div>
         <div className="space-y-0.5">
-          <SettingRow label="Name" value={poolName(data.stratumURL) || '--'} href={poolWebUrl(data.stratumURL)} />
+          <SettingRow label="Name" value={primary.name} href={primary.webUrl} />
           <SettingRow label="URL" value={data.stratumURL ? `${data.stratumURL}:${data.stratumPort || ''}` : '--'} />
           <SettingRow label="Worker" value={data.stratumUser || '--'} truncate />
           <SettingRow label="Pool Difficulty" value={poolData?.poolDifficulty ?? data.stratumDifficulty ?? data.poolDifficulty ?? '--'} />
@@ -139,7 +68,7 @@ export default function MinerSettings() {
           )}
         </div>
         <div className="space-y-0.5">
-          <SettingRow label="Name" value={poolName(data.fallbackStratumURL) || 'Not configured'} href={poolWebUrl(data.fallbackStratumURL)} />
+          <SettingRow label="Name" value={fallback.name === '--' ? 'Not configured' : fallback.name} href={fallback.webUrl} />
           <SettingRow label="URL" value={data.fallbackStratumURL ? `${data.fallbackStratumURL}:${data.fallbackStratumPort || ''}` : '--'} />
           <SettingRow label="Worker" value={data.fallbackStratumUser || '--'} truncate />
           <SettingRow label="TLS" value={data.fallbackStratumTLS ? 'Enabled' : 'Disabled'} />

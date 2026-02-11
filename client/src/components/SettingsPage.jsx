@@ -212,7 +212,6 @@ export default function SettingsPage({ onError }) {
 
   return (
     <div className="space-y-6">
-      {/* Success and error both use NotificationBanner */}
       {message?.type === 'success' && (
         <NotificationBanner
           variant="saved"

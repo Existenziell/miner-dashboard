@@ -27,7 +27,6 @@ function tempColor(temp) {
 
 export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
 
-// Hashrate: 0 = red; < 80% of expected = orange, else green
 function hashrateColor(hashRate, expectedHashrate) {
   if (hashRate == null || hashRate === 0) return 'text-danger';
   const expected = expectedHashrate != null && expectedHashrate > 0 ? expectedHashrate : DEFAULT_EXPECTED_HASHRATE_GH;
@@ -54,7 +53,6 @@ function efficiencyColor(jPerTh) {
   return 'text-danger';
 }
 
-// Input current (A): ≤7.75 green, 7.76–8 orange, >8 red
 const CURRENT_GREEN_MAX = 7.75;
 const CURRENT_ORANGE_MAX = 8;
 function currentColor(currentA) {
@@ -86,7 +84,7 @@ function voltageColor(actualMv, setMv) {
   return 'text-danger';
 }
 
-const FAN_PCT_ORANGE_MAX = 70; // green <50%, orange 50–70%, red >70%
+const FAN_PCT_ORANGE_MAX = 70;
 function fanSpeedColor(fanspeedPct) {
   if (fanspeedPct == null) return null;
   if (fanspeedPct < 50) return 'text-success';

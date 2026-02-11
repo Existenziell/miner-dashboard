@@ -11,7 +11,6 @@ export default function NetworkStatus({ data }) {
     : '--';
   const diffProgressPct = difficulty?.progressPercent;
 
-  // Halving epoch: every 210,000 blocks, last halving at 840,000
   const HALVING_INTERVAL = 210_000;
   const LAST_HALVING = 840_000;
   const halvingPct = blockHeight != null
