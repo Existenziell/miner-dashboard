@@ -1,7 +1,6 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useMiner } from './context/MinerContext';
 import { useNetworkData } from './hooks/useNetworkData';
-import { useAlerts } from './hooks/useAlerts';
 import { formatHashrate, formatTemp, formatPower } from './lib/formatters';
 import { getMetricColor, DEFAULT_EXPECTED_HASHRATE_GH } from './lib/metricRanges';
 import { getTabFromUrl, setTabInUrl } from './lib/tabUrl';
@@ -17,15 +16,13 @@ import NetworkStatus from './components/NetworkStatus';
 import Header from './components/Header';
 import SettingsPage from './components/SettingsPage';
 import DocumentationPage from './components/DocumentationPage';
-import AlertBanner from './components/AlertBanner';
-import BlockFoundBanner from './components/BlockFoundBanner';
+import Notifications from './components/Notifications';
 import Footer from './components/Footer';
 
 export default function App() {
  
   const { data: miner, error: minerError } = useMiner();
   const { data: network, error: networkError } = useNetworkData(60_000);
-  const { activeAlerts, dismissAlerts } = useAlerts(miner);
 
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
   const setActiveTab = useCallback((tab) => {
@@ -39,26 +36,6 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  const [blockFoundVisible, setBlockFoundVisible] = useState(false);
-  const prevBlockCountRef = useRef(null);
-
-  useEffect(() => {
-    if (!miner) return;
-    const raw = miner.totalFoundBlocks ?? miner.foundBlocks;
-    const count = typeof raw === 'number' ? raw : (miner.blockFound ? 1 : 0);
-    const prev = prevBlockCountRef.current;
-    if (typeof count === 'number' && count > 0 && (prev == null || count > prev)) {
-      queueMicrotask(() => setBlockFoundVisible(true));
-    }
-    prevBlockCountRef.current = count;
-  }, [miner]);
-
-  const requestNotificationPermission = useCallback(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
   const efficiency = computeEfficiency(miner);
 
   return (
@@ -66,35 +43,11 @@ export default function App() {
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Block found success notification (stays until dismissed) */}
-        {activeTab === 'dashboard' && blockFoundVisible && (
-          <BlockFoundBanner onDismiss={() => setBlockFoundVisible(false)} />
-        )}
-
-        {/* Metric alerts (temp, reject rate, etc.) */}
-        {activeTab === 'dashboard' && (
-          <AlertBanner
-            alerts={activeAlerts}
-            onDismiss={dismissAlerts}
-            onRequestPermission={
-              typeof Notification !== 'undefined' && Notification.permission === 'default'
-                ? requestNotificationPermission
-                : undefined
-            }
-          />
-        )}
-
-        {/* Error banner */}
-        {minerError && (
-          <div className="alert-box-danger">
-            Cannot reach miner: {minerError}
-          </div>
-        )}
-        {networkError && activeTab === 'dashboard' && (
-          <div className="alert-box-warning">
-            Network data unavailable: {networkError}
-          </div>
-        )}
+        <Notifications
+          activeTab={activeTab}
+          minerError={minerError}
+          networkError={networkError}
+        />
 
         {activeTab === 'settings' ? (
           <SettingsPage />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
+import NotificationBanner from './NotificationBanner';
 
 function Field({ label, children, hint }) {
   return (
@@ -211,11 +212,21 @@ export default function SettingsPage({ onError }) {
 
   return (
     <div className="space-y-6">
-      {/* Toast */}
-      {message && (
-        <div className={message.type === 'success' ? 'toast-success' : 'toast-danger'}>
-          {message.text}
-        </div>
+      {/* Success and error both use NotificationBanner */}
+      {message?.type === 'success' && (
+        <NotificationBanner
+          variant="saved"
+          title="Settings saved"
+          summary={message.text}
+          onDismiss={() => setMessage(null)}
+        />
+      )}
+      {message?.type === 'error' && (
+        <NotificationBanner
+          variant="danger"
+          alerts={[{ id: 'error', label: message.text, detail: null, severity: 'critical' }]}
+          onDismiss={() => setMessage(null)}
+        />
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
@@ -358,9 +369,6 @@ export default function SettingsPage({ onError }) {
         {/* Restart & Shutdown */}
         <div className="card">
           <h3 className="card-title">Restart & Shutdown</h3>
-          <p className="text-muted-standalone text-sm mb-4">
-            Restart reconnects the miner after a short disconnect. Shutdown stops the miner until you power it on again.
-          </p>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"

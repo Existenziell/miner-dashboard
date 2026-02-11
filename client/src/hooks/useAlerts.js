@@ -52,7 +52,7 @@ function showBrowserNotification(title, body, tag = 'miner-alert') {
   }
 }
 
-function requestNotificationPermission() {
+function getNotificationPermission() {
   if (!('Notification' in window)) return Promise.resolve('unsupported');
   if (Notification.permission === 'granted') return Promise.resolve('granted');
   if (Notification.permission === 'denied') return Promise.resolve('denied');
@@ -70,15 +70,17 @@ function buildDisplayed(evaluated, sticky, dismissedIds) {
   return [...byId.values()].filter((a) => !dismissedIds.has(a.id) || evaluatedIds.has(a.id));
 }
 
-export function useAlerts(minerData) {
+export function useAlerts(minerData, { minerError, networkError } = {}) {
   const lastFiredRef = useRef({});
   const prevActiveIdsRef = useRef(new Set());
   const stickyRef = useRef({});
   const displayedRef = useRef([]);
+  const prevBlockCountRef = useRef(null);
 
   const evaluated = useMemo(() => evaluateAlerts(minerData), [minerData]);
   const [dismissedIds, setDismissedIds] = useState(() => new Set());
   const [activeAlerts, setActiveAlerts] = useState([]);
+  const [blockFoundVisible, setBlockFoundVisible] = useState(false);
 
   // Update sticky from evaluated and compute displayed list (all in one effect to avoid cascading setState)
   useEffect(() => {
@@ -119,7 +121,7 @@ export function useAlerts(minerData) {
         lastFiredRef.current[alert.id] = now;
         const title = `Miner: ${alert.label}`;
         const body = alert.detail ? `${alert.detail}` : 'Check dashboard.';
-        requestNotificationPermission().then((perm) => {
+        getNotificationPermission().then((perm) => {
           if (perm === 'granted') showBrowserNotification(title, body, `miner-${alert.id}`);
         });
         playAlertSound();
@@ -129,5 +131,34 @@ export function useAlerts(minerData) {
     prevActiveIdsRef.current = activeIds;
   }, [evaluated]);
 
-  return { activeAlerts, dismissAlerts };
+  // Block found: show banner and play sound when block count increases
+  useEffect(() => {
+    if (!minerData) return;
+    const raw = minerData.totalFoundBlocks ?? minerData.foundBlocks;
+    const count = typeof raw === 'number' ? raw : (minerData.blockFound ? 1 : 0);
+    const prev = prevBlockCountRef.current;
+    if (typeof count === 'number' && count > 0 && (prev == null || count > prev)) {
+      queueMicrotask(() => setBlockFoundVisible(true));
+      playAlertSound();
+    }
+    prevBlockCountRef.current = count;
+  }, [minerData]);
+
+  const dismissBlockFound = useCallback(() => setBlockFoundVisible(false), []);
+
+  const requestNotificationPermission = useCallback(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  return {
+    activeAlerts,
+    dismissAlerts,
+    blockFoundVisible,
+    dismissBlockFound,
+    requestNotificationPermission,
+    minerError,
+    networkError,
+  };
 }
