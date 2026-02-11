@@ -16,9 +16,6 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, with Bit
 npm install
 cd client && npm install && cd ..
 
-# Configure miner IP (edit .env)
-cp .env.example .env  # then edit MINER_IP
-
 # Run in development mode
 npm run dev
 ```

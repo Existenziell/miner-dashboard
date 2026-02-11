@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 const router = Router();
 
-const MINER_IP = () => process.env.MINER_IP || '192.168.1.3';
+const MINER_IP = () => process.env.MINER_IP;
 
 // Proxy GET /api/miner/info -> miner's /api/system/info (optional query: ts, cur)
 router.get('/info', async (req, res) => {

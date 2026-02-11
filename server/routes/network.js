@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 const router = Router();
 
-const MEMPOOL_API = () => process.env.MEMPOOL_API || 'https://mempool.space/api';
+const MEMPOOL_API = () => process.env.MEMPOOL_API;
 
 // Simple in-memory cache
 const cache = new Map();
