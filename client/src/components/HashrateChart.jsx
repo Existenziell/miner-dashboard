@@ -1,13 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useState, useCallback } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
 import { useMiner } from '../context/MinerContext';
 import { getChartColors } from '../lib/themeColors';
-
-function formatTime(ts) {
-  const d = new Date(ts);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
+import { formatTime, useChartLegend } from '../lib/chartUtils';
+import { ClickableLegend, ChartCard } from './TimeSeriesChart';
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
@@ -23,141 +20,65 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-/** All available hashrate series — distinct hues (no yellow/orange cluster). */
 const SERIES = [
-  { key: 'hashRate',     name: 'Instant',  color: '#f7931a', width: 2 },
-  { key: 'hashRate_1m',  name: '1m Avg',   color: '#06b6d4', width: 1.5 },
-  { key: 'hashRate_10m', name: '10m Avg',  color: '#a855f7', width: 1.5 },
-  { key: 'hashRate_1h',  name: '1h Avg',   color: '#16a34a', width: 1.5 },
-  { key: 'hashRate_1d',  name: '1d Avg',   color: '#a21caf', width: 1.5 },
+  { key: 'hashRate',     name: 'Instant',  color: '#f7931a', width: 1 },
+  { key: 'hashRate_1m',  name: '1m Avg',   color: '#06b6d4', width: 1 },
+  { key: 'hashRate_10m', name: '10m Avg',  color: '#a855f7', width: 1 },
+  { key: 'hashRate_1h',  name: '1h Avg',   color: '#16a34a', width: 1 },
+  { key: 'hashRate_1d',  name: '1d Avg',   color: '#a21caf', width: 1 },
 ];
 
-const LEGEND_STORAGE_KEY = 'minerDashboard_chartLegend_hashrate';
+const LEGEND_STORAGE_KEY = 'chartLegend_hashrate';
 const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
 
-function loadStoredLegendHidden() {
-  try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LEGEND_STORAGE_KEY) : null;
-    if (!raw) return new Set();
-    const arr = JSON.parse(raw);
-    if (!Array.isArray(arr)) return new Set();
-    return new Set(arr.filter((k) => SERIES_KEYS.has(k)));
-  } catch {
-    return new Set();
-  }
-}
-
-function ClickableLegend({ series, hidden, onToggle }) {
-  return (
-    <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mb-2">
-      {series.map((s) => {
-        const off = hidden.has(s.key);
-        return (
-          <button
-            key={s.key}
-            type="button"
-            onClick={() => onToggle(s.key)}
-            className="legend-btn"
-            style={{ opacity: off ? 0.35 : 1 }}
-          >
-            <span
-              className="inline-block w-3 h-0.5 rounded-full"
-              style={{ backgroundColor: s.color }}
-            />
-            <span className="text-muted-standalone">{s.name}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 export default function HashrateChart() {
-  const { history } = useMiner();
-  const [hidden, setHidden] = useState(loadStoredLegendHidden);
+  const history = useMiner().historyHashrate;
+  const { hidden, toggle } = useChartLegend(LEGEND_STORAGE_KEY, SERIES_KEYS);
+  const [collapsed, setCollapsed] = useState(false);
+  const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
   const { resolved } = useTheme();
   const chartColors = getChartColors(resolved === 'dark');
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(LEGEND_STORAGE_KEY, JSON.stringify(Array.from(hidden)));
-    } catch { /* ignore localStorage */ }
-  }, [hidden]);
-
-  const toggle = useCallback((key) => {
-    setHidden((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }, []);
-
-  const [collapsed, setCollapsed] = useState(false);
-  const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
-
-  if (!history || history.length < 2) {
-    return (
-      <div className="card">
-        <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
-          <h3 className="text-lg font-semibold text-body m-0">Hashrate</h3>
-        </div>
-        <div className="h-72 flex items-center justify-center">
-          <span className="text-muted-standalone text-sm">Collecting hashrate data...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="card">
-      <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-lg font-semibold text-body m-0">Hashrate</h3>
-          <button
-            type="button"
-            onClick={toggleCollapsed}
-            className="text-muted-standalone text-sm underline hover:no-underline cursor-pointer focus:outline-none"
-            aria-expanded={!collapsed}
-          >
-            {collapsed ? 'Expand' : 'Collapse'}
-          </button>
-        </div>
-      </div>
-      {!collapsed && (
-        <>
-          <ClickableLegend series={SERIES} hidden={hidden} onToggle={toggle} />
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={history} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
-              <XAxis
-                dataKey="time"
-                tickFormatter={formatTime}
-                stroke={chartColors.axis}
-                fontSize={11}
-                tickCount={6}
-              />
-              <YAxis stroke={chartColors.axis} fontSize={11} tickFormatter={(v) => `${v.toFixed(0)}`} />
-              <Tooltip content={<CustomTooltip />} />
-              {SERIES.map((s) =>
-                hidden.has(s.key) ? null : (
-                  <Line
-                    key={s.key}
-                    type="monotone"
-                    dataKey={s.key}
-                    name={s.name}
-                    stroke={s.color}
-                    strokeWidth={s.width}
-                    dot={false}
-                    isAnimationActive={false}
-                    connectNulls
-                  />
-                )
-              )}
-            </LineChart>
-          </ResponsiveContainer>
-        </>
-      )}
-    </div>
+    <ChartCard
+      title="Hashrate"
+      loading={!history || history.length < 2}
+      loadingMessage="Collecting hashrate data..."
+      collapsed={collapsed}
+      onToggleCollapsed={toggleCollapsed}
+    >
+      <>
+        <ClickableLegend series={SERIES} hidden={hidden} onToggle={toggle} />
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={history} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+            <XAxis
+              dataKey="time"
+              tickFormatter={formatTime}
+              stroke={chartColors.axis}
+              fontSize={11}
+              tickCount={6}
+            />
+            <YAxis stroke={chartColors.axis} fontSize={11} tickFormatter={(v) => `${v.toFixed(0)}`} />
+            <Tooltip content={<CustomTooltip />} />
+            {SERIES.map((s) =>
+              hidden.has(s.key) ? null : (
+                <Line
+                  key={s.key}
+                  type="monotone"
+                  dataKey={s.key}
+                  name={s.name}
+                  stroke={s.color}
+                  strokeWidth={s.width}
+                  dot={false}
+                  isAnimationActive={false}
+                  connectNulls
+                />
+              )
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      </>
+    </ChartCard>
   );
 }

@@ -10,6 +10,7 @@ import MinerStatus from './components/MinerStatus';
 import StatCard from './components/StatCard';
 import HashrateChart from './components/HashrateChart';
 import TemperatureChart from './components/TemperatureChart';
+import PowerChart from './components/PowerChart';
 import SharesCard from './components/SharesCard';
 import MinerSettings from './components/MinerSettings';
 import NetworkStatus from './components/NetworkStatus';
@@ -160,10 +161,11 @@ export default function App() {
               />
             </div>
 
-            {/* Row 3: Charts (full width, stacked: Hashrate then Temp+Power) */}
+            {/* Row 3: Charts (full width, stacked: Hashrate, Temperature, Power) */}
             <div className="grid grid-cols-1 gap-4">
               <HashrateChart />
               <TemperatureChart />
+              <PowerChart />
             </div>
 
             {/* Row 4: Mining Details */}

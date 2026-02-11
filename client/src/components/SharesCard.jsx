@@ -62,6 +62,37 @@ export default function SharesCard() {
         </div>
       </div>
 
+      {/* Reject reasons (when miner provides them, or note when it doesn't) */}
+      {rejected > 0 && (
+        <div className="mt-6 pt-3 border-t border-default">
+          <div className="text-sm font-medium text-muted-standalone mb-1">Reject reasons</div>
+          {(() => {
+            const raw = data.sharesRejectedReasons ?? data.shares_rejected_reasons;
+            const reasons = Array.isArray(raw)
+              ? raw.map((r) => ({
+                  message: r.message ?? r.reason ?? r.msg ?? 'Unknown',
+                  count: Number(r.count ?? r.cnt ?? 0) || 0,
+                })).filter((r) => r.count > 0)
+              : [];
+            if (reasons.length > 0) {
+              return (
+                <ul className="text-sm space-y-0.5">
+                  {reasons.map((r, i) => (
+                    <li key={i} className="flex justify-between gap-2">
+                      <span className="text-body">{r.message}</span>
+                      <span className="text-warning dark:text-warning-dark font-medium shrink-0">{formatNumber(r.count)}</span>
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+            return (
+              <p className="text-sm text-muted-standalone">This device does not report reject reasons in its API.</p>
+            );
+          })()}
+        </div>
+      )}
+
       {/* Duplicate HW nonces */}
       {data.duplicateHWNonces > 0 && (
         <div className="mt-4 pt-3 border-t border-default">

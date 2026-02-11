@@ -45,7 +45,11 @@ export const ALERT_RULES = [
       const rej = m?.sharesRejected ?? 0;
       const total = acc + rej;
       const pct = total > 0 ? ((rej / total) * 100).toFixed(1) : '0';
-      return `${pct}% rejected`;
+      const raw = m?.sharesRejectedReasons ?? m?.shares_rejected_reasons;
+      const top = Array.isArray(raw) && raw.length > 0 ? raw[0] : null;
+      const msg = top?.message ?? top?.reason ?? top?.msg;
+      const reasonText = msg ? ` (${msg})` : '';
+      return `${pct}% rejected${reasonText}`;
     },
   },
   {

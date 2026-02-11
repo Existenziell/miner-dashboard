@@ -6,43 +6,48 @@ import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend } from '../lib/chartUtils';
 import { ClickableLegend, ChartCard } from './TimeSeriesChart';
 
+const SERIES = [
+  { key: 'power', name: 'Power', color: '#d946ef', width: 1, axis: 'power', fmt: (v) => (v != null ? `${v.toFixed(1)} W` : '--') },
+  { key: 'currentA', name: 'Current', color: '#2563eb', width: 1, axis: 'current', fmt: (v) => (v != null ? `${v.toFixed(2)} A` : '--') },
+];
+
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
+  const seriesMap = new Map(SERIES.map((s) => [s.key, s]));
   return (
     <div className="tooltip-card">
       <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
-      {payload.map((entry) => (
-        <div key={entry.dataKey} style={{ color: entry.color }}>
-          {entry.name}: {entry.value?.toFixed(1)}{'\u00B0C'}
-        </div>
-      ))}
+      {payload.map((entry) => {
+        const s = seriesMap.get(entry.dataKey);
+        return (
+          <div key={entry.dataKey} style={{ color: entry.color }}>
+            {entry.name}: {s?.fmt(entry.value) ?? entry.value}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-const SERIES = [
-  { key: 'temp',    name: 'ASIC Temp', color: '#d946ef', width: 1,   axis: 'temp' },
-  { key: 'vrTemp',  name: 'VR Temp',   color: '#2563eb', width: 1, axis: 'temp' },
-];
-
-const LEGEND_STORAGE_KEY = 'chartLegend_temperature';
+const LEGEND_STORAGE_KEY = 'chartLegend_power';
 const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
 
-export default function TemperatureChart() {
-  const history = useMiner().historyTemperature;
+export default function PowerChart() {
+  const history = useMiner().historyPower;
   const { hidden, toggle } = useChartLegend(LEGEND_STORAGE_KEY, SERIES_KEYS);
   const [collapsed, setCollapsed] = useState(false);
   const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
   const { resolved } = useTheme();
   const chartColors = getChartColors(resolved === 'dark');
 
-  const showTempAxis = SERIES.some((s) => s.axis === 'temp' && !hidden.has(s.key));
+  const showPowerAxis = SERIES.some((s) => s.axis === 'power' && !hidden.has(s.key));
+  const showCurrentAxis = SERIES.some((s) => s.axis === 'current' && !hidden.has(s.key));
 
   return (
     <ChartCard
-      title="Temperature"
+      title="Power"
       loading={!history || history.length < 2}
-      loadingMessage="Collecting temperature data..."
+      loadingMessage="Collecting power data..."
       collapsed={collapsed}
       onToggleCollapsed={toggleCollapsed}
     >
@@ -58,10 +63,26 @@ export default function TemperatureChart() {
               fontSize={11}
               tickCount={6}
             />
-            {showTempAxis && (
-              <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} tickFormatter={(v) => `${v}\u00B0`} />
-            )}
-            {!showTempAxis && <YAxis yAxisId="temp" hide />}
+            <YAxis
+              yAxisId="power"
+              orientation="left"
+              stroke={chartColors.axis}
+              fontSize={11}
+              tickFormatter={(v) => `${v} W`}
+              domain={[0, 120]}
+              allowDataOverflow
+              hide={!showPowerAxis}
+            />
+            <YAxis
+              yAxisId="current"
+              orientation="right"
+              stroke={chartColors.axis}
+              fontSize={11}
+              tickFormatter={(v) => `${v} A`}
+              domain={[0, 15]}
+              allowDataOverflow
+              hide={!showCurrentAxis}
+            />
             <Tooltip content={<CustomTooltip />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (
