@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { baseDomain, getPoolInfo, POOLS } from './poolUtils.js';
+import { baseDomain, getPoolInfo, POOLS } from '../lib/poolUtils.js';
 
 describe('POOLS', () => {
   it('has identifier, domains, name, and webUrl for each entry', () => {

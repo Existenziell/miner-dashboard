@@ -6,7 +6,7 @@ import {
   patchMinerSettings,
   restartMiner,
   shutdownMiner,
-} from './api.js';
+} from '../lib/api.js';
 
 describe('api', () => {
   let fetchStub;

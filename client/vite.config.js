@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
+    include: ['src/test/**/*.test.js'],
   },
   server: {
     port: 8000,

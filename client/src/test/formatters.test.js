@@ -11,7 +11,7 @@ import {
   timeSince,
   RESET_REASONS,
   formatResetReason,
-} from './formatters.js';
+} from '../lib/formatters.js';
 
 describe('formatHashrate', () => {
   it('returns "--" for null or undefined', () => {

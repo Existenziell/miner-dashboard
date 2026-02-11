@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CHART_COLORS, getChartColors } from './themeColors.js';
+import { CHART_COLORS, getChartColors } from '../lib/themeColors.js';
 
 describe('CHART_COLORS', () => {
   it('defines light theme with grid and axis hex colors', () => {

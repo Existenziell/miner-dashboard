@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { evaluateAlerts } from './alerts.js';
+import { evaluateAlerts } from '../lib/alerts.js';
 
 describe('evaluateAlerts', () => {
   it('returns empty array for null or undefined miner', () => {

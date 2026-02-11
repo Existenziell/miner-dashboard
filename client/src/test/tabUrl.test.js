@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getTabFromUrl, setTabInUrl } from './tabUrl.js';
+import { getTabFromUrl, setTabInUrl } from '../lib/tabUrl.js';
 
 const _originalWindow = globalThis.window;
 const _originalLocation = globalThis.location;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeEfficiency } from './minerMetrics.js';
+import { computeEfficiency } from '../lib/minerMetrics.js';
 
 describe('computeEfficiency', () => {
   it('returns null when miner is null or undefined', () => {

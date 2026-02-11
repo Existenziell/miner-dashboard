@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getMetricColor, DEFAULT_EXPECTED_HASHRATE_GH } from './metricRanges.js';
+import { getMetricColor, DEFAULT_EXPECTED_HASHRATE_GH } from '../lib/metricRanges.js';
 
 describe('DEFAULT_EXPECTED_HASHRATE_GH', () => {
   it('is 6000', () => {
