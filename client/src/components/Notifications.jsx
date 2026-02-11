@@ -2,6 +2,10 @@ import { useMiner } from '../context/MinerContext';
 import { useAlerts } from '../hooks/useAlerts';
 import NotificationBanner from './NotificationBanner';
 
+/**
+ * Dashboard-level notifications: block found, metric alerts, connection errors.
+ * For inline feedback (e.g. "saved" after form submit) use a short toast in the page.
+ */
 export default function Notifications({ activeTab, minerError, networkError }) {
   const { data: miner } = useMiner();
   const {

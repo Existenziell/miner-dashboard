@@ -1,9 +1,9 @@
 /**
- * Unified banner for dashboard notifications.
- * variant: 'success' | 'saved' | 'danger'
+ * Banner for dashboard-level notifications (block found, metric alerts).
+ * variant: 'success' | 'danger'
  * - success: e.g. block found (title, summary, onDismiss)
- * - saved: e.g. settings saved (title, summary, onDismiss) — same style as success
  * - danger: metric alerts (alerts array, onDismiss, optional onRequestPermission)
+ * For inline feedback like "saved" use a short toast near the action instead.
  */
 export default function NotificationBanner({
   variant,
@@ -13,7 +13,7 @@ export default function NotificationBanner({
   onDismiss,
   onRequestPermission,
 }) {
-  const isSuccess = variant === 'success' || variant === 'saved';
+  const isSuccess = variant === 'success';
   const isDanger = variant === 'danger';
 
   if (isDanger && (!alerts?.length)) return null;

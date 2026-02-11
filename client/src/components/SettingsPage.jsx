@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
-import NotificationBanner from './NotificationBanner';
 
 function Field({ label, children, hint }) {
   return (
@@ -136,6 +135,13 @@ export default function SettingsPage({ onError }) {
 
   const hasChanges = changes.length > 0;
 
+  // Auto-dismiss success message after a short delay
+  useEffect(() => {
+    if (message?.type !== 'success') return;
+    const t = setTimeout(() => setMessage(null), 3000);
+    return () => clearTimeout(t);
+  }, [message?.type]);
+
   const handleReset = useCallback(() => {
     if (!baseline) return;
     setFrequency(baseline.frequency);
@@ -212,22 +218,6 @@ export default function SettingsPage({ onError }) {
 
   return (
     <div className="space-y-6">
-      {message?.type === 'success' && (
-        <NotificationBanner
-          variant="saved"
-          title="Settings saved"
-          summary={message.text}
-          onDismiss={() => setMessage(null)}
-        />
-      )}
-      {message?.type === 'error' && (
-        <NotificationBanner
-          variant="danger"
-          alerts={[{ id: 'error', label: message.text, detail: null, severity: 'critical' }]}
-          onDismiss={() => setMessage(null)}
-        />
-      )}
-
       <form onSubmit={handleSave} className="space-y-6">
         {/* ASIC */}
         <div className="card">
@@ -423,6 +413,24 @@ export default function SettingsPage({ onError }) {
           >
             {saving ? 'Saving…' : 'Save settings'}
           </button>
+          {message?.type === 'success' && (
+            <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
+              <span aria-hidden>√</span>
+              <span>Saved successfully</span>
+            </span>
+          )}
+          {message?.type === 'error' && (
+            <span role="alert" className="toast-danger inline-flex items-center gap-2 px-3 py-2">
+              <span>{message.text}</span>
+              <button
+                type="button"
+                onClick={() => setMessage(null)}
+                className="link-text font-medium opacity-90 hover:opacity-100"
+              >
+                Dismiss
+              </button>
+            </span>
+          )}
         </div>
       </form>
     </div>
