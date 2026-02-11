@@ -16,18 +16,17 @@ function CustomTooltip({ active, payload, label }) {
       <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
       {payload.map((entry) => (
         <div key={entry.dataKey} style={{ color: entry.color }}>
-          {entry.name}: {entry.value?.toFixed(1)} {entry.dataKey === 'power' ? 'W' : '\u00B0C'}
+          {entry.name}: {entry.value?.toFixed(1)} \u00B0C
         </div>
       ))}
     </div>
   );
 }
 
-/** All available temperature / power series */
+/** All available temperature series */
 const SERIES = [
-  { key: 'temp',    name: 'ASIC Temp', color: '#ef4444', width: 2,   axis: 'temp' },
+  { key: 'temp',    name: 'ASIC Temp', color: '#f97316', width: 2,   axis: 'temp' },
   { key: 'vrTemp',  name: 'VR Temp',   color: '#2563eb', width: 1.5, axis: 'temp' },
-  { key: 'power',   name: 'Power',     color: '#22c55e', width: 2,   axis: 'power' },
 ];
 
 const LEGEND_STORAGE_KEY = 'minerDashboard_chartLegend_temperature';
@@ -98,7 +97,7 @@ export default function TemperatureChart() {
     return (
       <div className="card">
         <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
-          <h3 className="text-lg font-semibold text-body m-0">Temperature & Power</h3>
+          <h3 className="text-lg font-semibold text-body m-0">Temperature</h3>
         </div>
         <div className="h-72 flex items-center justify-center">
           <span className="text-muted-standalone text-sm">Collecting temperature data...</span>
@@ -109,13 +108,12 @@ export default function TemperatureChart() {
 
   // Determine which axes are still visible so we can hide unused Y-axes
   const showTempAxis = SERIES.some((s) => s.axis === 'temp' && !hidden.has(s.key));
-  const showPowerAxis = SERIES.some((s) => s.axis === 'power' && !hidden.has(s.key));
 
   return (
     <div className="card">
       <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-lg font-semibold text-body m-0">Temperature & Power</h3>
+          <h3 className="text-lg font-semibold text-body m-0">Temperature</h3>
           <button
             type="button"
             onClick={toggleCollapsed}
@@ -140,14 +138,9 @@ export default function TemperatureChart() {
                 tickCount={6}
               />
               {showTempAxis && (
-                <YAxis yAxisId="temp" stroke="#ef4444" fontSize={11} tickFormatter={(v) => `${v}\u00B0`} />
+                <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} tickFormatter={(v) => `${v}\u00B0`} />
               )}
-              {showPowerAxis && (
-                <YAxis yAxisId="power" orientation="right" stroke="#22c55e" fontSize={11} tickFormatter={(v) => `${v}W`} />
-              )}
-              {/* Hidden axes still needed so hidden-then-reshown lines have an axis ref */}
               {!showTempAxis && <YAxis yAxisId="temp" hide />}
-              {!showPowerAxis && <YAxis yAxisId="power" hide />}
               <Tooltip content={<CustomTooltip />} />
               {SERIES.map((s) =>
                 hidden.has(s.key) ? null : (

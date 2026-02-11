@@ -54,7 +54,6 @@ export default function MinerStatus() {
       <hr className="border-border dark:border-border-dark my-6" />
 
       <section>
-        <div className="stat-label mb-2">Network</div>
         <ItemGrid items={networkItems} />
       </section>
     </div>
