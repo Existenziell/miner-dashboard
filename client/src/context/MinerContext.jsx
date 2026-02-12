@@ -1,10 +1,9 @@
 /* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
 import { createContext, useContext, useMemo } from 'react';
 import { useMinerData } from '../hooks/useMinerData';
+import { POLL_MINER_INTERVAL_MS } from '../lib/constants';
 
 const MinerContext = createContext(null);
-
-const MINER_POLL_MS = 10_000;
 
 export function MinerProvider({ children, pausePolling = false }) {
   const {
@@ -15,7 +14,7 @@ export function MinerProvider({ children, pausePolling = false }) {
     historyTemperature,
     historyPower,
     refetch,
-  } = useMinerData(MINER_POLL_MS, pausePolling);
+  } = useMinerData(POLL_MINER_INTERVAL_MS, pausePolling);
   const value = useMemo(
     () => ({
       data,

@@ -1,5 +1,5 @@
-import { formatUptime, formatResetReason } from '../lib/formatters';
-import { POLL_MINER_INTERVAL_MS } from '../lib/constants';
+import { formatUptime, formatResetReason, formatBytes } from '../lib/formatters';
+import { POLL_MINER_INTERVAL_MS, LOW_HEAP_INT_THRESHOLD_BYTES } from '../lib/constants';
 import { useMiner } from '../context/MinerContext';
 
 function StatusDot({ connected }) {
@@ -22,6 +22,11 @@ function ItemGrid({ items }) {
             {item.status != null && <StatusDot connected={item.status === 'connected'} />}
             <span className="truncate min-w-0">{item.value}</span>
           </div>
+          {item.warning && (
+            <div className="text-xs text-warning dark:text-warning-dark mt-0.5" title={item.warningTitle}>
+              {item.warning}
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -57,8 +62,13 @@ export default function MinerStatus() {
 
   const hasHeap = data.freeHeap != null || data.freeHeapInt != null || data.runningPartition != null;
   const heapItems = [
-    { label: 'Free Heap', value: data.freeHeap != null ? `${data.freeHeap.toLocaleString()} B` : '--' },
-    { label: 'Free Heap (int)', value: data.freeHeapInt != null ? data.freeHeapInt.toLocaleString() : '--' },
+    { label: 'Free Heap', value: formatBytes(data.freeHeap) },
+    {
+      label: 'Free Heap (int RAM)',
+      value: data.freeHeapInt != null ? formatBytes(data.freeHeapInt) : '--',
+      warning: data.freeHeapInt != null && data.freeHeapInt < LOW_HEAP_INT_THRESHOLD_BYTES ? 'Low memory' : undefined,
+      warningTitle: data.freeHeapInt != null && data.freeHeapInt < LOW_HEAP_INT_THRESHOLD_BYTES ? 'Internal RAM free heap is below 50 KB; device may become unstable.' : undefined,
+    },
     { label: 'Running Partition', value: data.runningPartition ?? '--' },
     { label: 'Poll interval', value: `${(POLL_MINER_INTERVAL_MS / 1000).toFixed(0)} s` },
   ];

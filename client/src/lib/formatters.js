@@ -39,6 +39,19 @@ export function formatPower(watts) {
 }
 
 /**
+ * Format byte count for display (avoids locale-dependent thousands separators).
+ * Uses decimal units (KB, MB, GB) for consistency with other dashboard units.
+ */
+export function formatBytes(bytes) {
+  if (bytes == null || !Number.isFinite(bytes)) return '--';
+  const n = Number(bytes);
+  if (n >= 1e9) return `${(n / 1e9).toFixed(2)} GB`;
+  if (n >= 1e6) return `${(n / 1e6).toFixed(2)} MB`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(2)} KB`;
+  return `${n} B`;
+}
+
+/**
  * Format large numbers with commas.
  */
 export function formatNumber(num) {

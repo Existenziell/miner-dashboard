@@ -5,14 +5,14 @@ import { computeEfficiency } from './minerMetrics';
  * Color classes: text-success (green), text-warning (orange), text-danger (red).
  */
 export const METRIC_RANGES = {
-  temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
-  hashrate:   { greenMinGh: 5995, orangeMinGh: 5500, gaugeMaxGh: 7000 },
-  power:      { greenMax: 100, orangeMax: 112, gaugeMax: 120 },
+  hashrate:   { greenMinGh: 5950, orangeMinGh: 5500, gaugeMaxGh: 7000 },
   efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
-  current:    { greenMax: 7.75, orangeMax: 9, gaugeMax: 10 },
+  temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
+  fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
+  current:    { greenMax: 9, orangeMax: 9.5, gaugeMax: 10.5 },
   frequency:  { greenMinMhz: 700, orangeMinMhz: 650, gaugeMax: 850 },
   voltage:    { greenMv: 20, orangeMv: 50, gaugeMaxMv: 1300, diffGaugeMaxMv: 50 },
-  fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
+  power:      { greenMax: 111, orangeMax: 115, gaugeMax: 125 },
 };
 
 /** Expected hashrate (GH) when not set – 6 TH/s. */

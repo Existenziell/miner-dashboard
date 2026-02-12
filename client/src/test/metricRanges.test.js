@@ -40,30 +40,29 @@ describe('getMetricColor', () => {
       expect(getMetricColor({ hashRate: 4800 }, 'hashrate')).toBe('text-danger');
       expect(getMetricColor({ hashRate: 5499 }, 'hashrate')).toBe('text-danger');
     });
-    it('orange from 5500 GH/s up to just under green (5995 GH/s)', () => {
+    it('orange from 5500 GH/s up to just under green (5950 GH/s)', () => {
       expect(getMetricColor({ hashRate: 5500 }, 'hashrate')).toBe('text-warning');
-      expect(getMetricColor({ hashRate: 5989 }, 'hashrate')).toBe('text-warning');
-      expect(getMetricColor({ hashRate: 5994 }, 'hashrate')).toBe('text-warning');
+      expect(getMetricColor({ hashRate: 5949 }, 'hashrate')).toBe('text-warning');
     });
-    it('green at or above 5.995 TH/s (5995+ GH/s, displays as 6.00 TH/s)', () => {
-      expect(getMetricColor({ hashRate: 5995 }, 'hashrate')).toBe('text-success');
-      expect(getMetricColor({ hashRate: 5999 }, 'hashrate')).toBe('text-success');
+    it('green at or above 5950 GH/s', () => {
+      expect(getMetricColor({ hashRate: 5950 }, 'hashrate')).toBe('text-success');
       expect(getMetricColor({ hashRate: 6000 }, 'hashrate')).toBe('text-success');
       expect(getMetricColor({ hashRate: 7000 }, 'hashrate')).toBe('text-success');
     });
   });
 
   describe('power', () => {
-    it('green <= 100 W', () => {
-      expect(getMetricColor({ power: 100 }, 'power')).toBe('text-success');
+    it('green <= 111 W', () => {
       expect(getMetricColor({ power: 0 }, 'power')).toBe('text-success');
+      expect(getMetricColor({ power: 100 }, 'power')).toBe('text-success');
+      expect(getMetricColor({ power: 111 }, 'power')).toBe('text-success');
     });
-    it('orange 101-112 W', () => {
-      expect(getMetricColor({ power: 101 }, 'power')).toBe('text-warning');
+    it('orange 112–115 W', () => {
       expect(getMetricColor({ power: 112 }, 'power')).toBe('text-warning');
+      expect(getMetricColor({ power: 115 }, 'power')).toBe('text-warning');
     });
-    it('red > 112 W', () => {
-      expect(getMetricColor({ power: 113 }, 'power')).toBe('text-danger');
+    it('red > 115 W', () => {
+      expect(getMetricColor({ power: 116 }, 'power')).toBe('text-danger');
     });
   });
 
@@ -86,11 +85,10 @@ describe('getMetricColor', () => {
   });
 
   describe('current', () => {
-    it('green <= 7.75 A, orange 7.76–9 A, red > 9 A', () => {
-      expect(getMetricColor({ current: 7750 }, 'current')).toBe('text-success'); // 7.75 A
-      expect(getMetricColor({ current: 8000 }, 'current')).toBe('text-warning'); // 8 A
-      expect(getMetricColor({ current: 9000 }, 'current')).toBe('text-warning'); // 9 A
-      expect(getMetricColor({ current: 9100 }, 'current')).toBe('text-danger');  // > 9 A
+    it('green <= 9 A, orange 9.1–9.5 A, red > 9.5 A', () => {
+      expect(getMetricColor({ current: 9000 }, 'current')).toBe('text-success'); // 9 A
+      expect(getMetricColor({ current: 9500 }, 'current')).toBe('text-warning'); // 9.5 A
+      expect(getMetricColor({ current: 10500 }, 'current')).toBe('text-danger');  // > 10.5 A
     });
   });
 

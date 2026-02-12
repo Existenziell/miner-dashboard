@@ -4,6 +4,7 @@ import {
   formatUptime,
   formatTemp,
   formatPower,
+  formatBytes,
   formatNumber,
   formatDifficulty,
   formatPrice,
@@ -72,6 +73,19 @@ describe('formatPower', () => {
   it('formats watts with one decimal', () => {
     expect(formatPower(100)).toBe('100.0 W');
     expect(formatPower(99.5)).toBe('99.5 W');
+  });
+});
+
+describe('formatBytes', () => {
+  it('returns "--" for null or undefined', () => {
+    expect(formatBytes(null)).toBe('--');
+    expect(formatBytes(undefined)).toBe('--');
+  });
+  it('formats B, KB, MB, GB with fixed decimal (no locale)', () => {
+    expect(formatBytes(500)).toBe('500 B');
+    expect(formatBytes(1024)).toBe('1.02 KB');
+    expect(formatBytes(7020736)).toBe('7.02 MB');
+    expect(formatBytes(1e9)).toBe('1.00 GB');
   });
 });
 

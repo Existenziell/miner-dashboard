@@ -35,9 +35,8 @@ const API_ENDPOINTS = [
 ];
 
 const CLIENT_SETTINGS = [
-  { name: 'POLL_MINER_INTERVAL_MS', source: 'constants.js', value: `${POLL_MINER_INTERVAL_MS}`, description: 'Miner status poll interval (useMinerData default)' },
+  { name: 'POLL_MINER_INTERVAL_MS', source: 'constants.js', value: `${POLL_MINER_INTERVAL_MS}`, description: 'Miner status poll interval (reduced to limit load on the miner device)' },
   { name: 'POLL_NETWORK_INTERVAL_MS', source: 'constants.js', value: `${POLL_NETWORK_INTERVAL_MS}`, description: 'Network status poll interval (useNetworkData)' },
-  { name: 'MINER_POLL_MS', source: 'MinerContext.jsx', value: '10_000', description: 'Effective miner poll interval used by MinerProvider' },
   { name: 'BASE', source: 'api.js', value: "'' (same-origin)", description: 'Base URL for API requests' },
 ];
 
