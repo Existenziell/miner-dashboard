@@ -47,7 +47,18 @@ const SERVER_SETTINGS = [
   { name: 'CACHE_TTL_MS', source: 'network.js', value: '30_000', description: 'Network route response cache TTL (ms)' },
 ];
 
+const CURL_EXAMPLES = [
+  { method: 'GET', path: '/api/miner/info', curl: (origin) => `curl -s "${origin}/api/miner/info"` },
+  { method: 'GET', path: '/api/miner/info (with query)', curl: (origin) => `curl -s "${origin}/api/miner/info?ts=1&cur=1"` },
+  { method: 'GET', path: '/api/miner/asic', curl: (origin) => `curl -s "${origin}/api/miner/asic"` },
+  { method: 'GET', path: '/api/network/status', curl: (origin) => `curl -s "${origin}/api/network/status"` },
+  { method: 'PATCH', path: '/api/miner/settings', curl: (origin) => `curl -s -X PATCH "${origin}/api/miner/settings" -H "Content-Type: application/json" -d '{"frequency":650}'` },
+  { method: 'POST', path: '/api/miner/restart', curl: (origin) => `curl -s -X POST "${origin}/api/miner/restart"` },
+  { method: 'POST', path: '/api/miner/shutdown', curl: (origin) => `curl -s -X POST "${origin}/api/miner/shutdown"` },
+];
+
 export default function ApiPage() {
+  const [origin] = useState(() => typeof window !== 'undefined' ? window.location.origin : '');
   const { data: miner, error: minerError, loading: minerLoading } = useMiner();
   const [asic, setAsic] = useState(null);
   const [asicError, setAsicError] = useState(null);
@@ -178,6 +189,27 @@ export default function ApiPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="card">
+        <h3 className="card-title">Query the API with cURL</h3>
+        <p className="text-muted-standalone text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
+        <div className="rounded-lg overflow-hidden bg-[#1e1e1e] border border-border dark:border-border-dark shadow-inner">
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#2d2d2d] border-b border-[#3d3d3d]">
+            <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+            <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+            <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
+            <span className="text-xs text-gray-400 ml-2 font-medium">Terminal</span>
+          </div>
+          <div className="p-4 text-sm font-mono text-gray-300 overflow-x-auto space-y-2">
+            {CURL_EXAMPLES.map(({ path, curl }) => (
+              <div key={path} className="flex flex-wrap gap-x-2 items-baseline">
+                <span className="text-green-400 select-none shrink-0">$</span>
+                <code className="break-all">{origin ? curl(origin) : curl('http://localhost:3000')}</code>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
