@@ -1,22 +1,18 @@
 import { computeEfficiency } from './minerMetrics';
-
 /**
  * Single source of truth for metric range thresholds (green / orange / red) and gauge display max.
  * Color classes: text-success (green), text-warning (orange), text-danger (red).
  */
 export const METRIC_RANGES = {
-  hashrate:   { greenMinGh: 5950, orangeMinGh: 5500, gaugeMaxGh: 7000 },
+  hashrate:   { greenMin: 5950, orangeMin: 5500, gaugeMax: 7000 },
   efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
   temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
   fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
   current:    { greenMax: 9, orangeMax: 9.5, gaugeMax: 10.5 },
-  frequency:  { greenMinMhz: 700, orangeMinMhz: 650, gaugeMax: 850 },
-  voltage:    { greenMv: 20, orangeMv: 50, gaugeMaxMv: 1300, diffGaugeMaxMv: 50 },
+  frequency:  { greenMin: 700, orangeMin: 650, gaugeMax: 850 },
+  voltage:    { greenMv: 20, orangeMv: 50, gaugeMax: 1400 },
   power:      { greenMax: 111, orangeMax: 115, gaugeMax: 125 },
 };
-
-/** Expected hashrate (GH) when not set – 6 TH/s. */
-export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
 
 /** Low-is-good: value ≤ greenMax → success, ≤ orangeMax → warning, else danger */
 function colorLowGood(value, greenMax, orangeMax) {
@@ -49,7 +45,7 @@ export function getMetricGaugePercent(miner, metric, efficiency = null) {
     case 'temp':
       return miner.temp != null ? clamp01((miner.temp / r.temp.gaugeMax) * 100) : null;
     case 'hashrate':
-      return miner.hashRate != null ? clamp01((miner.hashRate / r.hashrate.gaugeMaxGh) * 100) : null;
+      return miner.hashRate != null ? clamp01((miner.hashRate / r.hashrate.gaugeMax) * 100) : null;
     case 'power':
       return miner.power != null ? clamp01((miner.power / r.power.gaugeMax) * 100) : null;
     case 'efficiency': {
@@ -65,7 +61,7 @@ export function getMetricGaugePercent(miner, metric, efficiency = null) {
     case 'frequency':
       return miner.frequency != null ? clamp01((miner.frequency / r.frequency.gaugeMax) * 100) : null;
     case 'voltage':
-      return miner.coreVoltageActual != null ? clamp01((miner.coreVoltageActual / r.voltage.gaugeMaxMv) * 100) : null;
+      return miner.coreVoltageActual != null ? clamp01((miner.coreVoltageActual / r.voltage.gaugeMax) * 100) : null;
     case 'fanRpm':
       return miner.fanspeed != null ? clamp01(miner.fanspeed) : null;
     default:
@@ -91,7 +87,7 @@ export function getMetricColor(miner, metric, efficiency = null) {
       break;
     case 'hashrate':
       if (miner.hashRate == null || miner.hashRate === 0) return 'text-danger';
-      out = colorHighGood(miner.hashRate, r.hashrate.greenMinGh, r.hashrate.orangeMinGh);
+      out = colorHighGood(miner.hashRate, r.hashrate.greenMin, r.hashrate.orangeMin);
       break;
     case 'power':
       out = colorLowGood(miner.power, r.power.greenMax, r.power.orangeMax);
@@ -107,7 +103,7 @@ export function getMetricColor(miner, metric, efficiency = null) {
       break;
     }
     case 'frequency':
-      out = colorHighGood(miner.frequency, r.frequency.greenMinMhz, r.frequency.orangeMinMhz);
+      out = colorHighGood(miner.frequency, r.frequency.greenMin, r.frequency.orangeMin);
       break;
     case 'voltage': {
       if (miner.coreVoltageActual == null || miner.coreVoltage == null) break;
@@ -116,7 +112,6 @@ export function getMetricColor(miner, metric, efficiency = null) {
       break;
     }
     case 'fanRpm':
-      // Green < 65%, orange 65–75%, red > 75%
       out = colorLowGood(miner.fanspeed, r.fanRpm.orangeMinPct - 1, r.fanRpm.orangeMaxPct);
       break;
     default:

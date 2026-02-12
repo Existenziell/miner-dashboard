@@ -19,3 +19,6 @@ export const NOTIFICATION_AUTO_CLOSE_MS = 8_000;
 
 /** Auto-dismiss success toast on settings save. */
 export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
+
+/** Expected hashrate (GH) when not set – 6 TH/s. */
+export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
