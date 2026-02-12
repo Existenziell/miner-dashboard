@@ -52,36 +52,47 @@ export default function SettingsPage({ onError }) {
     return () => { cancelled = true; };
   }, []);
 
-  // Official options from AxeOS / board; defaults and absolute max from ASIC endpoint
-  const officialFreq = asic?.frequencyOptions ?? [miner?.defaultFrequency ?? 600];
-  const officialVolt = asic?.voltageOptions ?? [miner?.defaultCoreVoltage ?? 1150];
-  const defaultFreq = asic?.defaultFrequency ?? miner?.defaultFrequency ?? 600;
-  const defaultVolt = asic?.defaultVoltage ?? miner?.defaultCoreVoltage ?? 1150;
-  const absMaxFreq = asic?.absMaxFrequency ?? 800;
-  const BOARD_MAX_VOLTAGE = 1200; // NerdQaxe++ board max; do not use API absMaxVoltage (can report higher)
-  const absMaxVolt = BOARD_MAX_VOLTAGE;
+  // Min/max and options from ASIC API (GET /api/miner/asic → miner /api/system/asic).
+  // See server/routes/miner.js for expected response: frequencyOptions, voltageOptions,
+  // defaultFrequency, defaultVoltage, absMinFrequency, absMaxFrequency, absMinVoltage, absMaxVoltage.
+  const officialFreq = asic?.frequencyOptions ?? (miner?.defaultFrequency != null ? [miner.defaultFrequency] : []);
+  const officialVolt = asic?.voltageOptions ?? (miner?.defaultCoreVoltage != null ? [miner.defaultCoreVoltage] : []);
+  const defaultFreq = asic?.defaultFrequency ?? miner?.defaultFrequency;
+  const defaultVolt = asic?.defaultVoltage ?? miner?.defaultCoreVoltage;
+  const absMinFreq = asic?.absMinFrequency;
+  const absMaxFreq = asic?.absMaxFrequency;                                    // e.g. 800 (MHz)
+  const absMinVolt = asic?.absMinVoltage;
+  const absMaxVolt = asic?.absMaxVoltage ?? 1200;                              // e.g. 1200 or 1400 (mV), fallback for older API
 
-  // Frequency: official AxeOS options + 25 MHz steps from 625 up to board max, plus current value
+  // Frequency: official options + 25 MHz steps from board min to board max (when provided), plus current value
   const extendedFreq = new Set(officialFreq);
-  for (let f = 625; f <= absMaxFreq; f += 25) extendedFreq.add(f);
+  const freqRangeStart = absMinFreq != null ? absMinFreq : 625;
+  if (absMaxFreq != null) {
+    for (let f = freqRangeStart; f <= absMaxFreq; f += 25) extendedFreq.add(f);
+  }
   extendedFreq.add(frequency);
   const frequencyOptions = [...extendedFreq].sort((a, b) => a - b);
 
-  // Voltage: official + current value + board max, capped at board max (1200 mV)
-  const voltageOptions = [...new Set([...officialVolt, coreVoltage, absMaxVolt])]
-    .filter((v) => v <= BOARD_MAX_VOLTAGE)
+  // Voltage: official + current value + board min/max, clamped to board range from API
+  const voltageCandidates = [...officialVolt, coreVoltage, absMaxVolt, ...(absMinVolt != null ? [absMinVolt] : [])];
+  const voltageOptions = [...new Set(voltageCandidates)]
+    .filter((v) => v <= absMaxVolt && (absMinVolt == null || v >= absMinVolt))
     .sort((a, b) => a - b);
 
+  const currentFreq = miner?.frequency;
+  const currentVolt = miner?.coreVoltage ?? miner?.defaultCoreVoltage;
   const getFreqTag = (f) => {
     if (f === defaultFreq) return 'default';
     if (f === absMaxFreq) return 'max';
-    if (!officialFreq.includes(f)) return 'custom';
+    if (absMinFreq != null && f === absMinFreq) return 'min';
+    if (currentFreq != null && f === currentFreq) return 'current';
     return null;
   };
   const getVoltTag = (v) => {
     if (v === defaultVolt) return 'default';
     if (v === absMaxVolt) return 'max';
-    if (!officialVolt.includes(v)) return 'custom';
+    if (absMinVolt != null && v === absMinVolt) return 'min';
+    if (currentVolt != null && v === currentVolt) return 'current';
     return null;
   };
 
@@ -225,156 +236,157 @@ export default function SettingsPage({ onError }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field
               label="Frequency (MHz)"
-              hint={`Up to ${absMaxFreq} MHz is the board maximum; custom values above the AxeOS list are overclock.`}
+              hint={absMaxFreq != null ? `Max: ${absMaxFreq} MHz` : undefined}
             >
-              <select
-                value={frequency}
-                onChange={(e) => setFrequency(Number(e.target.value))}
-                className="input"
-              >
+              <div className="option-list" role="radiogroup" aria-label="Frequency (MHz)">
                 {frequencyOptions.map((f) => {
                   const tag = getFreqTag(f);
-                  const label = tag ? `${f} MHz (${tag})` : `${f} MHz`;
+                  const isSelected = frequency === f;
                   return (
-                    <option key={f} value={f}>
-                      {label}
-                    </option>
+                    <label
+                      key={f}
+                      className={`option-row ${isSelected ? 'option-row-selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="frequency"
+                        value={f}
+                        checked={isSelected}
+                        onChange={() => setFrequency(f)}
+                        className="option-radio-input"
+                      />
+                      <span className="option-radio-dot" aria-hidden />
+                      <span className="option-label">
+                        {f} MHz
+                        {tag && <span className="option-tag">({tag})</span>}
+                      </span>
+                    </label>
                   );
                 })}
-              </select>
+              </div>
             </Field>
-            <Field label="Core voltage (mV)" hint="Do not exceed board max limit (1200 mV).">
-              <select
-                value={coreVoltage}
-                onChange={(e) => setCoreVoltage(Number(e.target.value))}
-                className="input"
-              >
+            <Field label="Core voltage (mV)" hint={`Max: ${absMaxVolt} mV`}>
+              <div className="option-list" role="radiogroup" aria-label="Core voltage (mV)">
                 {voltageOptions.map((v) => {
                   const tag = getVoltTag(v);
-                  const label = tag ? `${v} mV (${tag})` : `${v} mV`;
+                  const isSelected = coreVoltage === v;
                   return (
-                    <option key={v} value={v}>
-                      {label}
-                    </option>
+                    <label
+                      key={v}
+                      className={`option-row ${isSelected ? 'option-row-selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="coreVoltage"
+                        value={v}
+                        checked={isSelected}
+                        onChange={() => setCoreVoltage(v)}
+                        className="option-radio-input"
+                      />
+                      <span className="option-radio-dot" aria-hidden />
+                      <span className="option-label">
+                        {v} mV
+                        {tag && <span className="option-tag">({tag})</span>}
+                      </span>
+                    </label>
                   );
                 })}
-              </select>
+              </div>
             </Field>
           </div>
         </div>
 
-        {/* Temperature & Fan */}
-        <div className="card">
-          <h3 className="card-title">Temperature & Fan</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Overheat limit (°C)" hint="Miner shuts down above this temperature.">
-              <input
-                type="number"
-                min={50}
-                max={80}
-                value={overheatTemp}
-                onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
-                className="input"
-              />
-            </Field>
-            <Field label="Fan mode">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-body">Manual</span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={fanAuto}
-                  aria-label="Fan mode"
-                  onClick={() => setFanAuto((v) => !v)}
-                  className={`switch ${fanAuto ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                >
-                  <span className={`switch-thumb ${fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                </button>
-                <span className="text-sm text-body">Auto (PID)</span>
-              </div>
-            </Field>
-            {fanAuto ? (
-              <Field label="PID target temperature (°C)" hint="Fan aims to keep ASIC at this temp.">
+        {/* Temperature & Fan | Display side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="card">
+            <h3 className="card-title">Temperature & Fan</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Overheat limit (°C)" hint="Miner shuts down above this temperature.">
                 <input
                   type="number"
-                  min={40}
-                  max={75}
-                  value={pidTargetTemp}
-                  onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
+                  min={50}
+                  max={80}
+                  value={overheatTemp}
+                  onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
                   className="input"
                 />
               </Field>
-            ) : (
-              <Field label="Manual fan speed (%)">
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={manualFanSpeed}
-                  onChange={(e) => setManualFanSpeed(Number(e.target.value))}
-                  className="input-range"
-                />
-                <span className="text-sm text-body">{manualFanSpeed}%</span>
+              <div className="flex flex-col gap-4">
+                {fanAuto ? (
+                  <Field label="PID target temperature (°C)" hint="Fan aims to keep ASIC at this temp.">
+                    <input
+                      type="number"
+                      min={40}
+                      max={75}
+                      value={pidTargetTemp}
+                      onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
+                      className="input"
+                    />
+                  </Field>
+                ) : (
+                  <Field label="Manual fan speed (%)">
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={manualFanSpeed}
+                      onChange={(e) => setManualFanSpeed(Number(e.target.value))}
+                      className="input-range"
+                    />
+                    <span className="text-sm text-body">{manualFanSpeed}%</span>
+                  </Field>
+                )}
+                <Field label="Fan mode">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={fanAuto}
+                      aria-label="Fan mode: Manual / Auto (PID)"
+                      onClick={() => setFanAuto((v) => !v)}
+                      className={`switch ${fanAuto ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    >
+                      <span className={`switch-thumb ${fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                    </button>
+                    <span className="text-sm text-body">{fanAuto ? 'Auto (PID)' : 'Manual'}</span>
+                  </div>
+                </Field>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Display</h3>
+            <div className="flex flex-col gap-4">
+              <Field label="Automatic screen shutdown" hint="Turn off miner display after inactivity.">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={autoScreenOff}
+                    onClick={() => setAutoScreenOff((v) => !v)}
+                    className={`switch ${autoScreenOff ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  >
+                    <span className={`switch-thumb ${autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  </button>
+                  <span className="text-sm text-body">{autoScreenOff ? 'On' : 'Off'}</span>
+                </div>
               </Field>
-            )}
-          </div>
-        </div>
-
-        {/* Display */}
-        <div className="card">
-          <h3 className="card-title">Display</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Automatic screen shutdown" hint="Turn off miner display after inactivity.">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={autoScreenOff}
-                  onClick={() => setAutoScreenOff((v) => !v)}
-                  className={`switch ${autoScreenOff ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                >
-                  <span className={`switch-thumb ${autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                </button>
-                <span className="text-sm text-body">{autoScreenOff ? 'On' : 'Off'}</span>
-              </div>
-            </Field>
-            <Field label="Flip screen" hint="Rotate display 180°.">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={flipScreen}
-                  onClick={() => setFlipScreen((v) => !v)}
-                  className={`switch ${flipScreen ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                >
-                  <span className={`switch-thumb ${flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                </button>
-                <span className="text-sm text-body">{flipScreen ? 'On' : 'Off'}</span>
-              </div>
-            </Field>
-          </div>
-        </div>
-
-        {/* Restart & Shutdown */}
-        <div className="card">
-          <h3 className="card-title">Restart & Shutdown</h3>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={handleRestart}
-              disabled={restarting || shuttingDown}
-              className="btn-ghost-accent"
-            >
-              {restarting ? 'Restarting…' : 'Restart miner'}
-            </button>
-            <button
-              type="button"
-              onClick={handleShutdown}
-              disabled={restarting || shuttingDown}
-              className="btn-ghost-accent"
-            >
-              {shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
-            </button>
+              <Field label="Flip screen" hint="Rotate display 180°.">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={flipScreen}
+                    onClick={() => setFlipScreen((v) => !v)}
+                    className={`switch ${flipScreen ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  >
+                    <span className={`switch-thumb ${flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  </button>
+                  <span className="text-sm text-body">{flipScreen ? 'On' : 'Off'}</span>
+                </div>
+              </Field>
+            </div>
           </div>
         </div>
 
@@ -386,7 +398,7 @@ export default function SettingsPage({ onError }) {
               <button
                 type="button"
                 onClick={handleReset}
-                className="link-text text-body"
+                className="link-text text-body cursor-pointer"
               >
                 Reset
               </button>
@@ -404,33 +416,56 @@ export default function SettingsPage({ onError }) {
           </div>
         )}
 
-        {/* Save */}
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="submit"
-            disabled={saving || !hasChanges}
-            className="btn-primary"
-          >
-            {saving ? 'Saving…' : 'Save settings'}
-          </button>
-          {message?.type === 'success' && (
-            <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
-              <span aria-hidden>√</span>
-              <span>Saved successfully</span>
-            </span>
-          )}
-          {message?.type === 'error' && (
-            <span role="alert" className="toast-danger inline-flex items-center gap-2 px-3 py-2">
-              <span>{message.text}</span>
+        {/* Save (left) & Restart & Shutdown (right) */}
+        <div className="card">
+          <h3 className="card-title">Restart & Shutdown</h3>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                type="submit"
+                disabled={saving || !hasChanges}
+                className="btn-primary"
+              >
+                {saving ? 'Saving…' : 'Save settings'}
+              </button>
+              {message?.type === 'success' && (
+                <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
+                  <span aria-hidden>√</span>
+                  <span>Saved successfully</span>
+                </span>
+              )}
+              {message?.type === 'error' && (
+                <span role="alert" className="toast-danger inline-flex items-center gap-2 px-3 py-2">
+                  <span>{message.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => setMessage(null)}
+                    className="link-text font-medium opacity-90 hover:opacity-100"
+                  >
+                    Dismiss
+                  </button>
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={() => setMessage(null)}
-                className="link-text font-medium opacity-90 hover:opacity-100"
+                onClick={handleRestart}
+                disabled={restarting || shuttingDown}
+                className="btn-ghost-accent"
               >
-                Dismiss
+                {restarting ? 'Restarting…' : 'Restart miner'}
               </button>
-            </span>
-          )}
+              <button
+                type="button"
+                onClick={handleShutdown}
+                disabled={restarting || shuttingDown}
+                className="btn-ghost-accent"
+              >
+                {shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
+              </button>
+            </div>
+          </div>
         </div>
       </form>
     </div>

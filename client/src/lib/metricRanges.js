@@ -95,6 +95,50 @@ function fanSpeedColor(fanspeedPct) {
 /** Tailwind text class for accent (fuchsia) when metric has no range-based color */
 const DEFAULT_ACCENT_COLOR = 'text-accent';
 
+/** Gauge fill scale: 0–100 for ring fill. Uses same ranges as color logic where applicable. */
+const TEMP_GAUGE_MAX = 85;
+const POWER_GAUGE_MAX = 120;
+const EFF_GAUGE_MAX = 30;
+const CURRENT_GAUGE_MAX = 10;
+const HASHRATE_GAUGE_MAX_GH = 7000;   // 7 TH/s
+const VOLTAGE_GAUGE_MAX_MV = 1300;
+const FREQUENCY_GAUGE_MAX = 850;
+const VOLTAGE_DIFF_GAUGE_MAX_MV = 50;
+
+function clamp01(v) {
+  if (v == null || Number.isNaN(v)) return null;
+  return Math.max(0, Math.min(100, v));
+}
+
+export function getMetricGaugePercent(miner, metric, efficiency = null) {
+  if (!miner) return null;
+  switch (metric) {
+    case 'temp':
+      return miner.temp != null ? clamp01((miner.temp / TEMP_GAUGE_MAX) * 100) : null;
+    case 'hashrate':
+      return miner.hashRate != null ? clamp01((miner.hashRate / HASHRATE_GAUGE_MAX_GH) * 100) : null;
+    case 'power':
+      return miner.power != null ? clamp01((miner.power / POWER_GAUGE_MAX) * 100) : null;
+    case 'efficiency': {
+      const j = efficiency ?? computeEfficiency(miner);
+      if (j == null) return null;
+      return clamp01(((EFF_GAUGE_MAX - j) / EFF_GAUGE_MAX) * 100);
+    }
+    case 'current': {
+      const a = miner.current != null ? miner.current / 1000 : null;
+      return a != null ? clamp01((a / CURRENT_GAUGE_MAX) * 100) : null;
+    }
+    case 'frequency':
+      return miner.frequency != null ? clamp01((miner.frequency / FREQUENCY_GAUGE_MAX) * 100) : null;
+    case 'voltage':
+      return miner.coreVoltageActual != null ? clamp01((miner.coreVoltageActual / VOLTAGE_GAUGE_MAX_MV) * 100) : null;
+    case 'fanRpm':
+      return miner.fanspeed != null ? clamp01(miner.fanspeed) : null;
+    default:
+      return null;
+  }
+}
+
 /**
  * Returns the Tailwind color class for a metric given miner data.
  * @param {object} miner - Miner info object

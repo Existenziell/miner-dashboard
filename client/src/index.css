@@ -62,6 +62,13 @@ a:hover {
     border-border dark:border-border-dark;
 }
 
+/* Gauge cards: less padding, no clip, so the ring isn’t cut off at the sides */
+.gauge-card {
+  @apply rounded-xl p-2 sm:p-3 border overflow-visible
+    bg-surface-card dark:bg-surface-card-dark
+    border-border dark:border-border-dark;
+}
+
 /* Card section heading */
 .card-title {
   @apply text-sm font-semibold uppercase tracking-wide mb-4
@@ -240,6 +247,37 @@ input[type="number"] {
 }
 .switch-thumb-off {
   @apply translate-x-0.5;
+}
+
+/* Option list (exclusive radio list) */
+.option-list {
+  @apply flex flex-col rounded-lg border border-border dark:border-border-dark overflow-hidden
+    bg-surface-light dark:bg-surface-light-dark max-h-[18rem] overflow-y-auto;
+}
+.option-row {
+  @apply flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b border-border/50 dark:border-border-dark/50
+    last:border-b-0 transition-colors
+    hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
+}
+.option-row-selected {
+  @apply bg-accent/15 dark:bg-accent/20 border-l-2 border-l-accent -ml-px pl-[calc(1rem-1px)];
+}
+.option-radio-input {
+  @apply sr-only;
+}
+.option-radio-dot {
+  @apply flex-shrink-0 w-4 h-4 rounded-full border-2 border-border dark:border-border-dark
+    transition-colors duration-150;
+}
+.option-row:has(.option-radio-input:checked) .option-radio-dot,
+.option-row-selected .option-radio-dot {
+  @apply border-accent bg-accent ring-4 ring-accent/25;
+}
+.option-label {
+  @apply text-sm text-fg dark:text-fg-dark font-medium;
+}
+.option-tag {
+  @apply ml-1.5 text-xs text-muted dark:text-muted-dark font-normal;
 }
 
 /* Radio and range inputs */

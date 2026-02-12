@@ -23,7 +23,16 @@ router.get('/info', async (req, res) => {
   }
 });
 
-// Proxy GET /api/miner/asic -> miner's /api/system/asic (frequency/voltage options)
+// Proxy GET /api/miner/asic -> miner's /api/system/asic (frequency/voltage options).
+// Expected miner API response fields used by the dashboard:
+//   frequencyOptions: number[]   - official frequency steps (MHz)
+//   voltageOptions: number[]    - official voltage steps (mV)
+//   defaultFrequency: number    - default frequency (MHz)
+//   defaultVoltage: number      - default core voltage (mV)
+//   absMinFrequency: number     - board min frequency (MHz), optional
+//   absMaxFrequency: number     - board max frequency (MHz), e.g. 800
+//   absMinVoltage: number       - board min core voltage (mV), optional
+//   absMaxVoltage: number       - board max core voltage (mV), e.g. 1200 or 1400
 router.get('/asic', async (_req, res) => {
   try {
     const response = await fetch(`http://${MINER_IP()}/api/system/asic`);

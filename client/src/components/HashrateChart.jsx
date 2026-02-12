@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
 import { useMiner } from '../context/MinerContext';
 import { getChartColors } from '../lib/themeColors';
-import { formatTime, useChartLegend } from '../lib/chartUtils';
+import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
 import { ClickableLegend, ChartCard } from './TimeSeriesChart';
 
 function CustomTooltip({ active, payload, label }) {
@@ -29,13 +29,13 @@ const SERIES = [
 ];
 
 const LEGEND_STORAGE_KEY = 'chartLegend_hashrate';
+const COLLAPSED_STORAGE_KEY = 'chartCollapsed_hashrate';
 const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
 
 export default function HashrateChart() {
   const history = useMiner().historyHashrate;
   const { hidden, toggle } = useChartLegend(LEGEND_STORAGE_KEY, SERIES_KEYS);
-  const [collapsed, setCollapsed] = useState(false);
-  const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(COLLAPSED_STORAGE_KEY);
   const { resolved } = useTheme();
   const chartColors = getChartColors(resolved === 'dark');
 

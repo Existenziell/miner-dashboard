@@ -44,3 +44,32 @@ export function useChartLegend(storageKey, seriesKeys) {
 
   return { hidden, toggle };
 }
+
+/**
+ * Persist chart collapsed/expanded state in localStorage.
+ * @param {string} storageKey - localStorage key (e.g. 'chartCollapsed_hashrate')
+ * @returns {{ collapsed: boolean, toggleCollapsed: () => void }}
+ */
+export function useChartCollapsed(storageKey) {
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem(storageKey) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((c) => {
+      const next = !c;
+      try {
+        localStorage.setItem(storageKey, String(next));
+      } catch {
+        // ignore localStorage errors (e.g. private mode)
+      }
+      return next;
+    });
+  }, [storageKey]);
+
+  return { collapsed, toggleCollapsed };
+}
