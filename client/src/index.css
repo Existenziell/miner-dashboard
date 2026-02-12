@@ -140,6 +140,7 @@ input[type="number"]::-webkit-outer-spin-button {
 /* Hide number input spinner (Firefox) */
 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /* Inline text that looks like a link (dotted underline, hover solid) */
