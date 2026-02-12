@@ -5,6 +5,7 @@ import { useMiner } from '../context/MinerContext';
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'settings', label: 'Settings' },
+  { id: 'api', label: 'API' },
   { id: 'docs', label: 'Docs' },
 ];
 

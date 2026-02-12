@@ -38,6 +38,9 @@ export default function MinerSettings() {
   const primary = getPoolInfo(data.stratumURL);
   const fallback = getPoolInfo(data.fallbackStratumURL);
 
+  const primaryMisconfigured = !isUsingFallback && (!(data.stratumURL || '').trim() || !(data.stratumUser || '').trim());
+  const fallbackMisconfigured = isUsingFallback && (!(data.fallbackStratumURL || '').trim() || !(data.fallbackStratumUser || '').trim());
+
   return (
     <div className="card">
       <h3 className="card-title">Pool & Settings</h3>
@@ -50,6 +53,11 @@ export default function MinerSettings() {
             <span className="badge-success">ACTIVE</span>
           )}
         </div>
+        {primaryMisconfigured && (
+          <p className="text-warning dark:text-warning-dark text-xs mb-2" role="alert">
+            Pool may be misconfigured: add Pool URL and Worker in Settings.
+          </p>
+        )}
         <div className="space-y-0.5">
           <SettingRow label="Name" value={primary.name} href={primary.webUrl} />
           <SettingRow label="URL" value={data.stratumURL ? `${data.stratumURL}:${data.stratumPort || ''}` : '--'} />
@@ -67,6 +75,11 @@ export default function MinerSettings() {
             <span className="badge-warning">ACTIVE</span>
           )}
         </div>
+        {fallbackMisconfigured && (
+          <p className="text-warning dark:text-warning-dark text-xs mb-2" role="alert">
+            Pool may be misconfigured: add Pool URL and Worker in Settings.
+          </p>
+        )}
         <div className="space-y-0.5">
           <SettingRow label="Name" value={fallback.name === '--' ? 'Not configured' : fallback.name} href={fallback.webUrl} />
           <SettingRow label="URL" value={data.fallbackStratumURL ? `${data.fallbackStratumURL}:${data.fallbackStratumPort || ''}` : '--'} />

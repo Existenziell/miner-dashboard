@@ -6,7 +6,7 @@ import { computeEfficiency } from './minerMetrics';
  */
 export const METRIC_RANGES = {
   temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
-  hashrate:   { greenMinGh: 6000, gaugeMaxGh: 7000 },
+  hashrate:   { greenMinGh: 5995, orangeMinGh: 5500, gaugeMaxGh: 7000 },
   power:      { greenMax: 100, orangeMax: 112, gaugeMax: 120 },
   efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
   current:    { greenMax: 7.75, orangeMax: 9, gaugeMax: 10 },
@@ -15,8 +15,8 @@ export const METRIC_RANGES = {
   fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
 };
 
-/** Expected hashrate (GH) when not set – from METRIC_RANGES.hashrate.greenMinGh (6 TH/s). */
-export const DEFAULT_EXPECTED_HASHRATE_GH = METRIC_RANGES.hashrate.greenMinGh;
+/** Expected hashrate (GH) when not set – 6 TH/s. */
+export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
 
 /** Low-is-good: value ≤ greenMax → success, ≤ orangeMax → warning, else danger */
 function colorLowGood(value, greenMax, orangeMax) {
@@ -91,7 +91,7 @@ export function getMetricColor(miner, metric, efficiency = null) {
       break;
     case 'hashrate':
       if (miner.hashRate == null || miner.hashRate === 0) return 'text-danger';
-      out = colorHighGood(miner.hashRate, r.hashrate.greenMinGh, 0);
+      out = colorHighGood(miner.hashRate, r.hashrate.greenMinGh, r.hashrate.orangeMinGh);
       break;
     case 'power':
       out = colorLowGood(miner.power, r.power.greenMax, r.power.orangeMax);

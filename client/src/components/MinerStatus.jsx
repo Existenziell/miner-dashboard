@@ -1,5 +1,16 @@
 import { formatUptime, formatResetReason } from '../lib/formatters';
+import { POLL_MINER_INTERVAL_MS } from '../lib/constants';
 import { useMiner } from '../context/MinerContext';
+
+function StatusDot({ connected }) {
+  return (
+    <span
+      className={`inline-block w-2 h-2 rounded-full shrink-0 ${connected ? 'bg-green-500' : 'bg-red-500'}`}
+      title={connected ? 'WiFi connected' : 'WiFi disconnected'}
+      aria-hidden
+    />
+  );
+}
 
 function ItemGrid({ items }) {
   return (
@@ -7,8 +18,9 @@ function ItemGrid({ items }) {
       {items.map((item) => (
         <div key={item.label}>
           <div className="stat-label">{item.label}</div>
-          <div className="text-body text-sm font-medium mt-0.5 truncate" title={String(item.value)}>
-            {item.value}
+          <div className="text-body text-sm font-medium mt-0.5 truncate flex items-center gap-2" title={String(item.value)}>
+            {item.status != null && <StatusDot connected={item.status === 'connected'} />}
+            <span className="truncate min-w-0">{item.value}</span>
           </div>
         </div>
       ))}
@@ -31,11 +43,24 @@ export default function MinerStatus() {
     { label: 'Last Reset', value: formatResetReason(data.lastResetReason || data.resetReason) },
   ];
 
+  const wifiConnected = data.wifiStatus != null && String(data.wifiStatus).toLowerCase().includes('connect');
   const networkItems = [
-    { label: 'WiFi', value: data.wifiRSSI != null ? `${data.wifiRSSI} dBm (${data.ssid || ''})` : '--' },
+    {
+      label: 'WiFi',
+      value: data.wifiRSSI != null ? `${data.wifiRSSI} dBm (${data.ssid || ''})` : '--',
+      status: data.wifiStatus != null ? (wifiConnected ? 'connected' : 'disconnected') : null,
+    },
     { label: 'Hostname', value: data.hostname || '--' },
     { label: 'IP Address', value: data.hostip || data.ipv4 || '192.168.1.3' },
     { label: 'MAC', value: data.macAddr || '--' },
+  ];
+
+  const hasHeap = data.freeHeap != null || data.freeHeapInt != null || data.runningPartition != null;
+  const heapItems = [
+    { label: 'Free Heap', value: data.freeHeap != null ? `${data.freeHeap.toLocaleString()} B` : '--' },
+    { label: 'Free Heap (int)', value: data.freeHeapInt != null ? data.freeHeapInt.toLocaleString() : '--' },
+    { label: 'Running Partition', value: data.runningPartition ?? '--' },
+    { label: 'Poll interval', value: `${(POLL_MINER_INTERVAL_MS / 1000).toFixed(0)} s` },
   ];
 
   return (
@@ -53,9 +78,18 @@ export default function MinerStatus() {
 
       <hr className="border-border dark:border-border-dark my-6" />
 
-      <section>
+      <section className={hasHeap ? 'mb-5' : ''}>
         <ItemGrid items={networkItems} />
       </section>
+
+      {hasHeap && (
+        <>
+          <hr className="border-border dark:border-border-dark my-6" />
+          <section>
+            <ItemGrid items={heapItems} />
+          </section>
+        </>
+      )}
     </div>
   );
 }

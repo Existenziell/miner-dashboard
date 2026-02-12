@@ -1,6 +1,6 @@
 /**
- * Tab state synced with URL query (?tab=settings|docs).
- * Valid tab ids: 'dashboard' | 'settings' | 'docs'
+ * Tab state synced with URL query (?tab=settings|docs|api).
+ * Valid tab ids: 'dashboard' | 'settings' | 'docs' | 'api'
  */
 
 export function getTabFromUrl() {
@@ -9,6 +9,7 @@ export function getTabFromUrl() {
   const t = params.get('tab');
   if (t === 'settings') return 'settings';
   if (t === 'docs') return 'docs';
+  if (t === 'api') return 'api';
   return 'dashboard';
 }
 

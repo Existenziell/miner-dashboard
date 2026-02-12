@@ -6,8 +6,8 @@ const MinerContext = createContext(null);
 
 const MINER_POLL_MS = 10_000;
 
-export function MinerProvider({ children }) {
-  const minerState = useMinerData(MINER_POLL_MS);
+export function MinerProvider({ children, pausePolling = false }) {
+  const minerState = useMinerData(MINER_POLL_MS, pausePolling);
   return <MinerContext.Provider value={minerState}>{children}</MinerContext.Provider>;
 }
 

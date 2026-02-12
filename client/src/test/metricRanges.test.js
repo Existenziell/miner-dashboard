@@ -36,11 +36,18 @@ describe('getMetricColor', () => {
       expect(getMetricColor({ hashRate: null }, 'hashrate')).toBe('text-danger');
       expect(getMetricColor({ hashRate: 0 }, 'hashrate')).toBe('text-danger');
     });
-    it('orange when < 6 TH/s', () => {
-      expect(getMetricColor({ hashRate: 5999 }, 'hashrate')).toBe('text-warning');
-      expect(getMetricColor({ hashRate: 4800 }, 'hashrate')).toBe('text-warning');
+    it('red when below orange threshold (5500 GH/s)', () => {
+      expect(getMetricColor({ hashRate: 4800 }, 'hashrate')).toBe('text-danger');
+      expect(getMetricColor({ hashRate: 5499 }, 'hashrate')).toBe('text-danger');
     });
-    it('green at or above 6 TH/s', () => {
+    it('orange from 5500 GH/s up to just under green (5995 GH/s)', () => {
+      expect(getMetricColor({ hashRate: 5500 }, 'hashrate')).toBe('text-warning');
+      expect(getMetricColor({ hashRate: 5989 }, 'hashrate')).toBe('text-warning');
+      expect(getMetricColor({ hashRate: 5994 }, 'hashrate')).toBe('text-warning');
+    });
+    it('green at or above 5.995 TH/s (5995+ GH/s, displays as 6.00 TH/s)', () => {
+      expect(getMetricColor({ hashRate: 5995 }, 'hashrate')).toBe('text-success');
+      expect(getMetricColor({ hashRate: 5999 }, 'hashrate')).toBe('text-success');
       expect(getMetricColor({ hashRate: 6000 }, 'hashrate')).toBe('text-success');
       expect(getMetricColor({ hashRate: 7000 }, 'hashrate')).toBe('text-success');
     });

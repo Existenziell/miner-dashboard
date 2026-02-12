@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 
-/** Format timestamp for chart axis/tooltip (e.g. "20:41") */
+/** Format timestamp for chart axis/tooltip in 24h format (e.g. "20:41") */
 export function formatTime(ts) {
   const d = new Date(ts);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 /**

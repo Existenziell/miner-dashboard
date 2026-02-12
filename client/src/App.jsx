@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useMiner } from './context/MinerContext';
+import { useMiner, MinerProvider } from './context/MinerContext';
 import { useNetworkData } from './hooks/useNetworkData';
 import { formatHashrate, formatTemp, formatPower } from './lib/formatters';
 import { getMetricColor, getMetricGaugePercent, DEFAULT_EXPECTED_HASHRATE_GH } from './lib/metricRanges';
@@ -17,14 +17,11 @@ import NetworkStatus from './components/NetworkStatus';
 import Header from './components/Header';
 import SettingsPage from './components/SettingsPage';
 import DocumentationPage from './components/DocumentationPage';
+import ApiPage from './components/ApiPage';
 import Notifications from './components/Notifications';
 import Footer from './components/Footer';
 
 export default function App() {
- 
-  const { data: miner, error: minerError } = useMiner();
-  const { data: network, error: networkError } = useNetworkData(POLL_NETWORK_INTERVAL_MS);
-
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
   const setActiveTab = useCallback((tab) => {
     setActiveTabState(tab);
@@ -37,11 +34,21 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
+  return (
+    <MinerProvider pausePolling={activeTab === 'settings'}>
+      <AppContent activeTab={activeTab} onTabChange={setActiveTab} />
+    </MinerProvider>
+  );
+}
+
+function AppContent({ activeTab, onTabChange }) {
+  const { data: miner, error: minerError } = useMiner();
+  const { data: network, error: networkError } = useNetworkData(POLL_NETWORK_INTERVAL_MS);
   const efficiency = computeEfficiency(miner);
 
   return (
     <div className="min-h-screen bg-surface dark:bg-surface-dark text-body">
-      <Header activeTab={activeTab} onTabChange={setActiveTab} />
+      <Header activeTab={activeTab} onTabChange={onTabChange} />
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <Notifications
@@ -54,6 +61,8 @@ export default function App() {
           <SettingsPage />
         ) : activeTab === 'docs' ? (
           <DocumentationPage />
+        ) : activeTab === 'api' ? (
+          <ApiPage />
         ) : (
           <>
             <MinerStatus />

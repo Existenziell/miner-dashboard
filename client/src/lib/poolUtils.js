@@ -19,6 +19,58 @@ export const POOLS = [
   { identifier: 'd-central', domains: ['solo.d-central.tech', 'd-central.tech'], name: 'D-Central Solo', webUrl: 'https://d-central.tech' },
 ];
 
+/**
+ * Solo mining pool options for the Settings page dropdown.
+ * Each option has concrete connection details to build stratum config sent to the miner.
+ * @typedef {{ identifier: string, name: string, stratumHost: string, port: number, tls: boolean }} SoloPoolOption
+ */
+export const SOLO_POOL_OPTIONS = [
+  { identifier: 'ckpool', name: 'CKPool', stratumHost: 'solo.ckpool.org', port: 3333, tls: false },
+  { identifier: 'ckpool-eu', name: 'CKPool (EU)', stratumHost: 'eusolo.ckpool.org', port: 3333, tls: false },
+  { identifier: 'viabtc', name: 'ViaBTC', stratumHost: 'btc.viabtc.io', port: 3333, tls: false },
+  { identifier: 'bitcoin-com', name: 'Bitcoin.com', stratumHost: 'pool.bitcoin.com', port: 3333, tls: false },
+  { identifier: 'public-pool', name: 'Public Pool', stratumHost: 'public-pool.io', port: 3333, tls: false },
+  { identifier: 'd-central', name: 'D-Central Solo', stratumHost: 'solo.d-central.tech', port: 3333, tls: false },
+  { identifier: 'kano', name: 'Kano', stratumHost: 'kano.is', port: 3333, tls: false },
+  { identifier: 'braiins', name: 'Braiins', stratumHost: 'solo.stratum.braiins.com', port: 3333, tls: false },
+  { identifier: 'luxor', name: 'Luxor', stratumHost: 'stratum.luxor.tech', port: 3333, tls: false },
+  { identifier: 'ocean', name: 'OCEAN', stratumHost: 'stratum.ocean.xyz', port: 3333, tls: false },
+];
+
+/**
+ * Build stratum payload for miner PATCH from a solo pool option.
+ * @param {SoloPoolOption} option
+ * @returns {{ stratumURL: string, stratumPort: number, stratumTLS: boolean }}
+ */
+export function getStratumPayloadFromOption(option) {
+  return {
+    stratumURL: option.stratumHost,
+    stratumPort: option.port,
+    stratumTLS: option.tls,
+  };
+}
+
+/**
+ * Find a SOLO_POOL_OPTIONS entry that matches the current miner stratum host/port.
+ * @param {string | null | undefined} stratumURL
+ * @param {number | null | undefined} stratumPort
+ * @returns {SoloPoolOption | null}
+ */
+export function findSoloPoolOption(stratumURL, stratumPort) {
+  if (!stratumURL) return null;
+  const rawHost = stratumURL.replace(/^stratum\+tcp:\/\//, '').replace(/^stratum2\+tcp:\/\//, '').split(':')[0];
+  const base = baseDomain(stratumURL) || rawHost;
+  const port = stratumPort ?? 3333;
+  // Prefer exact host match so eusolo.ckpool.org matches CKPool (EU), not CKPool
+  const exact = SOLO_POOL_OPTIONS.find(
+    (opt) => opt.stratumHost === rawHost && opt.port === port
+  );
+  if (exact) return exact;
+  return SOLO_POOL_OPTIONS.find(
+    (opt) => baseDomain(opt.stratumHost) === base && opt.port === port
+  ) ?? null;
+}
+
 /** Extract the base domain from a stratum URL, stripping common prefixes. */
 export function baseDomain(stratumHost) {
   if (!stratumHost) return null;

@@ -1,7 +1,23 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
 import { SUCCESS_MESSAGE_DISMISS_MS } from '../lib/constants';
+import {
+  SOLO_POOL_OPTIONS,
+  getStratumPayloadFromOption,
+  findSoloPoolOption,
+} from '../lib/poolUtils';
+
+const MAX_STRATUM_USER_LENGTH = 128;
+const MAX_STRATUM_PASSWORD_LENGTH = 128;
+const MAX_STRATUM_URL_LENGTH = 512;
+const MIN_STRATUM_PORT = 1;
+const MAX_STRATUM_PORT = 65535;
+
+const POOL_MODE_OPTIONS = [
+  { value: 'failover', label: 'Failover (Primary/Fallback)' },
+  { value: 'dual', label: 'Dual Pool' },
+];
 
 function Field({ label, children, hint }) {
   return (
@@ -31,6 +47,24 @@ export default function SettingsPage({ onError }) {
   const [autoScreenOff, setAutoScreenOff] = useState(!!(miner?.autoscreenoff === 1 || miner?.autoscreenoff === true));
   const [flipScreen, setFlipScreen] = useState(!!(miner?.flipscreen === 1 || miner?.flipscreen === true));
 
+  // Pool form state
+  const [primaryPoolKey, setPrimaryPoolKey] = useState('');
+  const [fallbackPoolKey, setFallbackPoolKey] = useState('');
+  const [primaryCustomURL, setPrimaryCustomURL] = useState('');
+  const [fallbackCustomURL, setFallbackCustomURL] = useState('');
+  const [primaryStratumPort, setPrimaryStratumPort] = useState(miner?.stratumPort ?? 3333);
+  const [fallbackStratumPort, setFallbackStratumPort] = useState(miner?.fallbackStratumPort ?? 3333);
+  const [primaryPassword, setPrimaryPassword] = useState(miner?.stratumPassword ?? '');
+  const [fallbackPassword, setFallbackPassword] = useState(miner?.fallbackStratumPassword ?? '');
+  const [primaryStratumUser, setPrimaryStratumUser] = useState(miner?.stratumUser ?? '');
+  const [fallbackStratumUser, setFallbackStratumUser] = useState(miner?.fallbackStratumUser ?? '');
+  const [poolMode, setPoolMode] = useState('failover');
+  const [stratumTcpKeepalive, setStratumTcpKeepalive] = useState(!!(miner?.stratum_keep === 1 || miner?.stratum_keep === true || miner?.stratumTcpKeepalive === 1 || miner?.stratumTcpKeepalive === true));
+  const [primaryTLS, setPrimaryTLS] = useState(!!(miner?.stratumTLS === 1 || miner?.stratumTLS === true));
+  const [fallbackTLS, setFallbackTLS] = useState(!!(miner?.fallbackStratumTLS === 1 || miner?.fallbackStratumTLS === true));
+  const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(!!(miner?.stratumEnonceSubscribe === 1 || miner?.stratumEnonceSubscribe === true || miner?.stratumExtranonceSubscribe === 1 || miner?.stratumExtranonceSubscribe === true));
+  const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(!!(miner?.fallbackStratumEnonceSubscribe === 1 || miner?.fallbackStratumEnonceSubscribe === true || miner?.fallbackStratumExtranonceSubscribe === 1 || miner?.fallbackStratumExtranonceSubscribe === true));
+
   // Sync form when miner data updates
   useEffect(() => {
     if (!miner) return;
@@ -42,6 +76,29 @@ export default function SettingsPage({ onError }) {
     setManualFanSpeed(miner.manualFanSpeed ?? 100);
     setAutoScreenOff(!!(miner.autoscreenoff === 1 || miner.autoscreenoff === true));
     setFlipScreen(!!(miner.flipscreen === 1 || miner.flipscreen === true));
+    setPrimaryStratumPort(miner.stratumPort ?? 3333);
+    setFallbackStratumPort(miner.fallbackStratumPort ?? 3333);
+    setPrimaryPassword(miner.stratumPassword ?? '');
+    setFallbackPassword(miner.fallbackStratumPassword ?? '');
+    setPrimaryStratumUser(miner.stratumUser ?? '');
+    setFallbackStratumUser(miner.fallbackStratumUser ?? '');
+    const primaryOpt = findSoloPoolOption(miner.stratumURL, miner.stratumPort);
+    setPrimaryPoolKey(
+      primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOL_OPTIONS[0]?.identifier ?? ''))
+    );
+    setPrimaryCustomURL(primaryOpt ? '' : (miner.stratumURL ?? ''));
+    const fallbackOpt = findSoloPoolOption(miner.fallbackStratumURL, miner.fallbackStratumPort);
+    setFallbackPoolKey(
+      fallbackOpt?.identifier ?? (miner.fallbackStratumURL ? 'other' : '')
+    );
+    setFallbackCustomURL(fallbackOpt ? '' : (miner.fallbackStratumURL ?? ''));
+    const mode = miner.poolMode != null ? String(miner.poolMode).toLowerCase() : 'failover';
+    setPoolMode(mode === 'dual' ? 'dual' : 'failover');
+    setStratumTcpKeepalive(!!(miner.stratum_keep === 1 || miner.stratum_keep === true || miner.stratumTcpKeepalive === 1 || miner.stratumTcpKeepalive === true));
+    setPrimaryTLS(!!(miner.stratumTLS === 1 || miner.stratumTLS === true));
+    setFallbackTLS(!!(miner.fallbackStratumTLS === 1 || miner.fallbackStratumTLS === true));
+    setPrimaryExtranonceSubscribe(!!(miner.stratumEnonceSubscribe === 1 || miner.stratumEnonceSubscribe === true || miner.stratumExtranonceSubscribe === 1 || miner.stratumExtranonceSubscribe === true));
+    setFallbackExtranonceSubscribe(!!(miner.fallbackStratumEnonceSubscribe === 1 || miner.fallbackStratumEnonceSubscribe === true || miner.fallbackStratumExtranonceSubscribe === 1 || miner.fallbackStratumExtranonceSubscribe === true));
   }, [miner]);
 
   // Fetch ASIC options (frequency/voltage dropdowns)
@@ -74,11 +131,38 @@ export default function SettingsPage({ onError }) {
   extendedFreq.add(frequency);
   const frequencyOptions = [...extendedFreq].sort((a, b) => a - b);
 
-  // Voltage: official + current value + board min/max, clamped to board range from API
-  const voltageCandidates = [...officialVolt, coreVoltage, absMaxVolt, ...(absMinVolt != null ? [absMinVolt] : [])];
-  const voltageOptions = [...new Set(voltageCandidates)]
+  // Voltage: official + 50 mV steps from board min to max (like frequency), plus current value
+  const VOLTAGE_STEP_MV = 50;
+  const extendedVolt = new Set([...officialVolt, coreVoltage, absMaxVolt, ...(absMinVolt != null ? [absMinVolt] : [])]);
+  const voltRangeStart = absMinVolt ?? (officialVolt.length ? Math.min(...officialVolt) : 1000);
+  if (absMaxVolt != null) {
+    for (let v = voltRangeStart; v <= absMaxVolt; v += VOLTAGE_STEP_MV) extendedVolt.add(v);
+  }
+  const voltageOptions = [...extendedVolt]
     .filter((v) => v <= absMaxVolt && (absMinVolt == null || v >= absMinVolt))
     .sort((a, b) => a - b);
+
+  // Warn when frequency/voltage combination is risky (high freq + low volt, or low freq + high volt)
+  const frequencyVoltageWarning = useMemo(() => {
+    const maxF = frequencyOptions.length ? Math.max(...frequencyOptions) : null;
+    const minF = frequencyOptions.length ? Math.min(...frequencyOptions) : null;
+    const maxV = voltageOptions.length ? Math.max(...voltageOptions) : null;
+    const minV = voltageOptions.length ? Math.min(...voltageOptions) : null;
+    if (maxF == null || minF == null || maxV == null || minV == null) return null;
+    const highFreq = frequency >= maxF - 25;
+    const lowFreq = frequency <= minF + 25;
+    const highVolt = coreVoltage >= maxV - 50;
+    const lowVolt = coreVoltage <= minV + 50;
+    if (highFreq && lowVolt) {
+      return 'High frequency with low voltage can cause instability or damage. Use vendor‑recommended combinations.';
+    }
+    if (lowFreq && highVolt) {
+      return 'Low frequency with high voltage wastes power and increases heat. Prefer recommended settings.';
+    }
+    return null;
+  }, [frequency, coreVoltage, frequencyOptions, voltageOptions]);
+
+  const selectedFreqRef = useRef(/** @type {HTMLLabelElement | null} */ (null));
 
   const currentFreq = miner?.frequency;
   const currentVolt = miner?.coreVoltage ?? miner?.defaultCoreVoltage;
@@ -97,23 +181,46 @@ export default function SettingsPage({ onError }) {
     return null;
   };
 
+  // Scroll frequency list so the selected option is in view
+  useEffect(() => {
+    selectedFreqRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [frequency]);
+
   // Baseline from miner (current saved state) for change detection
-  const baseline = useMemo(
-    () =>
-      miner
-        ? {
-            frequency: miner.frequency ?? 600,
-            coreVoltage: miner.coreVoltage ?? miner.defaultCoreVoltage ?? 1150,
-            overheatTemp: miner.overheat_temp ?? 70,
-            fanAuto: !!(miner.autofanspeed != null && miner.autofanspeed !== 0),
-            pidTargetTemp: miner.pidTargetTemp ?? 55,
-            manualFanSpeed: miner.manualFanSpeed ?? 100,
-            autoScreenOff: !!(miner.autoscreenoff === 1 || miner.autoscreenoff === true),
-            flipScreen: !!(miner.flipscreen === 1 || miner.flipscreen === true),
-          }
-        : null,
-    [miner]
-  );
+  const baseline = useMemo(() => {
+    if (!miner) return null;
+    const primaryOpt = findSoloPoolOption(miner.stratumURL, miner.stratumPort);
+    const fallbackOpt = findSoloPoolOption(miner.fallbackStratumURL, miner.fallbackStratumPort);
+    return {
+      frequency: miner.frequency ?? 600,
+      coreVoltage: miner.coreVoltage ?? miner.defaultCoreVoltage ?? 1150,
+      overheatTemp: miner.overheat_temp ?? 70,
+      fanAuto: !!(miner.autofanspeed != null && miner.autofanspeed !== 0),
+      pidTargetTemp: miner.pidTargetTemp ?? 55,
+      manualFanSpeed: miner.manualFanSpeed ?? 100,
+      autoScreenOff: !!(miner.autoscreenoff === 1 || miner.autoscreenoff === true),
+      flipScreen: !!(miner.flipscreen === 1 || miner.flipscreen === true),
+      primaryPoolKey: primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOL_OPTIONS[0]?.identifier ?? '')),
+      fallbackPoolKey: fallbackOpt?.identifier ?? (miner.fallbackStratumURL ? 'other' : ''),
+      primaryCustomURL: primaryOpt ? '' : (miner.stratumURL ?? ''),
+      fallbackCustomURL: fallbackOpt ? '' : (miner.fallbackStratumURL ?? ''),
+      primaryStratumPort: miner.stratumPort ?? 3333,
+      fallbackStratumPort: miner.fallbackStratumPort ?? 3333,
+      primaryPassword: miner.stratumPassword ?? '',
+      fallbackPassword: miner.fallbackStratumPassword ?? '',
+      primaryStratumUser: miner.stratumUser ?? '',
+      fallbackStratumUser: miner.fallbackStratumUser ?? '',
+      poolMode: (() => {
+        const m = miner.poolMode != null ? String(miner.poolMode).toLowerCase() : 'failover';
+        return m === 'dual' ? 'dual' : 'failover';
+      })(),
+      stratumTcpKeepalive: !!(miner.stratum_keep === 1 || miner.stratum_keep === true || miner.stratumTcpKeepalive === 1 || miner.stratumTcpKeepalive === true),
+      primaryTLS: !!(miner.stratumTLS === 1 || miner.stratumTLS === true),
+      fallbackTLS: !!(miner.fallbackStratumTLS === 1 || miner.fallbackStratumTLS === true),
+      primaryExtranonceSubscribe: !!(miner.stratumEnonceSubscribe === 1 || miner.stratumEnonceSubscribe === true || miner.stratumExtranonceSubscribe === 1 || miner.stratumExtranonceSubscribe === true),
+      fallbackExtranonceSubscribe: !!(miner.fallbackStratumEnonceSubscribe === 1 || miner.fallbackStratumEnonceSubscribe === true || miner.fallbackStratumExtranonceSubscribe === 1 || miner.fallbackStratumExtranonceSubscribe === true),
+    };
+  }, [miner]);
 
   const changes = useMemo(() => {
     if (!baseline) return [];
@@ -142,8 +249,58 @@ export default function SettingsPage({ onError }) {
     if (flipScreen !== baseline.flipScreen) {
       list.push({ label: 'Flip screen', from: baseline.flipScreen ? 'On' : 'Off', to: flipScreen ? 'On' : 'Off' });
     }
+    const poolLabel = (key) => (key === 'other' ? 'Other' : key === '' ? 'None' : SOLO_POOL_OPTIONS.find((o) => o.identifier === key)?.name ?? key);
+    if (primaryPoolKey !== baseline.primaryPoolKey) {
+      list.push({ label: 'Primary pool', from: poolLabel(baseline.primaryPoolKey), to: poolLabel(primaryPoolKey) });
+    }
+    if (fallbackPoolKey !== baseline.fallbackPoolKey) {
+      list.push({ label: 'Fallback pool', from: poolLabel(baseline.fallbackPoolKey), to: poolLabel(fallbackPoolKey) });
+    }
+    if (primaryPoolKey === 'other' && primaryCustomURL !== baseline.primaryCustomURL) {
+      list.push({ label: 'Primary pool URL', from: baseline.primaryCustomURL || '—', to: primaryCustomURL || '—' });
+    }
+    if (fallbackPoolKey === 'other' && fallbackCustomURL !== baseline.fallbackCustomURL) {
+      list.push({ label: 'Fallback pool URL', from: baseline.fallbackCustomURL || '—', to: fallbackCustomURL || '—' });
+    }
+    if (primaryStratumPort !== baseline.primaryStratumPort) {
+      list.push({ label: 'Primary port', from: String(baseline.primaryStratumPort), to: String(primaryStratumPort) });
+    }
+    if (fallbackStratumPort !== baseline.fallbackStratumPort) {
+      list.push({ label: 'Fallback port', from: String(baseline.fallbackStratumPort), to: String(fallbackStratumPort) });
+    }
+    if (primaryPassword !== baseline.primaryPassword) {
+      list.push({ label: 'Primary password', from: baseline.primaryPassword ? '•••' : '—', to: primaryPassword ? '•••' : '—' });
+    }
+    if (fallbackPassword !== baseline.fallbackPassword) {
+      list.push({ label: 'Fallback password', from: baseline.fallbackPassword ? '•••' : '—', to: fallbackPassword ? '•••' : '—' });
+    }
+    if (primaryStratumUser !== baseline.primaryStratumUser) {
+      list.push({ label: 'Primary worker', from: baseline.primaryStratumUser || '—', to: primaryStratumUser || '—' });
+    }
+    if (fallbackStratumUser !== baseline.fallbackStratumUser) {
+      list.push({ label: 'Fallback worker', from: baseline.fallbackStratumUser || '—', to: fallbackStratumUser || '—' });
+    }
+    const poolModeLabel = (v) => POOL_MODE_OPTIONS.find((o) => o.value === v)?.label ?? v;
+    if (poolMode !== baseline.poolMode) {
+      list.push({ label: 'Pool mode', from: poolModeLabel(baseline.poolMode), to: poolModeLabel(poolMode) });
+    }
+    if (stratumTcpKeepalive !== baseline.stratumTcpKeepalive) {
+      list.push({ label: 'Stratum TCP Keepalive', from: baseline.stratumTcpKeepalive ? 'On' : 'Off', to: stratumTcpKeepalive ? 'On' : 'Off' });
+    }
+    if (primaryTLS !== baseline.primaryTLS) {
+      list.push({ label: 'Primary TLS', from: baseline.primaryTLS ? 'On' : 'Off', to: primaryTLS ? 'On' : 'Off' });
+    }
+    if (fallbackTLS !== baseline.fallbackTLS) {
+      list.push({ label: 'Fallback TLS', from: baseline.fallbackTLS ? 'On' : 'Off', to: fallbackTLS ? 'On' : 'Off' });
+    }
+    if (primaryExtranonceSubscribe !== baseline.primaryExtranonceSubscribe) {
+      list.push({ label: 'Primary Extranonce Subscribe', from: baseline.primaryExtranonceSubscribe ? 'On' : 'Off', to: primaryExtranonceSubscribe ? 'On' : 'Off' });
+    }
+    if (fallbackExtranonceSubscribe !== baseline.fallbackExtranonceSubscribe) {
+      list.push({ label: 'Fallback Extranonce Subscribe', from: baseline.fallbackExtranonceSubscribe ? 'On' : 'Off', to: fallbackExtranonceSubscribe ? 'On' : 'Off' });
+    }
     return list;
-  }, [baseline, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen]);
+  }, [baseline, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryPassword, fallbackPassword, primaryStratumUser, fallbackStratumUser, poolMode, stratumTcpKeepalive, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe]);
 
   const hasChanges = changes.length > 0;
 
@@ -164,13 +321,164 @@ export default function SettingsPage({ onError }) {
     setManualFanSpeed(baseline.manualFanSpeed);
     setAutoScreenOff(baseline.autoScreenOff);
     setFlipScreen(baseline.flipScreen);
+    setPrimaryPoolKey(baseline.primaryPoolKey);
+    setFallbackPoolKey(baseline.fallbackPoolKey);
+    setPrimaryCustomURL(baseline.primaryCustomURL);
+    setFallbackCustomURL(baseline.fallbackCustomURL);
+    setPrimaryStratumPort(baseline.primaryStratumPort);
+    setFallbackStratumPort(baseline.fallbackStratumPort);
+    setPrimaryPassword(baseline.primaryPassword);
+    setFallbackPassword(baseline.fallbackPassword);
+    setPrimaryStratumUser(baseline.primaryStratumUser);
+    setFallbackStratumUser(baseline.fallbackStratumUser);
+    setPoolMode(baseline.poolMode);
+    setStratumTcpKeepalive(baseline.stratumTcpKeepalive);
+    setPrimaryTLS(baseline.primaryTLS);
+    setFallbackTLS(baseline.fallbackTLS);
+    setPrimaryExtranonceSubscribe(baseline.primaryExtranonceSubscribe);
+    setFallbackExtranonceSubscribe(baseline.fallbackExtranonceSubscribe);
   }, [baseline]);
+
+  // Centralized validation: single source of truth for form validity and inline errors
+  const { validationErrors, isFormValid } = useMemo(() => {
+    const errors = [];
+    // Numeric ranges (Temperature & Fan)
+    const overheatNum = Number(overheatTemp);
+    if (!Number.isFinite(overheatNum) || overheatNum < 50 || overheatNum > 80) {
+      errors.push({ id: 'overheatTemp', message: `Overheat limit must be between 50 and 80°C` });
+    }
+    const pidNum = Number(pidTargetTemp);
+    if (!Number.isFinite(pidNum) || pidNum < 40 || pidNum > 75) {
+      errors.push({ id: 'pidTargetTemp', message: `PID target temperature must be between 40 and 75°C` });
+    }
+    const fanNum = Number(manualFanSpeed);
+    if (!Number.isFinite(fanNum) || fanNum < 0 || fanNum > 100) {
+      errors.push({ id: 'manualFanSpeed', message: `Manual fan speed must be between 0 and 100%` });
+    }
+    // Pool – Primary custom URL
+    if (primaryPoolKey === 'other') {
+      const url = primaryCustomURL.trim();
+      if (!url) {
+        errors.push({ id: 'primaryCustomURL', message: 'Enter a pool URL for Primary pool.' });
+      } else if (url.length > MAX_STRATUM_URL_LENGTH) {
+        errors.push({ id: 'primaryCustomURL', message: `Pool URL must be at most ${MAX_STRATUM_URL_LENGTH} characters` });
+      }
+    }
+    // Pool – Fallback custom URL
+    if (fallbackPoolKey === 'other') {
+      const url = fallbackCustomURL.trim();
+      if (!url) {
+        errors.push({ id: 'fallbackCustomURL', message: 'Enter a pool URL for Fallback pool, or set Pool to None.' });
+      } else if (url.length > MAX_STRATUM_URL_LENGTH) {
+        errors.push({ id: 'fallbackCustomURL', message: `Pool URL must be at most ${MAX_STRATUM_URL_LENGTH} characters` });
+      }
+    }
+    // Pool – Ports
+    const primaryPortNum = Number(primaryStratumPort);
+    if (!Number.isFinite(primaryPortNum) || primaryPortNum < MIN_STRATUM_PORT || primaryPortNum > MAX_STRATUM_PORT) {
+      errors.push({ id: 'primaryStratumPort', message: `Primary port must be between ${MIN_STRATUM_PORT} and ${MAX_STRATUM_PORT}` });
+    }
+    const fallbackPortNum = Number(fallbackStratumPort);
+    if (!Number.isFinite(fallbackPortNum) || fallbackPortNum < MIN_STRATUM_PORT || fallbackPortNum > MAX_STRATUM_PORT) {
+      errors.push({ id: 'fallbackStratumPort', message: `Fallback port must be between ${MIN_STRATUM_PORT} and ${MAX_STRATUM_PORT}` });
+    }
+    // Pool – Stratum user length
+    if (primaryStratumUser.length > MAX_STRATUM_USER_LENGTH) {
+      errors.push({ id: 'primaryStratumUser', message: `Primary worker: max ${MAX_STRATUM_USER_LENGTH} characters` });
+    }
+    if (fallbackStratumUser.length > MAX_STRATUM_USER_LENGTH) {
+      errors.push({ id: 'fallbackStratumUser', message: `Fallback worker: max ${MAX_STRATUM_USER_LENGTH} characters` });
+    }
+    // Pool – Password length
+    if (primaryPassword.length > MAX_STRATUM_PASSWORD_LENGTH) {
+      errors.push({ id: 'primaryPassword', message: `Primary password: max ${MAX_STRATUM_PASSWORD_LENGTH} characters` });
+    }
+    if (fallbackPassword.length > MAX_STRATUM_PASSWORD_LENGTH) {
+      errors.push({ id: 'fallbackPassword', message: `Fallback password: max ${MAX_STRATUM_PASSWORD_LENGTH} characters` });
+    }
+    return {
+      validationErrors: errors,
+      isFormValid: errors.length === 0,
+    };
+  }, [overheatTemp, pidTargetTemp, manualFanSpeed, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword]);
+
+  // Derived per-field values for inline UI (driven from centralized validation)
+  const primaryStratumUserError = validationErrors.find((e) => e.id === 'primaryStratumUser')?.message ?? null;
+  const fallbackStratumUserError = validationErrors.find((e) => e.id === 'fallbackStratumUser')?.message ?? null;
+  const primaryPortValid = !validationErrors.some((e) => e.id === 'primaryStratumPort');
+  const fallbackPortValid = !validationErrors.some((e) => e.id === 'fallbackStratumPort');
+  const primaryCustomURLError = validationErrors.find((e) => e.id === 'primaryCustomURL')?.message ?? null;
+  const fallbackCustomURLError = validationErrors.find((e) => e.id === 'fallbackCustomURL')?.message ?? null;
+  const primaryPasswordError = validationErrors.find((e) => e.id === 'primaryPassword')?.message ?? null;
+  const fallbackPasswordError = validationErrors.find((e) => e.id === 'fallbackPassword')?.message ?? null;
+  const overheatTempError = validationErrors.find((e) => e.id === 'overheatTemp')?.message ?? null;
+  const pidTargetTempError = validationErrors.find((e) => e.id === 'pidTargetTemp')?.message ?? null;
+  const manualFanSpeedError = validationErrors.find((e) => e.id === 'manualFanSpeed')?.message ?? null;
 
   const handleSave = async (e) => {
     e.preventDefault();
     setMessage(null);
+    if (!isFormValid) {
+      setMessage({ type: 'error', text: validationErrors[0].message });
+      return;
+    }
     setSaving(true);
     try {
+      const primaryOpt = primaryPoolKey && primaryPoolKey !== 'other'
+        ? SOLO_POOL_OPTIONS.find((o) => o.identifier === primaryPoolKey)
+        : null;
+      const fallbackOpt = fallbackPoolKey && fallbackPoolKey !== 'other'
+        ? SOLO_POOL_OPTIONS.find((o) => o.identifier === fallbackPoolKey)
+        : null;
+
+      const primaryPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(primaryStratumPort) || 3333));
+      const fallbackPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(fallbackStratumPort) || 3333));
+
+      const stripStratumHost = (url) => {
+        const s = (url || '').trim();
+        if (!s) return '';
+        return s
+          .replace(/^stratum\+tcp:\/\//i, '')
+          .replace(/^stratum2\+tcp:\/\//i, '')
+          .split(':')[0]
+          .split('/')[0]
+          .trim();
+      };
+
+      let poolPayload = {};
+      if (primaryOpt) {
+        const p = getStratumPayloadFromOption(primaryOpt);
+        poolPayload = { stratumURL: p.stratumURL, stratumPort: primaryPort, stratumTLS: primaryTLS };
+      } else if (primaryPoolKey === 'other') {
+        poolPayload = {
+          stratumURL: stripStratumHost(primaryCustomURL),
+          stratumPort: primaryPort,
+          stratumTLS: primaryTLS,
+        };
+      }
+      if (fallbackPoolKey === '') {
+        poolPayload.fallbackStratumURL = '';
+        poolPayload.fallbackStratumPort = fallbackPort;
+        poolPayload.fallbackStratumTLS = false;
+      } else if (fallbackOpt) {
+        const p = getStratumPayloadFromOption(fallbackOpt);
+        poolPayload.fallbackStratumURL = p.stratumURL;
+        poolPayload.fallbackStratumPort = fallbackPort;
+        poolPayload.fallbackStratumTLS = fallbackTLS;
+      } else if (fallbackPoolKey === 'other') {
+        poolPayload.fallbackStratumURL = stripStratumHost(fallbackCustomURL);
+        poolPayload.fallbackStratumPort = fallbackPort;
+        poolPayload.fallbackStratumTLS = fallbackTLS;
+      }
+      poolPayload.stratumEnonceSubscribe = primaryExtranonceSubscribe;
+      poolPayload.fallbackStratumEnonceSubscribe = fallbackExtranonceSubscribe;
+      poolPayload.stratumUser = primaryStratumUser.trim();
+      poolPayload.fallbackStratumUser = fallbackStratumUser.trim();
+      poolPayload.stratumPassword = primaryPassword.trim();
+      poolPayload.fallbackStratumPassword = fallbackPassword.trim();
+      poolPayload.poolMode = poolMode;
+      poolPayload.stratum_keep = stratumTcpKeepalive;
+
       await patchMinerSettings({
         frequency: Number(frequency),
         coreVoltage: Number(coreVoltage),
@@ -179,6 +487,7 @@ export default function SettingsPage({ onError }) {
         ...(fanAuto ? { pidTargetTemp: Number(pidTargetTemp) } : { manualFanSpeed: Number(manualFanSpeed) }),
         autoscreenoff: autoScreenOff,
         flipscreen: flipScreen,
+        ...poolPayload,
       });
       setMessage({ type: 'success', text: 'Settings saved.' });
       refetch();
@@ -229,8 +538,8 @@ export default function SettingsPage({ onError }) {
   }
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-4">
+      <form onSubmit={handleSave} className="space-y-4">
         {/* ASIC */}
         <div className="card">
           <h3 className="card-title">ASIC</h3>
@@ -246,6 +555,7 @@ export default function SettingsPage({ onError }) {
                   return (
                     <label
                       key={f}
+                      ref={isSelected ? selectedFreqRef : undefined}
                       className={`option-row ${isSelected ? 'option-row-selected' : ''}`}
                     >
                       <input
@@ -295,6 +605,11 @@ export default function SettingsPage({ onError }) {
               </div>
             </Field>
           </div>
+          {frequencyVoltageWarning && (
+            <p className="mt-3 text-warning dark:text-warning-dark text-sm" role="alert">
+              {frequencyVoltageWarning}
+            </p>
+          )}
         </div>
 
         {/* Temperature & Fan | Display side by side */}
@@ -309,8 +624,15 @@ export default function SettingsPage({ onError }) {
                   max={80}
                   value={overheatTemp}
                   onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
-                  className="input"
+                  className={`input ${overheatTempError ? 'border-danger' : ''}`}
+                  aria-invalid={!!overheatTempError}
+                  aria-describedby={overheatTempError ? 'overheat-temp-error' : undefined}
                 />
+                {overheatTempError && (
+                  <p id="overheat-temp-error" className="text-danger text-xs mt-1" role="alert">
+                    {overheatTempError}
+                  </p>
+                )}
               </Field>
               <div className="flex flex-col gap-4">
                 {fanAuto ? (
@@ -321,8 +643,15 @@ export default function SettingsPage({ onError }) {
                       max={75}
                       value={pidTargetTemp}
                       onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
-                      className="input"
+                      className={`input ${pidTargetTempError ? 'border-danger' : ''}`}
+                      aria-invalid={!!pidTargetTempError}
+                      aria-describedby={pidTargetTempError ? 'pid-target-temp-error' : undefined}
                     />
+                    {pidTargetTempError && (
+                      <p id="pid-target-temp-error" className="text-danger text-xs mt-1" role="alert">
+                        {pidTargetTempError}
+                      </p>
+                    )}
                   </Field>
                 ) : (
                   <Field label="Manual fan speed (%)">
@@ -332,9 +661,16 @@ export default function SettingsPage({ onError }) {
                       max={100}
                       value={manualFanSpeed}
                       onChange={(e) => setManualFanSpeed(Number(e.target.value))}
-                      className="input-range"
+                      className={`input-range ${manualFanSpeedError ? 'border-danger' : ''}`}
+                      aria-invalid={!!manualFanSpeedError}
+                      aria-describedby={manualFanSpeedError ? 'manual-fan-speed-error' : undefined}
                     />
                     <span className="text-sm text-body">{manualFanSpeed}%</span>
+                    {manualFanSpeedError && (
+                      <p id="manual-fan-speed-error" className="text-danger text-xs mt-1" role="alert">
+                        {manualFanSpeedError}
+                      </p>
+                    )}
                   </Field>
                 )}
                 <Field label="Fan mode">
@@ -391,6 +727,299 @@ export default function SettingsPage({ onError }) {
           </div>
         </div>
 
+        {/* Pool (last settings section) */}
+        <div className="card">
+          <h3 className="card-title">Pool</h3>
+
+          {/* Top: Pool mode + TCP Keepalive */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-border dark:border-border-dark">
+            <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
+              <select
+                value={poolMode}
+                onChange={(e) => setPoolMode(e.target.value)}
+                className="input"
+                aria-label="Pool mode"
+              >
+                {POOL_MODE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Enable Stratum TCP Keepalive" hint="Keep stratum connection alive with periodic pings.">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={stratumTcpKeepalive}
+                  aria-label="Enable Stratum TCP Keepalive"
+                  onClick={() => setStratumTcpKeepalive((v) => !v)}
+                  className={`switch ${stratumTcpKeepalive ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                >
+                  <span className={`switch-thumb ${stratumTcpKeepalive ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                </button>
+                <span className="text-sm text-body">{stratumTcpKeepalive ? 'On' : 'Off'}</span>
+              </div>
+            </Field>
+          </div>
+
+          {/* Pool 1 (left) | Pool 2 (right) with divider */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4">
+            <div className="flex flex-col gap-4 pr-4 md:border-r md:border-border dark:md:border-border-dark">
+              <div className="flex items-center gap-2">
+                <p className="label font-semibold text-body mb-0">
+                  {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
+                </p>
+                {!(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.stratumURL || '').trim() ? (
+                  <span className="badge-success">ACTIVE</span>
+                ) : null}
+              </div>
+              <Field label="Pool" hint="Solo mining pool for block templates.">
+                <select
+                  value={primaryPoolKey}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setPrimaryPoolKey(v);
+                    const opt = v && v !== 'other' ? SOLO_POOL_OPTIONS.find((o) => o.identifier === v) : null;
+                    if (opt) setPrimaryStratumPort(opt.port);
+                  }}
+                  className="input"
+                  aria-label="Primary pool"
+                >
+                  {SOLO_POOL_OPTIONS.map((opt) => (
+                    <option key={opt.identifier} value={opt.identifier}>
+                      {opt.name} ({opt.stratumHost})
+                    </option>
+                  ))}
+                  <option value="other">Other</option>
+                </select>
+              </Field>
+              {primaryPoolKey === 'other' && (
+                <Field label="Pool URL" hint="Do not include 'stratum+tcp://' or port.">
+                  <input
+                    type="text"
+                    value={primaryCustomURL}
+                    onChange={(e) => setPrimaryCustomURL(e.target.value)}
+                    placeholder="stratum.example.com"
+                    className={`input ${primaryCustomURLError ? 'border-danger' : ''}`}
+                    aria-label="Primary pool URL"
+                    aria-invalid={!!primaryCustomURLError}
+                    aria-describedby={primaryCustomURLError ? 'primary-custom-url-error' : undefined}
+                  />
+                  {primaryCustomURLError && (
+                    <p id="primary-custom-url-error" className="text-danger text-xs mt-1" role="alert">
+                      {primaryCustomURLError}
+                    </p>
+                  )}
+                </Field>
+              )}
+              <Field label="Stratum port" hint={`Port 1–${MAX_STRATUM_PORT}. Usually 3333.`}>
+                <input
+                  type="number"
+                  min={MIN_STRATUM_PORT}
+                  max={MAX_STRATUM_PORT}
+                  value={primaryStratumPort}
+                  onChange={(e) => setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || 3333)))}
+                  className={`input ${!primaryPortValid ? 'border-danger' : ''}`}
+                  aria-invalid={!primaryPortValid}
+                />
+              </Field>
+              <Field label="Worker / payout address" hint="Bitcoin address or pool username.">
+                <input
+                  type="text"
+                  value={primaryStratumUser}
+                  onChange={(e) => setPrimaryStratumUser(e.target.value)}
+                  placeholder="bc1q..."
+                  maxLength={MAX_STRATUM_USER_LENGTH}
+                  className={`input ${primaryStratumUserError ? 'border-danger' : ''}`}
+                  aria-invalid={!!primaryStratumUserError}
+                  aria-describedby={primaryStratumUserError ? 'primary-stratum-user-error' : undefined}
+                />
+                {primaryStratumUserError && (
+                  <p id="primary-stratum-user-error" className="text-danger text-xs mt-1" role="alert">
+                    {primaryStratumUserError}
+                  </p>
+                )}
+              </Field>
+              <Field label="Password" hint="Pool password. Some devices do not return it; leave blank to keep the current password.">
+                <input
+                  type="text"
+                  value={primaryPassword}
+                  onChange={(e) => setPrimaryPassword(e.target.value)}
+                  maxLength={MAX_STRATUM_PASSWORD_LENGTH}
+                  className={`input ${primaryPasswordError ? 'border-danger' : ''}`}
+                  placeholder="Optional"
+                  aria-label="Primary pool password"
+                  aria-invalid={!!primaryPasswordError}
+                  aria-describedby={primaryPasswordError ? 'primary-password-error' : undefined}
+                />
+                {primaryPasswordError && (
+                  <p id="primary-password-error" className="text-danger text-xs mt-1" role="alert">
+                    {primaryPasswordError}
+                  </p>
+                )}
+              </Field>
+              <Field label="Enable Extranonce Subscribe" hint="Request extranonce updates from pool.">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={primaryExtranonceSubscribe}
+                    aria-label="Primary pool Enable Extranonce Subscribe"
+                    onClick={() => setPrimaryExtranonceSubscribe((v) => !v)}
+                    className={`switch ${primaryExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  >
+                    <span className={`switch-thumb ${primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  </button>
+                  <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
+                </div>
+              </Field>
+              <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool.">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={primaryTLS}
+                    aria-label="Primary pool Encrypted connection TLS"
+                    onClick={() => setPrimaryTLS((v) => !v)}
+                    className={`switch ${primaryTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  >
+                    <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  </button>
+                  <span className="text-sm text-body">{primaryTLS ? 'On' : 'Off'}</span>
+                </div>
+              </Field>
+            </div>
+            <div className="flex flex-col gap-4 pt-4 md:pt-0 md:pl-4">
+              <div className="flex items-center gap-2">
+                <p className="label font-semibold text-body mb-0">
+                  {poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
+                </p>
+                {(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.fallbackStratumURL || '').trim() ? (
+                  <span className="badge-warning">ACTIVE</span>
+                ) : null}
+              </div>
+              <Field label="Pool" hint="Used when primary is unreachable.">
+                <select
+                  value={fallbackPoolKey}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setFallbackPoolKey(v);
+                    const opt = v && v !== 'other' ? SOLO_POOL_OPTIONS.find((o) => o.identifier === v) : null;
+                    if (opt) setFallbackStratumPort(opt.port);
+                  }}
+                  className="input"
+                  aria-label="Fallback pool"
+                >
+                  <option value="">None</option>
+                  {SOLO_POOL_OPTIONS.map((opt) => (
+                    <option key={opt.identifier} value={opt.identifier}>
+                      {opt.name} ({opt.stratumHost})
+                    </option>
+                  ))}
+                  <option value="other">Other</option>
+                </select>
+              </Field>
+              {fallbackPoolKey === 'other' && (
+                <Field label="Pool URL" hint="Do not include 'stratum+tcp://' or port.">
+                  <input
+                    type="text"
+                    value={fallbackCustomURL}
+                    onChange={(e) => setFallbackCustomURL(e.target.value)}
+                    placeholder="stratum.example.com"
+                    className={`input ${fallbackCustomURLError ? 'border-danger' : ''}`}
+                    aria-label="Fallback pool URL"
+                    aria-invalid={!!fallbackCustomURLError}
+                    aria-describedby={fallbackCustomURLError ? 'fallback-custom-url-error' : undefined}
+                  />
+                  {fallbackCustomURLError && (
+                    <p id="fallback-custom-url-error" className="text-danger text-xs mt-1" role="alert">
+                      {fallbackCustomURLError}
+                    </p>
+                  )}
+                </Field>
+              )}
+              <Field label="Stratum port" hint={`Port 1–${MAX_STRATUM_PORT}. Usually 3333.`}>
+                <input
+                  type="number"
+                  min={MIN_STRATUM_PORT}
+                  max={MAX_STRATUM_PORT}
+                  value={fallbackStratumPort}
+                  onChange={(e) => setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || 3333)))}
+                  className={`input ${!fallbackPortValid ? 'border-danger' : ''}`}
+                  aria-invalid={!fallbackPortValid}
+                />
+              </Field>
+              <Field label="Worker / payout address" hint="Bitcoin address or pool username.">
+                <input
+                  type="text"
+                  value={fallbackStratumUser}
+                  onChange={(e) => setFallbackStratumUser(e.target.value)}
+                  placeholder="bc1q..."
+                  maxLength={MAX_STRATUM_USER_LENGTH}
+                  className={`input ${fallbackStratumUserError ? 'border-danger' : ''}`}
+                  aria-invalid={!!fallbackStratumUserError}
+                  aria-describedby={fallbackStratumUserError ? 'fallback-stratum-user-error' : undefined}
+                />
+                {fallbackStratumUserError && (
+                  <p id="fallback-stratum-user-error" className="text-danger text-xs mt-1" role="alert">
+                    {fallbackStratumUserError}
+                  </p>
+                )}
+              </Field>
+              <Field label="Password" hint="Pool password. Some devices do not return it; leave blank to keep the current password.">
+                <input
+                  type="text"
+                  value={fallbackPassword}
+                  onChange={(e) => setFallbackPassword(e.target.value)}
+                  maxLength={MAX_STRATUM_PASSWORD_LENGTH}
+                  className={`input ${fallbackPasswordError ? 'border-danger' : ''}`}
+                  placeholder="Optional"
+                  aria-label="Fallback pool password"
+                  aria-invalid={!!fallbackPasswordError}
+                  aria-describedby={fallbackPasswordError ? 'fallback-password-error' : undefined}
+                />
+                {fallbackPasswordError && (
+                  <p id="fallback-password-error" className="text-danger text-xs mt-1" role="alert">
+                    {fallbackPasswordError}
+                  </p>
+                )}
+              </Field>
+              <Field label="Enable Extranonce Subscribe" hint="Request extranonce updates from pool.">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={fallbackExtranonceSubscribe}
+                    aria-label="Fallback pool Enable Extranonce Subscribe"
+                    onClick={() => setFallbackExtranonceSubscribe((v) => !v)}
+                    className={`switch ${fallbackExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  >
+                    <span className={`switch-thumb ${fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  </button>
+                  <span className="text-sm text-body">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
+                </div>
+              </Field>
+              <Field label="Encrypted connection (TLS)" hint="Use TLS for fallback pool.">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={fallbackTLS}
+                    aria-label="Fallback pool Encrypted connection TLS"
+                    onClick={() => setFallbackTLS((v) => !v)}
+                    className={`switch ${fallbackTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  >
+                    <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  </button>
+                  <span className="text-sm text-body">{fallbackTLS ? 'On' : 'Off'}</span>
+                </div>
+              </Field>
+            </div>
+          </div>
+        </div>
+
         {/* Pending changes */}
         {hasChanges && (
           <div className="highlight-box">
@@ -422,9 +1051,14 @@ export default function SettingsPage({ onError }) {
           <h3 className="card-title">Restart & Shutdown</h3>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4">
+              {hasChanges && !isFormValid && (
+                <span className="text-danger text-sm" role="alert">
+                  Fix the errors above to save.
+                </span>
+              )}
               <button
                 type="submit"
-                disabled={saving || !hasChanges}
+                disabled={saving || !hasChanges || !isFormValid}
                 className="btn-primary"
               >
                 {saving ? 'Saving…' : 'Save settings'}
