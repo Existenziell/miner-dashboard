@@ -120,11 +120,12 @@ describe('getMetricColor', () => {
   });
 
   describe('fanRpm', () => {
-    it('green < 50%', () => {
+    it('green < 65%', () => {
       expect(getMetricColor({ fanspeed: 49 }, 'fanRpm')).toBe('text-success');
+      expect(getMetricColor({ fanspeed: 64 }, 'fanRpm')).toBe('text-success');
     });
-    it('orange 50–75%', () => {
-      expect(getMetricColor({ fanspeed: 50 }, 'fanRpm')).toBe('text-warning');
+    it('orange 65–75%', () => {
+      expect(getMetricColor({ fanspeed: 65 }, 'fanRpm')).toBe('text-warning');
       expect(getMetricColor({ fanspeed: 75 }, 'fanRpm')).toBe('text-warning');
     });
     it('red > 75%', () => {

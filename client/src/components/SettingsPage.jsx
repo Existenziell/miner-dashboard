@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
+import { SUCCESS_MESSAGE_DISMISS_MS } from '../lib/constants';
 
 function Field({ label, children, hint }) {
   return (
@@ -149,7 +150,7 @@ export default function SettingsPage({ onError }) {
   // Auto-dismiss success message after a short delay
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), 3000);
+    const t = setTimeout(() => setMessage(null), SUCCESS_MESSAGE_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 

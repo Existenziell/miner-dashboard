@@ -1,106 +1,41 @@
 import { computeEfficiency } from './minerMetrics';
 
 /**
- * Metric range settings:
- *
- * | Metric            | Green        | Orange       | Red          |
- * |-------------------|--------------|--------------|--------------|
- * | ASIC Temperature  | 0–55.5 °C    | >55.5–65 °C  | >65 °C       |
- * | Hashrate          | >6 TH/s      | ≤6 TH/s      | 0            |
- * | Power             | ≤100 W       | 101–112 W    | >112 W       |
- * | Efficiency        | ≤20 J/TH     | 21–25 J/TH   | >25 J/TH     |
- * | Input Current     | ≤7.75 A      | 7.76–9 A     | >9 A         |
- * | ASIC Frequency    | ≤90% of max  | 91–95% of max| >95% of max  |
- * | ASIC Voltage      | 20 mV of set | 21–50 mV off | >50 mV off   |
- * | Fan Speed         | <50% of max  | 50–75%       | >75% of max   |
- *
- * Returns Tailwind color classes: text-success (green), text-warning (orange), text-danger (red).
+ * Single source of truth for metric range thresholds (green / orange / red) and gauge display max.
+ * Color classes: text-success (green), text-warning (orange), text-danger (red).
  */
+export const METRIC_RANGES = {
+  temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
+  hashrate:   { greenMinGh: 6000, gaugeMaxGh: 7000 },
+  power:      { greenMax: 100, orangeMax: 112, gaugeMax: 120 },
+  efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
+  current:    { greenMax: 7.75, orangeMax: 9, gaugeMax: 10 },
+  frequency:  { greenMinMhz: 700, orangeMinMhz: 650, gaugeMax: 850 },
+  voltage:    { greenMv: 20, orangeMv: 50, gaugeMaxMv: 1300, diffGaugeMaxMv: 50 },
+  fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
+};
 
-const TEMP_GREEN_MAX = 55.5;
-const TEMP_ORANGE_MAX = 65;
-function tempColor(temp) {
-  if (temp == null) return null;
-  if (temp <= TEMP_GREEN_MAX) return 'text-success';
-  if (temp <= TEMP_ORANGE_MAX) return 'text-warning';
+/** Expected hashrate (GH) when not set – from METRIC_RANGES.hashrate.greenMinGh (6 TH/s). */
+export const DEFAULT_EXPECTED_HASHRATE_GH = METRIC_RANGES.hashrate.greenMinGh;
+
+/** Low-is-good: value ≤ greenMax → success, ≤ orangeMax → warning, else danger */
+function colorLowGood(value, greenMax, orangeMax) {
+  if (value == null) return null;
+  if (value <= greenMax) return 'text-success';
+  if (value <= orangeMax) return 'text-warning';
   return 'text-danger';
 }
 
-export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
-
-const HASHRATE_GREEN_MIN_GH = 6000; // 6 TH/s – green at or above this
-function hashrateColor(hashRate) {
-  if (hashRate == null || hashRate === 0) return 'text-danger';
-  if (hashRate >= HASHRATE_GREEN_MIN_GH) return 'text-success';
-  return 'text-warning';
-}
-
-const POWER_GREEN_MAX = 100;
-const POWER_ORANGE_MAX = 112;  // red only above 112 W
-function powerColor(power) {
-  if (power == null) return null;
-  if (power <= POWER_GREEN_MAX) return 'text-success';
-  if (power <= POWER_ORANGE_MAX) return 'text-warning';
-  return 'text-danger';
-}
-
-const EFF_GREEN_MAX = 20;
-const EFF_ORANGE_MAX = 25;
-function efficiencyColor(jPerTh) {
-  if (jPerTh == null) return null;
-  if (jPerTh <= EFF_GREEN_MAX) return 'text-success';
-  if (jPerTh <= EFF_ORANGE_MAX) return 'text-warning';
-  return 'text-danger';
-}
-
-const CURRENT_GREEN_MAX = 7.75;
-const CURRENT_ORANGE_MAX = 9;  // red only above 9 A
-function currentColor(currentA) {
-  if (currentA == null) return null;
-  if (currentA <= CURRENT_GREEN_MAX) return 'text-success';
-  if (currentA <= CURRENT_ORANGE_MAX) return 'text-warning';
-  return 'text-danger';
-}
-
-const FREQUENCY_GREEN_MIN_MHZ = 700;   // green above 700 MHz
-const FREQUENCY_ORANGE_MIN_MHZ = 650;  // orange 650–699, red below 650
-function frequencyColor(frequency) {
-  if (frequency == null) return null;
-  if (frequency >= FREQUENCY_GREEN_MIN_MHZ) return 'text-success';   // high = good
-  if (frequency >= FREQUENCY_ORANGE_MIN_MHZ) return 'text-warning';
-  return 'text-danger';   // low = bad
-}
-
-const VOLTAGE_MV_GREEN = 20;
-const VOLTAGE_MV_ORANGE = 50;
-function voltageColor(actualMv, setMv) {
-  if (actualMv == null || setMv == null) return null;
-  const diff = Math.abs(actualMv - setMv);
-  if (diff <= VOLTAGE_MV_GREEN) return 'text-success';
-  if (diff <= VOLTAGE_MV_ORANGE) return 'text-warning';
-  return 'text-danger';
-}
-
-const FAN_PCT_ORANGE_MAX = 75;  // red only above 75%
-function fanSpeedColor(fanspeedPct) {
-  if (fanspeedPct == null) return null;
-  if (fanspeedPct < 50) return 'text-success';
-  if (fanspeedPct <= FAN_PCT_ORANGE_MAX) return 'text-warning';
+/** High-is-good: value ≥ greenMin → success, ≥ orangeMin → warning, else danger */
+function colorHighGood(value, greenMin, orangeMin) {
+  if (value == null) return null;
+  if (value >= greenMin) return 'text-success';
+  if (value >= orangeMin) return 'text-warning';
   return 'text-danger';
 }
 
 /** Tailwind text class for accent (fuchsia) when metric has no range-based color */
 const DEFAULT_ACCENT_COLOR = 'text-accent';
-
-/** Gauge fill scale: 0–100 for ring fill. Uses same ranges as color logic where applicable. */
-const TEMP_GAUGE_MAX = 85;
-const POWER_GAUGE_MAX = 120;
-const EFF_GAUGE_MAX = 30;
-const CURRENT_GAUGE_MAX = 10;
-const HASHRATE_GAUGE_MAX_GH = 7000;   // 7 TH/s
-const VOLTAGE_GAUGE_MAX_MV = 1300;
-const FREQUENCY_GAUGE_MAX = 850;
-const VOLTAGE_DIFF_GAUGE_MAX_MV = 50;
 
 function clamp01(v) {
   if (v == null || Number.isNaN(v)) return null;
@@ -109,26 +44,28 @@ function clamp01(v) {
 
 export function getMetricGaugePercent(miner, metric, efficiency = null) {
   if (!miner) return null;
+  const r = METRIC_RANGES;
   switch (metric) {
     case 'temp':
-      return miner.temp != null ? clamp01((miner.temp / TEMP_GAUGE_MAX) * 100) : null;
+      return miner.temp != null ? clamp01((miner.temp / r.temp.gaugeMax) * 100) : null;
     case 'hashrate':
-      return miner.hashRate != null ? clamp01((miner.hashRate / HASHRATE_GAUGE_MAX_GH) * 100) : null;
+      return miner.hashRate != null ? clamp01((miner.hashRate / r.hashrate.gaugeMaxGh) * 100) : null;
     case 'power':
-      return miner.power != null ? clamp01((miner.power / POWER_GAUGE_MAX) * 100) : null;
+      return miner.power != null ? clamp01((miner.power / r.power.gaugeMax) * 100) : null;
     case 'efficiency': {
       const j = efficiency ?? computeEfficiency(miner);
       if (j == null) return null;
-      return clamp01(((EFF_GAUGE_MAX - j) / EFF_GAUGE_MAX) * 100);
+      const max = r.efficiency.gaugeMax;
+      return clamp01(((max - j) / max) * 100);
     }
     case 'current': {
       const a = miner.current != null ? miner.current / 1000 : null;
-      return a != null ? clamp01((a / CURRENT_GAUGE_MAX) * 100) : null;
+      return a != null ? clamp01((a / r.current.gaugeMax) * 100) : null;
     }
     case 'frequency':
-      return miner.frequency != null ? clamp01((miner.frequency / FREQUENCY_GAUGE_MAX) * 100) : null;
+      return miner.frequency != null ? clamp01((miner.frequency / r.frequency.gaugeMax) * 100) : null;
     case 'voltage':
-      return miner.coreVoltageActual != null ? clamp01((miner.coreVoltageActual / VOLTAGE_GAUGE_MAX_MV) * 100) : null;
+      return miner.coreVoltageActual != null ? clamp01((miner.coreVoltageActual / r.voltage.gaugeMaxMv) * 100) : null;
     case 'fanRpm':
       return miner.fanspeed != null ? clamp01(miner.fanspeed) : null;
     default:
@@ -145,24 +82,46 @@ export function getMetricGaugePercent(miner, metric, efficiency = null) {
 export function getMetricColor(miner, metric, efficiency = null) {
   if (!miner) return DEFAULT_ACCENT_COLOR;
 
+  const r = METRIC_RANGES;
+  let out = null;
+
   switch (metric) {
     case 'temp':
-      return tempColor(miner.temp) ?? DEFAULT_ACCENT_COLOR;
+      out = colorLowGood(miner.temp, r.temp.greenMax, r.temp.orangeMax);
+      break;
     case 'hashrate':
-      return hashrateColor(miner.hashRate);
+      if (miner.hashRate == null || miner.hashRate === 0) return 'text-danger';
+      out = colorHighGood(miner.hashRate, r.hashrate.greenMinGh, 0);
+      break;
     case 'power':
-      return powerColor(miner.power) ?? DEFAULT_ACCENT_COLOR;
-    case 'efficiency':
-      return efficiencyColor(efficiency ?? computeEfficiency(miner)) ?? DEFAULT_ACCENT_COLOR;
-    case 'current':
-      return currentColor(miner.current != null ? miner.current / 1000 : null) ?? DEFAULT_ACCENT_COLOR;
+      out = colorLowGood(miner.power, r.power.greenMax, r.power.orangeMax);
+      break;
+    case 'efficiency': {
+      const j = efficiency ?? computeEfficiency(miner);
+      out = colorLowGood(j, r.efficiency.greenMax, r.efficiency.orangeMax);
+      break;
+    }
+    case 'current': {
+      const currentA = miner.current != null ? miner.current / 1000 : null;
+      out = colorLowGood(currentA, r.current.greenMax, r.current.orangeMax);
+      break;
+    }
     case 'frequency':
-      return frequencyColor(miner.frequency) ?? DEFAULT_ACCENT_COLOR;
-    case 'voltage':
-      return voltageColor(miner.coreVoltageActual, miner.coreVoltage) ?? DEFAULT_ACCENT_COLOR;
+      out = colorHighGood(miner.frequency, r.frequency.greenMinMhz, r.frequency.orangeMinMhz);
+      break;
+    case 'voltage': {
+      if (miner.coreVoltageActual == null || miner.coreVoltage == null) break;
+      const diff = Math.abs(miner.coreVoltageActual - miner.coreVoltage);
+      out = colorLowGood(diff, r.voltage.greenMv, r.voltage.orangeMv);
+      break;
+    }
     case 'fanRpm':
-      return fanSpeedColor(miner.fanspeed) ?? DEFAULT_ACCENT_COLOR;
+      // Green < 65%, orange 65–75%, red > 75%
+      out = colorLowGood(miner.fanspeed, r.fanRpm.orangeMinPct - 1, r.fanRpm.orangeMaxPct);
+      break;
     default:
       return DEFAULT_ACCENT_COLOR;
   }
+
+  return out ?? DEFAULT_ACCENT_COLOR;
 }

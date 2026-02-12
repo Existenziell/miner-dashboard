@@ -4,6 +4,7 @@ import { useNetworkData } from './hooks/useNetworkData';
 import { formatHashrate, formatTemp, formatPower } from './lib/formatters';
 import { getMetricColor, getMetricGaugePercent, DEFAULT_EXPECTED_HASHRATE_GH } from './lib/metricRanges';
 import { getTabFromUrl, setTabInUrl } from './lib/tabUrl';
+import { POLL_NETWORK_INTERVAL_MS } from './lib/constants';
 import { computeEfficiency } from './lib/minerMetrics';
 import MinerStatus from './components/MinerStatus';
 import MetricGauge from './components/MetricGauge';
@@ -22,7 +23,7 @@ import Footer from './components/Footer';
 export default function App() {
  
   const { data: miner, error: minerError } = useMiner();
-  const { data: network, error: networkError } = useNetworkData(60_000);
+  const { data: network, error: networkError } = useNetworkData(POLL_NETWORK_INTERVAL_MS);
 
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
   const setActiveTab = useCallback((tab) => {

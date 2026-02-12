@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchMinerInfo } from '../lib/api';
+import { POLL_MINER_INTERVAL_MS } from '../lib/constants';
 
 const CHART_HISTORY_HASHRATE = 'chartHistory_hashrate';
 const CHART_HISTORY_TEMPERATURE = 'chartHistory_temperature';
@@ -99,7 +100,7 @@ function rollingAvg(buffer, key, n, nextVal) {
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
-export function useMinerData(intervalMs = 10_000, pausePolling = false) {
+export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling = false) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);

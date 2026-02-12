@@ -1,7 +1,6 @@
 import { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { evaluateAlerts } from '../lib/alerts';
-
-const COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes before re-alerting same issue
+import { ALERT_COOLDOWN_MS, NOTIFICATION_AUTO_CLOSE_MS } from '../lib/constants';
 
 function playAlertSound() {
   try {
@@ -45,7 +44,7 @@ function showBrowserNotification(title, body, tag = 'miner-alert') {
         window.focus();
         n.close();
       };
-      setTimeout(() => n.close(), 8000);
+      setTimeout(() => n.close(), NOTIFICATION_AUTO_CLOSE_MS);
     } catch {
       // ignore notification errors
     }
@@ -115,7 +114,7 @@ export function useAlerts(minerData, { minerError, networkError } = {}) {
     for (const alert of evaluated) {
       const justTriggered = !prevIds.has(alert.id);
       const lastFired = lastFiredRef.current[alert.id] ?? 0;
-      const cooldownPassed = now - lastFired >= COOLDOWN_MS;
+      const cooldownPassed = now - lastFired >= ALERT_COOLDOWN_MS;
 
       if (justTriggered || cooldownPassed) {
         lastFiredRef.current[alert.id] = now;
