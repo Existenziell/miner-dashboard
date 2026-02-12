@@ -51,15 +51,17 @@ export function ChartCard({ title, loading, loadingMessage, collapsed, onToggleC
 
   return (
     <div className="card">
-      <button
-        type="button"
-        onClick={onToggleCollapsed}
-        className="w-full text-left bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4 flex items-center justify-between gap-2 cursor-pointer border-0 focus:outline-none"
-        aria-expanded={!collapsed}
-      >
-        <h3 className="text-lg font-semibold text-body m-0">{title}</h3>
-        <span className="text-muted-standalone text-sm">{collapsed ? 'Expand' : 'Collapse'}</span>
-      </button>
+      <div className="-mx-5 -mt-5 mb-4 min-w-0">
+        <button
+          type="button"
+          onClick={onToggleCollapsed}
+          className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2 cursor-pointer border-0 focus:outline-none"
+          aria-expanded={!collapsed}
+        >
+          <h3 className="text-lg font-semibold text-body m-0">{title}</h3>
+          <span className="text-muted-standalone text-sm shrink-0">{collapsed ? 'Expand' : 'Collapse'}</span>
+        </button>
+      </div>
       {!collapsed && children}
     </div>
   );

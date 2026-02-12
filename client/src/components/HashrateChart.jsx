@@ -65,7 +65,6 @@ export default function HashrateChart() {
               domain={[5000, 'auto']}
               tickCount={10}
               tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}` : v.toFixed(0))}
-              unit=" TH/s"
             />
             <Tooltip content={<CustomTooltip />} />
             {SERIES.map((s) =>
