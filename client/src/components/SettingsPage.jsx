@@ -1138,7 +1138,7 @@ export default function SettingsPage({ onError }) {
         {hasChanges && (
           <div className="highlight-box">
             <div className="flex items-center justify-between gap-2 mb-2">
-              <p className="label font-semibold">Pending changes</p>
+              <p className="label font-semibold text-body">Pending changes</p>
               <button
                 type="button"
                 onClick={handleReset}
