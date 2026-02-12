@@ -69,7 +69,7 @@ export default function PowerChart() {
               stroke={chartColors.axis}
               fontSize={11}
               tickFormatter={(v) => `${v} W`}
-              domain={[0, 120]}
+              domain={[80, 'auto']}
               allowDataOverflow
               hide={!showPowerAxis}
             />
@@ -79,7 +79,7 @@ export default function PowerChart() {
               stroke={chartColors.axis}
               fontSize={11}
               tickFormatter={(v) => `${v} A`}
-              domain={[0, 15]}
+              domain={[4, 'auto']}
               allowDataOverflow
               hide={!showCurrentAxis}
             />

@@ -59,7 +59,14 @@ export default function HashrateChart() {
               fontSize={11}
               tickCount={6}
             />
-            <YAxis stroke={chartColors.axis} fontSize={11} tickFormatter={(v) => `${v.toFixed(0)}`} />
+            <YAxis
+              stroke={chartColors.axis}
+              fontSize={11}
+              domain={[5000, 'auto']}
+              tickCount={10}
+              tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}` : v.toFixed(0))}
+              unit=" TH/s"
+            />
             <Tooltip content={<CustomTooltip />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (

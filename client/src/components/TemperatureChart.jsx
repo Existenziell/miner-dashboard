@@ -59,7 +59,7 @@ export default function TemperatureChart() {
               tickCount={6}
             />
             {showTempAxis && (
-              <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} tickFormatter={(v) => `${v}\u00B0`} />
+              <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} domain={[40, 'auto']} tickFormatter={(v) => `${v}\u00B0`} />
             )}
             {!showTempAxis && <YAxis yAxisId="temp" hide />}
             <Tooltip content={<CustomTooltip />} />

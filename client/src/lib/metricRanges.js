@@ -5,38 +5,38 @@ import { computeEfficiency } from './minerMetrics';
  *
  * | Metric            | Green        | Orange       | Red          |
  * |-------------------|--------------|--------------|--------------|
- * | ASIC Temperature  | 0–55 °C      | 56–65 °C     | >65 °C       |
- * | Hashrate          | ≥80%         | <80%         | 0            |
- * | Power             | ≤100 W       | 101–110 W    | >110 W       |
+ * | ASIC Temperature  | 0–55.5 °C    | >55.5–65 °C  | >65 °C       |
+ * | Hashrate          | >6 TH/s      | ≤6 TH/s      | 0            |
+ * | Power             | ≤100 W       | 101–112 W    | >112 W       |
  * | Efficiency        | ≤20 J/TH     | 21–25 J/TH   | >25 J/TH     |
- * | Input Current     | ≤7.75 A      | 7.76–8 A     | >8 A         |
+ * | Input Current     | ≤7.75 A      | 7.76–9 A     | >9 A         |
  * | ASIC Frequency    | ≤90% of max  | 91–95% of max| >95% of max  |
  * | ASIC Voltage      | 20 mV of set | 21–50 mV off | >50 mV off   |
- * | Fan Speed         | <50% of max  | 50–70%       | >70% of max   |
+ * | Fan Speed         | <50% of max  | 50–75%       | >75% of max   |
  *
  * Returns Tailwind color classes: text-success (green), text-warning (orange), text-danger (red).
- * Expected hashrate default: 6000 GH/s (6 TH/s) when miner does not report it.
  */
 
+const TEMP_GREEN_MAX = 55.5;
+const TEMP_ORANGE_MAX = 65;
 function tempColor(temp) {
   if (temp == null) return null;
-  if (temp <= 55) return 'text-success';
-  if (temp <= 65) return 'text-warning';
+  if (temp <= TEMP_GREEN_MAX) return 'text-success';
+  if (temp <= TEMP_ORANGE_MAX) return 'text-warning';
   return 'text-danger';
 }
 
 export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
 
-function hashrateColor(hashRate, expectedHashrate) {
+const HASHRATE_GREEN_MIN_GH = 6000; // 6 TH/s – green at or above this
+function hashrateColor(hashRate) {
   if (hashRate == null || hashRate === 0) return 'text-danger';
-  const expected = expectedHashrate != null && expectedHashrate > 0 ? expectedHashrate : DEFAULT_EXPECTED_HASHRATE_GH;
-  const pct = (hashRate / expected) * 100;
-  if (pct < 80) return 'text-warning';
-  return 'text-success';
+  if (hashRate >= HASHRATE_GREEN_MIN_GH) return 'text-success';
+  return 'text-warning';
 }
 
 const POWER_GREEN_MAX = 100;
-const POWER_ORANGE_MAX = 110;
+const POWER_ORANGE_MAX = 112;  // red only above 112 W
 function powerColor(power) {
   if (power == null) return null;
   if (power <= POWER_GREEN_MAX) return 'text-success';
@@ -54,7 +54,7 @@ function efficiencyColor(jPerTh) {
 }
 
 const CURRENT_GREEN_MAX = 7.75;
-const CURRENT_ORANGE_MAX = 8;
+const CURRENT_ORANGE_MAX = 9;  // red only above 9 A
 function currentColor(currentA) {
   if (currentA == null) return null;
   if (currentA <= CURRENT_GREEN_MAX) return 'text-success';
@@ -62,16 +62,13 @@ function currentColor(currentA) {
   return 'text-danger';
 }
 
-const FREQUENCY_MAX_MHZ = 800;
-const FREQUENCY_GREEN_MAX_PCT = 0.9;  // 720 MHz
-const FREQUENCY_ORANGE_MAX_PCT = 0.95; // 760 MHz
+const FREQUENCY_GREEN_MIN_MHZ = 700;   // green above 700 MHz
+const FREQUENCY_ORANGE_MIN_MHZ = 650;  // orange 650–699, red below 650
 function frequencyColor(frequency) {
   if (frequency == null) return null;
-  const greenMax = FREQUENCY_MAX_MHZ * FREQUENCY_GREEN_MAX_PCT;
-  const orangeMax = FREQUENCY_MAX_MHZ * FREQUENCY_ORANGE_MAX_PCT;
-  if (frequency <= greenMax) return 'text-success';
-  if (frequency <= orangeMax) return 'text-warning';
-  return 'text-danger';
+  if (frequency >= FREQUENCY_GREEN_MIN_MHZ) return 'text-success';   // high = good
+  if (frequency >= FREQUENCY_ORANGE_MIN_MHZ) return 'text-warning';
+  return 'text-danger';   // low = bad
 }
 
 const VOLTAGE_MV_GREEN = 20;
@@ -84,7 +81,7 @@ function voltageColor(actualMv, setMv) {
   return 'text-danger';
 }
 
-const FAN_PCT_ORANGE_MAX = 70;
+const FAN_PCT_ORANGE_MAX = 75;  // red only above 75%
 function fanSpeedColor(fanspeedPct) {
   if (fanspeedPct == null) return null;
   if (fanspeedPct < 50) return 'text-success';
@@ -152,7 +149,7 @@ export function getMetricColor(miner, metric, efficiency = null) {
     case 'temp':
       return tempColor(miner.temp) ?? DEFAULT_ACCENT_COLOR;
     case 'hashrate':
-      return hashrateColor(miner.hashRate, miner.expectedHashrate);
+      return hashrateColor(miner.hashRate);
     case 'power':
       return powerColor(miner.power) ?? DEFAULT_ACCENT_COLOR;
     case 'efficiency':
