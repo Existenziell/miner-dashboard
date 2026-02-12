@@ -100,6 +100,18 @@ describe('api', () => {
       fetchStub.mockResolvedValueOnce({ ok: false, status: 400 });
       await expect(patchMinerSettings({})).rejects.toThrow('Miner PATCH error: 400');
     });
+
+    it('sends WiFi settings (hostname, ssid, wifiPass) when provided', async () => {
+      const settings = { hostname: 'bitaxe', ssid: 'MyNetwork', wifiPass: 'secret123' };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: true }) });
+
+      await patchMinerSettings(settings);
+      expect(fetchStub).toHaveBeenCalledWith('/api/miner/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+    });
   });
 
   describe('restartMiner', () => {

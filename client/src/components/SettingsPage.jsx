@@ -13,6 +13,10 @@ const MAX_STRATUM_PASSWORD_LENGTH = 128;
 const MAX_STRATUM_URL_LENGTH = 512;
 const MIN_STRATUM_PORT = 1;
 const MAX_STRATUM_PORT = 65535;
+const MAX_HOSTNAME_LENGTH = 64;
+const MAX_WIFI_SSID_LENGTH = 32;
+const MIN_WIFI_PASSWORD_LENGTH = 8;
+const MAX_WIFI_PASSWORD_LENGTH = 63;
 
 const POOL_MODE_OPTIONS = [
   { value: 'failover', label: 'Failover (Primary/Fallback)' },
@@ -47,6 +51,11 @@ export default function SettingsPage({ onError }) {
   const [autoScreenOff, setAutoScreenOff] = useState(!!(miner?.autoscreenoff === 1 || miner?.autoscreenoff === true));
   const [flipScreen, setFlipScreen] = useState(!!(miner?.flipscreen === 1 || miner?.flipscreen === true));
 
+  // WiFi form state (password not returned by API; leave blank to keep current)
+  const [hostname, setHostname] = useState(miner?.hostname ?? '');
+  const [wifiSsid, setWifiSsid] = useState(miner?.ssid ?? '');
+  const [wifiPassword, setWifiPassword] = useState('');
+
   // Pool form state
   const [primaryPoolKey, setPrimaryPoolKey] = useState('');
   const [fallbackPoolKey, setFallbackPoolKey] = useState('');
@@ -76,6 +85,8 @@ export default function SettingsPage({ onError }) {
     setManualFanSpeed(miner.manualFanSpeed ?? 100);
     setAutoScreenOff(!!(miner.autoscreenoff === 1 || miner.autoscreenoff === true));
     setFlipScreen(!!(miner.flipscreen === 1 || miner.flipscreen === true));
+    setHostname(miner.hostname ?? '');
+    setWifiSsid(miner.ssid ?? '');
     setPrimaryStratumPort(miner.stratumPort ?? 3333);
     setFallbackStratumPort(miner.fallbackStratumPort ?? 3333);
     setPrimaryPassword(miner.stratumPassword ?? '');
@@ -162,7 +173,7 @@ export default function SettingsPage({ onError }) {
     return null;
   }, [frequency, coreVoltage, frequencyOptions, voltageOptions]);
 
-  const selectedFreqRef = useRef(/** @type {HTMLLabelElement | null} */ (null));
+  const selectedFreqRef = useRef(/** @type {HTMLLabelElement | null} */(null));
 
   const currentFreq = miner?.frequency;
   const currentVolt = miner?.coreVoltage ?? miner?.defaultCoreVoltage;
@@ -200,6 +211,9 @@ export default function SettingsPage({ onError }) {
       manualFanSpeed: miner.manualFanSpeed ?? 100,
       autoScreenOff: !!(miner.autoscreenoff === 1 || miner.autoscreenoff === true),
       flipScreen: !!(miner.flipscreen === 1 || miner.flipscreen === true),
+      hostname: miner.hostname ?? '',
+      wifiSsid: miner.ssid ?? '',
+      wifiPassword: '',
       primaryPoolKey: primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOL_OPTIONS[0]?.identifier ?? '')),
       fallbackPoolKey: fallbackOpt?.identifier ?? (miner.fallbackStratumURL ? 'other' : ''),
       primaryCustomURL: primaryOpt ? '' : (miner.stratumURL ?? ''),
@@ -248,6 +262,15 @@ export default function SettingsPage({ onError }) {
     }
     if (flipScreen !== baseline.flipScreen) {
       list.push({ label: 'Flip screen', from: baseline.flipScreen ? 'On' : 'Off', to: flipScreen ? 'On' : 'Off' });
+    }
+    if (hostname !== baseline.hostname) {
+      list.push({ label: 'Hostname', from: baseline.hostname || '—', to: hostname || '—' });
+    }
+    if (wifiSsid !== baseline.wifiSsid) {
+      list.push({ label: 'WiFi network (SSID)', from: baseline.wifiSsid || '—', to: wifiSsid || '—' });
+    }
+    if (wifiPassword !== baseline.wifiPassword && wifiPassword !== '') {
+      list.push({ label: 'WiFi password', from: '—', to: '•••' });
     }
     const poolLabel = (key) => (key === 'other' ? 'Other' : key === '' ? 'None' : SOLO_POOL_OPTIONS.find((o) => o.identifier === key)?.name ?? key);
     if (primaryPoolKey !== baseline.primaryPoolKey) {
@@ -300,7 +323,7 @@ export default function SettingsPage({ onError }) {
       list.push({ label: 'Fallback Extranonce Subscribe', from: baseline.fallbackExtranonceSubscribe ? 'On' : 'Off', to: fallbackExtranonceSubscribe ? 'On' : 'Off' });
     }
     return list;
-  }, [baseline, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryPassword, fallbackPassword, primaryStratumUser, fallbackStratumUser, poolMode, stratumTcpKeepalive, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe]);
+  }, [baseline, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen, hostname, wifiSsid, wifiPassword, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryPassword, fallbackPassword, primaryStratumUser, fallbackStratumUser, poolMode, stratumTcpKeepalive, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe]);
 
   const hasChanges = changes.length > 0;
 
@@ -321,6 +344,9 @@ export default function SettingsPage({ onError }) {
     setManualFanSpeed(baseline.manualFanSpeed);
     setAutoScreenOff(baseline.autoScreenOff);
     setFlipScreen(baseline.flipScreen);
+    setHostname(baseline.hostname);
+    setWifiSsid(baseline.wifiSsid);
+    setWifiPassword(baseline.wifiPassword);
     setPrimaryPoolKey(baseline.primaryPoolKey);
     setFallbackPoolKey(baseline.fallbackPoolKey);
     setPrimaryCustomURL(baseline.primaryCustomURL);
@@ -396,11 +422,25 @@ export default function SettingsPage({ onError }) {
     if (fallbackPassword.length > MAX_STRATUM_PASSWORD_LENGTH) {
       errors.push({ id: 'fallbackPassword', message: `Fallback password: max ${MAX_STRATUM_PASSWORD_LENGTH} characters` });
     }
+    // WiFi – hostname (alphanumeric and hyphens, max 64)
+    if (hostname.trim().length > 0) {
+      if (hostname.length > MAX_HOSTNAME_LENGTH) {
+        errors.push({ id: 'hostname', message: `Hostname: max ${MAX_HOSTNAME_LENGTH} characters` });
+      } else if (!/^[a-zA-Z0-9-]+$/.test(hostname.trim())) {
+        errors.push({ id: 'hostname', message: 'Hostname: alphanumeric and hyphens only' });
+      }
+    }
+    if (wifiSsid.length > MAX_WIFI_SSID_LENGTH) {
+      errors.push({ id: 'wifiSsid', message: `WiFi network: max ${MAX_WIFI_SSID_LENGTH} characters` });
+    }
+    if (wifiPassword.length > 0 && (wifiPassword.length < MIN_WIFI_PASSWORD_LENGTH || wifiPassword.length > MAX_WIFI_PASSWORD_LENGTH)) {
+      errors.push({ id: 'wifiPassword', message: `WiFi password: ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters when set` });
+    }
     return {
       validationErrors: errors,
       isFormValid: errors.length === 0,
     };
-  }, [overheatTemp, pidTargetTemp, manualFanSpeed, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword]);
+  }, [overheatTemp, pidTargetTemp, manualFanSpeed, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword, hostname, wifiSsid, wifiPassword]);
 
   // Derived per-field values for inline UI (driven from centralized validation)
   const primaryStratumUserError = validationErrors.find((e) => e.id === 'primaryStratumUser')?.message ?? null;
@@ -414,6 +454,9 @@ export default function SettingsPage({ onError }) {
   const overheatTempError = validationErrors.find((e) => e.id === 'overheatTemp')?.message ?? null;
   const pidTargetTempError = validationErrors.find((e) => e.id === 'pidTargetTemp')?.message ?? null;
   const manualFanSpeedError = validationErrors.find((e) => e.id === 'manualFanSpeed')?.message ?? null;
+  const hostnameError = validationErrors.find((e) => e.id === 'hostname')?.message ?? null;
+  const wifiSsidError = validationErrors.find((e) => e.id === 'wifiSsid')?.message ?? null;
+  const wifiPasswordError = validationErrors.find((e) => e.id === 'wifiPassword')?.message ?? null;
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -479,6 +522,12 @@ export default function SettingsPage({ onError }) {
       poolPayload.poolMode = poolMode;
       poolPayload.stratum_keep = stratumTcpKeepalive;
 
+      const wifiPayload = {
+        hostname: hostname.trim(),
+        ssid: wifiSsid.trim(),
+        ...(wifiPassword.length > 0 ? { wifiPass: wifiPassword } : {}),
+      };
+
       await patchMinerSettings({
         frequency: Number(frequency),
         coreVoltage: Number(coreVoltage),
@@ -487,6 +536,7 @@ export default function SettingsPage({ onError }) {
         ...(fanAuto ? { pidTargetTemp: Number(pidTargetTemp) } : { manualFanSpeed: Number(manualFanSpeed) }),
         autoscreenoff: autoScreenOff,
         flipscreen: flipScreen,
+        ...wifiPayload,
         ...poolPayload,
       });
       setMessage({ type: 'success', text: 'Settings saved.' });
@@ -724,6 +774,70 @@ export default function SettingsPage({ onError }) {
                 </div>
               </Field>
             </div>
+          </div>
+        </div>
+
+        {/* WiFi Settings */}
+        <div className="card">
+          <h3 className="card-title">WiFi Settings</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
+              <input
+                type="text"
+                value={hostname}
+                onChange={(e) => setHostname(e.target.value)}
+                placeholder="bitaxe"
+                maxLength={MAX_HOSTNAME_LENGTH}
+                className={`input ${hostnameError ? 'border-danger' : ''}`}
+                aria-label="Hostname"
+                aria-invalid={!!hostnameError}
+                aria-describedby={hostnameError ? 'hostname-error' : undefined}
+              />
+              {hostnameError && (
+                <p id="hostname-error" className="text-danger text-xs mt-1" role="alert">
+                  {hostnameError}
+                </p>
+              )}
+            </Field>
+            <Field label="WiFi Network (SSID)" hint="Network name to connect to.">
+              <input
+                type="text"
+                value={wifiSsid}
+                onChange={(e) => setWifiSsid(e.target.value)}
+                placeholder="YourWiFi"
+                maxLength={MAX_WIFI_SSID_LENGTH}
+                className={`input ${wifiSsidError ? 'border-danger' : ''}`}
+                aria-label="WiFi Network (SSID)"
+                aria-invalid={!!wifiSsidError}
+                aria-describedby={wifiSsidError ? 'wifi-ssid-error' : undefined}
+              />
+              {wifiSsidError && (
+                <p id="wifi-ssid-error" className="text-danger text-xs mt-1" role="alert">
+                  {wifiSsidError}
+                </p>
+              )}
+            </Field>
+            <Field label="WiFi Password" hint="Leave blank to keep current password. When set, 8–63 characters.">
+              <input
+                type="password"
+                value={wifiPassword}
+                onChange={(e) => setWifiPassword(e.target.value)}
+                placeholder="Leave blank to keep current"
+                maxLength={MAX_WIFI_PASSWORD_LENGTH}
+                className={`input ${wifiPasswordError ? 'border-danger' : ''}`}
+                aria-label="WiFi Password"
+                aria-invalid={!!wifiPasswordError}
+                aria-describedby={wifiPasswordError ? 'wifi-password-error' : undefined}
+              />
+              {wifiPasswordError && (
+                <p id="wifi-password-error" className="text-danger text-xs mt-1" role="alert">
+                  {wifiPasswordError}
+                </p>
+              )}
+            </Field>
+            <p className="text-muted-standalone text-xs mt-5">
+              Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
+            </p>
           </div>
         </div>
 

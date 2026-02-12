@@ -47,6 +47,11 @@ router.get('/asic', async (_req, res) => {
   }
 });
 
+const MAX_HOSTNAME_LENGTH = 64;
+const MAX_WIFI_SSID_LENGTH = 32;
+const MIN_WIFI_PASSWORD_LENGTH = 8;
+const MAX_WIFI_PASSWORD_LENGTH = 63;
+
 const ALLOWED_SETTINGS_KEYS = new Set([
   'frequency',
   'coreVoltage',
@@ -56,6 +61,9 @@ const ALLOWED_SETTINGS_KEYS = new Set([
   'manualFanSpeed',
   'autoscreenoff',
   'flipscreen',
+  'hostname',
+  'ssid',
+  'wifiPass',
   'stratumURL',
   'stratumPort',
   'stratumUser',
@@ -181,6 +189,49 @@ function validateSettings(body) {
           break;
         }
         payload[key] = s || 'failover';
+        break;
+      }
+      case 'hostname': {
+        if (value != null && typeof value !== 'string') {
+          errors.push(`${key}: must be a string`);
+          break;
+        }
+        const s = value == null ? '' : String(value).trim();
+        if (s.length > MAX_HOSTNAME_LENGTH) {
+          errors.push(`${key}: max length ${MAX_HOSTNAME_LENGTH}`);
+          break;
+        }
+        if (s !== '' && !/^[a-zA-Z0-9-]+$/.test(s)) {
+          errors.push(`${key}: alphanumeric and hyphens only`);
+          break;
+        }
+        payload[key] = s;
+        break;
+      }
+      case 'ssid': {
+        if (value != null && typeof value !== 'string') {
+          errors.push(`${key}: must be a string`);
+          break;
+        }
+        const s = value == null ? '' : String(value).trim();
+        if (s.length > MAX_WIFI_SSID_LENGTH) {
+          errors.push(`${key}: max length ${MAX_WIFI_SSID_LENGTH}`);
+          break;
+        }
+        payload[key] = s;
+        break;
+      }
+      case 'wifiPass': {
+        if (value != null && typeof value !== 'string') {
+          errors.push(`${key}: must be a string`);
+          break;
+        }
+        const s = value == null ? '' : String(value);
+        if (s.length > 0 && (s.length < MIN_WIFI_PASSWORD_LENGTH || s.length > MAX_WIFI_PASSWORD_LENGTH)) {
+          errors.push(`${key}: when set, length must be ${MIN_WIFI_PASSWORD_LENGTH}-${MAX_WIFI_PASSWORD_LENGTH}`);
+          break;
+        }
+        payload[key] = s;
         break;
       }
       case 'stratumTcpKeepalive':
