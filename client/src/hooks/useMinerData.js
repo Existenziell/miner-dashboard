@@ -7,6 +7,7 @@ const CHART_HISTORY_TEMPERATURE = 'chartHistory_temperature';
 const CHART_HISTORY_POWER = 'chartHistory_power';
 const LEGACY_CHART_HISTORY_KEY = 'chartHistory';
 const MAX_HISTORY = 500; // cap per chart
+const PERSIST_INTERVAL_MS = 60_000; // throttle localStorage writes to at most every 60s
 const POINTS_1M = 6;   // 1 min at 10s
 const POINTS_10M = 60;
 const POINTS_1H = 360;
@@ -107,6 +108,20 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
   const historyHashrateRef = useRef(loadHashrateHistory());
   const historyTemperatureRef = useRef(loadTemperatureHistory());
   const historyPowerRef = useRef(loadPowerHistory());
+  const lastPersistRef = useRef(0);
+
+  const persistChartHistory = useCallback(() => {
+    saveStored(CHART_HISTORY_HASHRATE, historyHashrateRef.current);
+    saveStored(CHART_HISTORY_TEMPERATURE, historyTemperatureRef.current);
+    saveStored(CHART_HISTORY_POWER, historyPowerRef.current);
+    lastPersistRef.current = Date.now();
+  }, []);
+
+  const maybePersistChartHistory = useCallback(() => {
+    if (Date.now() - lastPersistRef.current >= PERSIST_INTERVAL_MS) {
+      persistChartHistory();
+    }
+  }, [persistChartHistory]);
 
   const poll = useCallback(async () => {
     try {
@@ -138,7 +153,6 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
         },
       ];
       historyHashrateRef.current = nextHr;
-      saveStored(CHART_HISTORY_HASHRATE, nextHr);
 
       const bufTemp = historyTemperatureRef.current.slice(-(MAX_HISTORY - 1));
       const nextTemp = [
@@ -146,7 +160,6 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
         { time: now, temp: info.temp, vrTemp: info.vrTemp },
       ];
       historyTemperatureRef.current = nextTemp;
-      saveStored(CHART_HISTORY_TEMPERATURE, nextTemp);
 
       const bufPower = historyPowerRef.current.slice(-(MAX_HISTORY - 1));
       const nextPower = [
@@ -160,13 +173,13 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
         },
       ];
       historyPowerRef.current = nextPower;
-      saveStored(CHART_HISTORY_POWER, nextPower);
+      maybePersistChartHistory();
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [maybePersistChartHistory]);
 
   useEffect(() => {
     poll();
@@ -174,6 +187,20 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
     const id = setInterval(poll, intervalMs);
     return () => clearInterval(id);
   }, [poll, intervalMs, pausePolling]);
+
+  // Persist chart history when tab is hidden or page is closing
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') persistChartHistory();
+    };
+    const onBeforeUnload = () => persistChartHistory();
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('beforeunload', onBeforeUnload);
+    };
+  }, [persistChartHistory]);
 
   return {
     data,

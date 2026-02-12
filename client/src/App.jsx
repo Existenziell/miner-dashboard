@@ -42,7 +42,7 @@ export default function App() {
 }
 
 function AppContent({ activeTab, onTabChange }) {
-  const { data: miner, error: minerError } = useMiner();
+  const { data: miner, error: minerError, historyHashrate, historyTemperature, historyPower } = useMiner();
   const { data: network, error: networkError } = useNetworkData(POLL_NETWORK_INTERVAL_MS);
   const efficiency = computeEfficiency(miner);
 
@@ -132,9 +132,9 @@ function AppContent({ activeTab, onTabChange }) {
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <HashrateChart />
-              <TemperatureChart />
-              <PowerChart />
+              <HashrateChart history={historyHashrate} />
+              <TemperatureChart history={historyTemperature} />
+              <PowerChart history={historyPower} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
-import { useMiner } from '../context/MinerContext';
 import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
 import { ClickableLegend, ChartCard } from './TimeSeriesChart';
@@ -32,8 +31,7 @@ const LEGEND_STORAGE_KEY = 'chartLegend_hashrate';
 const COLLAPSED_STORAGE_KEY = 'chartCollapsed_hashrate';
 const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
 
-export default function HashrateChart() {
-  const history = useMiner().historyHashrate;
+function HashrateChart({ history }) {
   const { hidden, toggle } = useChartLegend(LEGEND_STORAGE_KEY, SERIES_KEYS);
   const { collapsed, toggleCollapsed } = useChartCollapsed(COLLAPSED_STORAGE_KEY);
   const { resolved } = useTheme();
@@ -88,3 +86,5 @@ export default function HashrateChart() {
     </ChartCard>
   );
 }
+
+export default memo(HashrateChart);
