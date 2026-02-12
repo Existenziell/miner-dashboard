@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useMiner, MinerProvider } from './context/MinerContext';
 import { useNetworkData } from './hooks/useNetworkData';
 import { formatHashrate, formatTemp, formatPower } from './lib/formatters';
@@ -15,11 +15,12 @@ import SharesCard from './components/SharesCard';
 import MinerSettings from './components/MinerSettings';
 import NetworkStatus from './components/NetworkStatus';
 import Header from './components/Header';
-import SettingsPage from './components/SettingsPage';
-import DocumentationPage from './components/DocumentationPage';
-import ApiPage from './components/ApiPage';
 import Notifications from './components/Notifications';
 import Footer from './components/Footer';
+
+const SettingsPage = lazy(() => import('./components/SettingsPage'));
+const DocumentationPage = lazy(() => import('./components/DocumentationPage'));
+const ApiPage = lazy(() => import('./components/ApiPage'));
 
 export default function App() {
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
@@ -58,11 +59,17 @@ function AppContent({ activeTab, onTabChange }) {
         />
 
         {activeTab === 'settings' ? (
-          <SettingsPage />
+          <Suspense fallback={<div className="text-muted-standalone py-8 text-center">Loading settings…</div>}>
+            <SettingsPage />
+          </Suspense>
         ) : activeTab === 'docs' ? (
-          <DocumentationPage />
+          <Suspense fallback={<div className="text-muted-standalone py-8 text-center">Loading docs…</div>}>
+            <DocumentationPage />
+          </Suspense>
         ) : activeTab === 'api' ? (
-          <ApiPage />
+          <Suspense fallback={<div className="text-muted-standalone py-8 text-center">Loading API…</div>}>
+            <ApiPage />
+          </Suspense>
         ) : (
           <>
             <MinerStatus />

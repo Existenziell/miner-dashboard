@@ -4,6 +4,21 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react';
+          }
+          if (id.includes('node_modules/recharts')) {
+            return 'recharts';
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 500,
+  },
   test: {
     environment: 'node',
     globals: true,
