@@ -34,7 +34,7 @@ export default function NetworkStatus({ data }) {
             </div>
             <div className="w-full bg-surface-subtle rounded-full h-1.5">
               <div
-                className="bg-btc-orange rounded-full h-1.5 transition-all"
+                className="bg-accent rounded-full h-1.5 transition-all"
                 style={{ width: `${Math.min(halvingPct, 100)}%` }}
               />
             </div>
@@ -59,7 +59,7 @@ export default function NetworkStatus({ data }) {
             </div>
             <div className="w-full bg-surface-subtle rounded-full h-1.5">
               <div
-                className="bg-btc-orange rounded-full h-1.5 transition-all"
+                className="bg-accent rounded-full h-1.5 transition-all"
                 style={{ width: `${Math.min(diffProgressPct, 100)}%` }}
               />
             </div>

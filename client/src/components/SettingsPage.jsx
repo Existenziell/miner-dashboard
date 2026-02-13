@@ -720,7 +720,7 @@ export default function SettingsPage({ onError }) {
           </div>
         </div>
         <p className="text-muted-standalone text-sm mb-4">
-          Server-persisted config.
+          Server-persisted config for dashboard.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Miner IP or hostname" hint="Address of the miner. Leave empty if using .env MINER_IP.">
