@@ -55,7 +55,7 @@ Then open `http://localhost:8001`.
 - **Miner IP or hostname** — fallback if not set in `.env`
 - **Expected hashrate (GH/s)** — used for the hashrate gauge scale and the Efficiency “Expected” display
 - **Miner / Network poll intervals (ms)** — how often the dashboard fetches miner status and network stats
-- **Metric ranges** — green/orange/red thresholds and gauge max per metric (hashrate, temp, power, efficiency, etc.). Each value is editable in the Dashboard tab; the hashrate gauge uses the larger of “Expected hashrate” and “Hashrate → Gauge max”.
+- **Metric ranges** — single threshold and gauge max per metric (hashrate, temp, power, efficiency, etc.). Gauges use accent (OK) and red (out of range). Each value is editable in the Dashboard tab; the hashrate gauge uses the larger of “Expected hashrate” and “Hashrate → Gauge max”.
 
 **Settings tabs:** Settings has three sections (Miner, Pools, Dashboard). The active section is reflected in the URL (`?tab=settings&section=miner|pools|dashboard`) so you can bookmark or share a link to a specific tab.
 

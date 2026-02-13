@@ -43,15 +43,11 @@ const METRIC_LABELS = {
 };
 
 const METRIC_KEY_LABELS = {
-  greenMin: 'Green min',
-  orangeMin: 'Orange min',
+  min: 'Min',
+  max: 'Max',
   gaugeMax: 'Gauge max',
-  greenMax: 'Green max',
-  orangeMax: 'Orange max',
-  orangeMinPct: 'Orange min %',
-  orangeMaxPct: 'Orange max %',
-  greenMv: 'Green (mV)',
-  orangeMv: 'Orange (mV)',
+  maxPct: 'Max %',
+  maxMv: 'Max (mV)',
 };
 
 function deepCopyMetricRanges(ranges) {
@@ -138,6 +134,7 @@ export default function SettingsPage({ onError }) {
   const [dashboardMetricRanges, setDashboardMetricRanges] = useState(() =>
     deepCopyMetricRanges(config.metricRanges)
   );
+  const [showResetDashboardConfirm, setShowResetDashboardConfirm] = useState(false);
   useEffect(() => {
     setDashboardMinerIp(config.minerIp);
     setDashboardExpectedHashrate(config.defaultExpectedHashrateGh);
@@ -689,6 +686,78 @@ export default function SettingsPage({ onError }) {
     hasChartColorsChange ||
     hasMetricRangesChange;
 
+  const defaultAccent = normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor);
+  const hasDashboardDefaultsDiff =
+    dashboardExpectedHashrate !== DASHBOARD_DEFAULTS.defaultExpectedHashrateGh ||
+    dashboardPollMiner !== DASHBOARD_DEFAULTS.pollMinerIntervalMs ||
+    dashboardPollNetwork !== DASHBOARD_DEFAULTS.pollNetworkIntervalMs ||
+    effectiveAccent !== defaultAccent ||
+    JSON.stringify(dashboardChartColors) !== JSON.stringify(DASHBOARD_DEFAULTS.chartColors) ||
+    JSON.stringify(dashboardMetricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges);
+
+  const dashboardChanges = useMemo(() => {
+    const list = [];
+    if (dashboardMinerIp !== config.minerIp) {
+      list.push({ label: 'Miner IP', from: config.minerIp || '—', to: dashboardMinerIp.trim() || '—' });
+    }
+    if (dashboardExpectedHashrate !== config.defaultExpectedHashrateGh) {
+      list.push({ label: 'Expected hashrate', from: `${config.defaultExpectedHashrateGh} GH/s`, to: `${dashboardExpectedHashrate} GH/s` });
+    }
+    if (dashboardPollMiner !== config.pollMinerIntervalMs) {
+      list.push({ label: 'Miner poll interval', from: `${config.pollMinerIntervalMs} ms`, to: `${dashboardPollMiner} ms` });
+    }
+    if (dashboardPollNetwork !== config.pollNetworkIntervalMs) {
+      list.push({ label: 'Network poll interval', from: `${config.pollNetworkIntervalMs} ms`, to: `${dashboardPollNetwork} ms` });
+    }
+    if (effectiveAccent !== configAccent) {
+      list.push({ label: 'Accent color', from: configAccent, to: effectiveAccent });
+    }
+    if (hasChartColorsChange) {
+      const saved = config.chartColors ?? DASHBOARD_DEFAULTS.chartColors;
+      CHART_COLOR_SPEC.forEach((chart) => {
+        chart.series.forEach(({ key, label: seriesLabel }) => {
+          const fromVal = saved[chart.id]?.[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key];
+          const toVal = dashboardChartColors[chart.id]?.[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key];
+          const fromHex = normalizeHex(fromVal, DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key]);
+          const toHex = normalizeHex(toVal, DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key]);
+          if (fromHex !== toHex) {
+            list.push({ label: `${chart.label} → ${seriesLabel}`, from: fromHex, to: toHex });
+          }
+        });
+      });
+    }
+    if (hasMetricRangesChange) {
+      const saved = config.metricRanges ?? DASHBOARD_DEFAULTS.metricRanges;
+      Object.keys(DASHBOARD_DEFAULTS.metricRanges).forEach((metric) => {
+        const keys = Object.keys(DASHBOARD_DEFAULTS.metricRanges[metric]);
+        keys.forEach((key) => {
+          const fromVal = saved[metric]?.[key];
+          const toVal = dashboardMetricRanges[metric]?.[key];
+          if (fromVal !== toVal && (fromVal !== undefined || toVal !== undefined)) {
+            const metricLabel = METRIC_LABELS[metric] ?? metric;
+            const keyLabel = METRIC_KEY_LABELS[key] ?? key;
+            list.push({
+              label: `${metricLabel} → ${keyLabel}`,
+              from: fromVal !== undefined ? String(fromVal) : '—',
+              to: toVal !== undefined ? String(toVal) : '—',
+            });
+          }
+        });
+      });
+    }
+    return list;
+  }, [config.minerIp, config.defaultExpectedHashrateGh, config.pollMinerIntervalMs, config.pollNetworkIntervalMs, config.chartColors, config.metricRanges, configAccent, dashboardMinerIp, dashboardExpectedHashrate, dashboardPollMiner, dashboardPollNetwork, dashboardChartColors, dashboardMetricRanges, effectiveAccent, hasChartColorsChange, hasMetricRangesChange]);
+
+  const handleRevertDashboard = () => {
+    setDashboardMinerIp(config.minerIp);
+    setDashboardExpectedHashrate(config.defaultExpectedHashrateGh);
+    setDashboardPollMiner(config.pollMinerIntervalMs);
+    setDashboardPollNetwork(config.pollNetworkIntervalMs);
+    setDashboardAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
+    setDashboardChartColors(deepCopyChartColors(config.chartColors));
+    setDashboardMetricRanges(deepCopyMetricRanges(config.metricRanges));
+  };
+
   const handleSaveDashboard = async (e) => {
     e.preventDefault();
     setDashboardMessage(null);
@@ -727,14 +796,22 @@ export default function SettingsPage({ onError }) {
   };
 
   const handleResetDashboard = () => {
-    setDashboardMinerIp(DASHBOARD_DEFAULTS.minerIp);
+    // Do not reset miner IP — keep current value
     setDashboardExpectedHashrate(DASHBOARD_DEFAULTS.defaultExpectedHashrateGh);
     setDashboardPollMiner(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
     setDashboardPollNetwork(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
     setDashboardAccentColor(DASHBOARD_DEFAULTS.accentColor);
     setDashboardChartColors(deepCopyChartColors(DASHBOARD_DEFAULTS.chartColors));
     setDashboardMetricRanges(deepCopyMetricRanges(DASHBOARD_DEFAULTS.metricRanges));
+    setShowResetDashboardConfirm(false);
   };
+
+  // Auto-dismiss dashboard success message
+  useEffect(() => {
+    if (dashboardMessage?.type !== 'success') return;
+    const t = setTimeout(() => setDashboardMessage(null), SUCCESS_MESSAGE_DISMISS_MS);
+    return () => clearTimeout(t);
+  }, [dashboardMessage?.type]);
 
   const setChartColorValue = (chartId, seriesKey, value) => {
     setDashboardChartColors((prev) => ({
@@ -765,7 +842,7 @@ export default function SettingsPage({ onError }) {
             <h3 className="card-header-title">Configuration</h3>
           </div>
         </div>
-        <p className="text-muted-standalone text-sm mb-4">
+        <p className="text-muted-standalone text-sm mb-6">
           Server-persisted config for dashboard.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -815,7 +892,7 @@ export default function SettingsPage({ onError }) {
         </div>
         <div className="space-y-4">
           <div>
-            <p className="text-sm font-medium text-body mb-1 mt-4">Metric ranges</p>
+            <p className="text-sm font-medium text-body mb-1 mt-8">Metric ranges</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {Object.keys(DASHBOARD_DEFAULTS.metricRanges).map((metric) => {
                 const keys = Object.keys(DASHBOARD_DEFAULTS.metricRanges[metric]);
@@ -851,10 +928,10 @@ export default function SettingsPage({ onError }) {
               })}
             </div>
             <p className="text-muted-standalone text-xs my-3 space-y-1.5">
-              <span className="block"><strong>Gauge max</strong> — value that maps to 100% on the needle (the scale).</span>
-              <span className="block"><strong>Min</strong> (hashrate, frequency): “higher is better” — at/above green min = green, at/above orange min = orange, below = red.</span>
-              <span className="block"><strong>Max</strong> (temp, power, efficiency): “lower is better” — at/below green max = green, at/below orange max = orange, above = red.</span>
-              <span className="block"><strong>Voltage</strong> — green/orange are the allowed <em>deviation</em> in mV from the set voltage; if actual creeps away from set beyond those limits, the gauge goes orange then red.</span>
+              <span className="block"><strong>Gauge max:</strong> value that maps to 100% on the needle (the scale).</span>
+              <span className="block"><strong>Min:</strong> lower bound for "higher is better" (hashrate, frequency).</span>
+              <span className="block"><strong>Max:</strong> upper bound for "lower is better" (temp, power, efficiency, current).</span>
+              <span className="block"><strong>Max (mV):</strong> allowed voltage deviation from set.</span>
             </p>
           </div>
         </div>
@@ -936,6 +1013,43 @@ export default function SettingsPage({ onError }) {
       </div>
       )}
 
+      {hasDashboardChanges && (
+        <div className="highlight-box">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <p className="label font-semibold text-body">Pending changes</p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleRevertDashboard}
+                className="link-text text-body cursor-pointer"
+              >
+                Reset
+              </button>
+              <span className="text-muted-standalone">/</span>
+              <button
+                type="button"
+                onClick={() => setShowResetDashboardConfirm(true)}
+                disabled={!hasDashboardDefaultsDiff}
+                className="link-text text-body cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                aria-disabled={!hasDashboardDefaultsDiff}
+              >
+                Reset to defaults
+              </button>
+            </div>
+          </div>
+          <ul className="text-sm text-body space-y-1">
+            {dashboardChanges.map((c) => (
+              <li key={c.label}>
+                <span className="text-muted-standalone">{c.label}:</span>{' '}
+                <span className="line-through opacity-75">{c.from}</span>
+                <span className="mx-1">→</span>
+                <span className="text-accent font-medium">{c.to}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="card">
         <div className="flex flex-wrap items-center gap-4">
           <button
@@ -945,13 +1059,9 @@ export default function SettingsPage({ onError }) {
           >
             {savingDashboard ? 'Saving…' : 'Save settings'}
           </button>
-          <button type="button" onClick={handleResetDashboard} className="link-text text-body cursor-pointer">
-            Reset to defaults
-          </button>
           {dashboardMessage?.type === 'success' && (
-            <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
-              <span aria-hidden>√</span>
-              <span>{dashboardMessage.text}</span>
+            <span role="status" className="text-success dark:text-success-dark text-sm">
+              {dashboardMessage.text}
             </span>
           )}
           {dashboardMessage?.type === 'error' && (
@@ -962,6 +1072,23 @@ export default function SettingsPage({ onError }) {
           )}
         </div>
       </div>
+
+      {showResetDashboardConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="reset-dashboard-dialog-title">
+          <div className="card max-w-md w-full shadow-xl">
+            <h2 id="reset-dashboard-dialog-title" className="text-lg font-semibold text-body mb-2">Reset to defaults</h2>
+            <p className="text-muted-standalone text-sm mb-6">Reset all dashboard settings to their default values. This only updates the form.</p>
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setShowResetDashboardConfirm(false)} className="btn-ghost">
+                Cancel
+              </button>
+              <button type="button" onClick={handleResetDashboard} className="btn-primary">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 
@@ -1649,7 +1776,6 @@ export default function SettingsPage({ onError }) {
               </button>
               {message?.type === 'success' && (
                 <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
-                  <span aria-hidden>√</span>
                   <span>Saved successfully</span>
                 </span>
               )}

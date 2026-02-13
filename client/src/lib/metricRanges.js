@@ -12,20 +12,16 @@ function getRanges() {
   return metricRangesOverride ?? METRIC_RANGES;
 }
 
-/** Low-is-good: value ≤ greenMax → success, ≤ orangeMax → warning, else danger */
-function colorLowGood(value, greenMax, orangeMax) {
+/** Low-is-good: value ≤ max → accent (OK), else danger */
+function okLowGood(value, max) {
   if (value == null) return null;
-  if (value <= greenMax) return 'text-success';
-  if (value <= orangeMax) return 'text-warning';
-  return 'text-danger';
+  return value <= max ? 'text-accent' : 'text-danger';
 }
 
-/** High-is-good: value ≥ greenMin → success, ≥ orangeMin → warning, else danger */
-function colorHighGood(value, greenMin, orangeMin) {
+/** High-is-good: value ≥ min → accent (OK), else danger */
+function okHighGood(value, min) {
   if (value == null) return null;
-  if (value >= greenMin) return 'text-success';
-  if (value >= orangeMin) return 'text-warning';
-  return 'text-danger';
+  return value >= min ? 'text-accent' : 'text-danger';
 }
 
 /** Tailwind text class for accent (fuchsia) when metric has no range-based color */
@@ -81,36 +77,36 @@ export function getMetricColor(miner, metric, efficiency = null) {
 
   switch (metric) {
     case 'temp':
-      out = colorLowGood(miner.temp, r.temp.greenMax, r.temp.orangeMax);
+      out = okLowGood(miner.temp, r.temp.max);
       break;
     case 'hashrate':
       if (miner.hashRate == null || miner.hashRate === 0) return 'text-danger';
-      out = colorHighGood(miner.hashRate, r.hashrate.greenMin, r.hashrate.orangeMin);
+      out = okHighGood(miner.hashRate, r.hashrate.min);
       break;
     case 'power':
-      out = colorLowGood(miner.power, r.power.greenMax, r.power.orangeMax);
+      out = okLowGood(miner.power, r.power.max);
       break;
     case 'efficiency': {
       const j = efficiency ?? computeEfficiency(miner);
-      out = colorLowGood(j, r.efficiency.greenMax, r.efficiency.orangeMax);
+      out = okLowGood(j, r.efficiency.max);
       break;
     }
     case 'current': {
       const currentA = miner.current != null ? miner.current / 1000 : null;
-      out = colorLowGood(currentA, r.current.greenMax, r.current.orangeMax);
+      out = okLowGood(currentA, r.current.max);
       break;
     }
     case 'frequency':
-      out = colorHighGood(miner.frequency, r.frequency.greenMin, r.frequency.orangeMin);
+      out = okHighGood(miner.frequency, r.frequency.min);
       break;
     case 'voltage': {
       if (miner.coreVoltageActual == null || miner.coreVoltage == null) break;
       const diff = Math.abs(miner.coreVoltageActual - miner.coreVoltage);
-      out = colorLowGood(diff, r.voltage.greenMv, r.voltage.orangeMv);
+      out = okLowGood(diff, r.voltage.maxMv);
       break;
     }
     case 'fanRpm':
-      out = colorLowGood(miner.fanspeed, r.fanRpm.orangeMinPct - 1, r.fanRpm.orangeMaxPct);
+      out = okLowGood(miner.fanspeed, r.fanRpm.maxPct);
       break;
     default:
       return DEFAULT_ACCENT_COLOR;

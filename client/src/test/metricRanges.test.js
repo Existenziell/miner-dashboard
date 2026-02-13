@@ -15,16 +15,12 @@ describe('getMetricColor', () => {
   });
 
   describe('temp', () => {
-    it('green <= 55.5 °C', () => {
-      expect(getMetricColor({ temp: 0 }, 'temp')).toBe('text-success');
-      expect(getMetricColor({ temp: 55 }, 'temp')).toBe('text-success');
-      expect(getMetricColor({ temp: 55.5 }, 'temp')).toBe('text-success');
+    it('accent when <= 65 °C', () => {
+      expect(getMetricColor({ temp: 0 }, 'temp')).toBe('text-accent');
+      expect(getMetricColor({ temp: 55 }, 'temp')).toBe('text-accent');
+      expect(getMetricColor({ temp: 65 }, 'temp')).toBe('text-accent');
     });
-    it('orange > 55.5–65 °C', () => {
-      expect(getMetricColor({ temp: 56 }, 'temp')).toBe('text-warning');
-      expect(getMetricColor({ temp: 65 }, 'temp')).toBe('text-warning');
-    });
-    it('red > 65 °C', () => {
+    it('red when > 65 °C', () => {
       expect(getMetricColor({ temp: 66 }, 'temp')).toBe('text-danger');
     });
     it('accent when temp is null', () => {
@@ -37,77 +33,62 @@ describe('getMetricColor', () => {
       expect(getMetricColor({ hashRate: null }, 'hashrate')).toBe('text-danger');
       expect(getMetricColor({ hashRate: 0 }, 'hashrate')).toBe('text-danger');
     });
-    it('red when below orange threshold (5500 GH/s)', () => {
+    it('red when below min (5500 GH/s)', () => {
       expect(getMetricColor({ hashRate: 4800 }, 'hashrate')).toBe('text-danger');
       expect(getMetricColor({ hashRate: 5499 }, 'hashrate')).toBe('text-danger');
     });
-    it('orange from 5500 GH/s up to just under green (5950 GH/s)', () => {
-      expect(getMetricColor({ hashRate: 5500 }, 'hashrate')).toBe('text-warning');
-      expect(getMetricColor({ hashRate: 5949 }, 'hashrate')).toBe('text-warning');
-    });
-    it('green at or above 5950 GH/s', () => {
-      expect(getMetricColor({ hashRate: 5950 }, 'hashrate')).toBe('text-success');
-      expect(getMetricColor({ hashRate: 6000 }, 'hashrate')).toBe('text-success');
-      expect(getMetricColor({ hashRate: 7000 }, 'hashrate')).toBe('text-success');
+    it('accent at or above 5500 GH/s', () => {
+      expect(getMetricColor({ hashRate: 5500 }, 'hashrate')).toBe('text-accent');
+      expect(getMetricColor({ hashRate: 6000 }, 'hashrate')).toBe('text-accent');
+      expect(getMetricColor({ hashRate: 7000 }, 'hashrate')).toBe('text-accent');
     });
   });
 
   describe('power', () => {
-    it('green <= 115 W', () => {
-      expect(getMetricColor({ power: 0 }, 'power')).toBe('text-success');
-      expect(getMetricColor({ power: 100 }, 'power')).toBe('text-success');
-      expect(getMetricColor({ power: 115 }, 'power')).toBe('text-success');
+    it('accent when <= 117.5 W', () => {
+      expect(getMetricColor({ power: 0 }, 'power')).toBe('text-accent');
+      expect(getMetricColor({ power: 100 }, 'power')).toBe('text-accent');
+      expect(getMetricColor({ power: 115 }, 'power')).toBe('text-accent');
+      expect(getMetricColor({ power: 117.5 }, 'power')).toBe('text-accent');
     });
-    it('orange > 115–117.5 W', () => {
-      expect(getMetricColor({ power: 116 }, 'power')).toBe('text-warning');
-      expect(getMetricColor({ power: 117.5 }, 'power')).toBe('text-warning');
-    });
-    it('red > 117.5 W', () => {
+    it('red when > 117.5 W', () => {
       expect(getMetricColor({ power: 118 }, 'power')).toBe('text-danger');
     });
   });
 
   describe('efficiency', () => {
-    it('green <= 20 J/TH', () => {
-      expect(getMetricColor({ power: 100, hashRate: 5000 }, 'efficiency')).toBe('text-success');
-      expect(getMetricColor({ power: 120, hashRate: 6000 }, 'efficiency')).toBe('text-success');
+    it('accent when <= 25 J/TH', () => {
+      expect(getMetricColor({ power: 100, hashRate: 5000 }, 'efficiency')).toBe('text-accent');
+      expect(getMetricColor({ power: 120, hashRate: 6000 }, 'efficiency')).toBe('text-accent');
+      expect(getMetricColor({ power: 126, hashRate: 6000 }, 'efficiency')).toBe('text-accent'); // 21
+      expect(getMetricColor({ power: 150, hashRate: 6000 }, 'efficiency')).toBe('text-accent'); // 25
     });
-    it('orange 21-25 J/TH', () => {
-      expect(getMetricColor({ power: 126, hashRate: 6000 }, 'efficiency')).toBe('text-warning'); // 21
-      expect(getMetricColor({ power: 150, hashRate: 6000 }, 'efficiency')).toBe('text-warning'); // 25
-    });
-    it('red > 25 J/TH', () => {
+    it('red when > 25 J/TH', () => {
       expect(getMetricColor({ power: 156, hashRate: 6000 }, 'efficiency')).toBe('text-danger');
     });
     it('accepts precomputed efficiency as third arg', () => {
-      expect(getMetricColor({}, 'efficiency', 15)).toBe('text-success');
+      expect(getMetricColor({}, 'efficiency', 15)).toBe('text-accent');
       expect(getMetricColor({}, 'efficiency', 30)).toBe('text-danger');
     });
   });
 
   describe('current', () => {
-    it('green <= 9.4 A', () => {
-      expect(getMetricColor({ current: 9000 }, 'current')).toBe('text-success');  // 9 A
-      expect(getMetricColor({ current: 9400 }, 'current')).toBe('text-success'); // 9.4 A
+    it('accent when <= 9.75 A', () => {
+      expect(getMetricColor({ current: 9000 }, 'current')).toBe('text-accent');  // 9 A
+      expect(getMetricColor({ current: 9400 }, 'current')).toBe('text-accent'); // 9.4 A
+      expect(getMetricColor({ current: 9750 }, 'current')).toBe('text-accent'); // 9.75 A
     });
-    it('orange > 9.4–9.75 A', () => {
-      expect(getMetricColor({ current: 9500 }, 'current')).toBe('text-warning'); // 9.5 A
-      expect(getMetricColor({ current: 9750 }, 'current')).toBe('text-warning'); // 9.75 A
-    });
-    it('red > 9.75 A', () => {
+    it('red when > 9.75 A', () => {
       expect(getMetricColor({ current: 9760 }, 'current')).toBe('text-danger');
       expect(getMetricColor({ current: 10500 }, 'current')).toBe('text-danger');  // 10.5 A
     });
   });
 
   describe('frequency', () => {
-    it('green when >= 700 MHz', () => {
-      expect(getMetricColor({ frequency: 700 }, 'frequency')).toBe('text-success');
-      expect(getMetricColor({ frequency: 801 }, 'frequency')).toBe('text-success');
-    });
-    it('orange 650–699 MHz', () => {
-      expect(getMetricColor({ frequency: 650 }, 'frequency')).toBe('text-warning');
-      expect(getMetricColor({ frequency: 699 }, 'frequency')).toBe('text-warning');
+    it('accent when >= 650 MHz', () => {
+      expect(getMetricColor({ frequency: 650 }, 'frequency')).toBe('text-accent');
+      expect(getMetricColor({ frequency: 700 }, 'frequency')).toBe('text-accent');
+      expect(getMetricColor({ frequency: 801 }, 'frequency')).toBe('text-accent');
     });
     it('red when < 650 MHz', () => {
       expect(getMetricColor({ frequency: 649 }, 'frequency')).toBe('text-danger');
@@ -115,13 +96,10 @@ describe('getMetricColor', () => {
   });
 
   describe('voltage', () => {
-    it('green when diff <= 20 mV', () => {
-      expect(getMetricColor({ coreVoltageActual: 1000, coreVoltage: 1000 }, 'voltage')).toBe('text-success');
-      expect(getMetricColor({ coreVoltageActual: 1015, coreVoltage: 1000 }, 'voltage')).toBe('text-success');
-    });
-    it('orange when diff 21-50 mV', () => {
-      expect(getMetricColor({ coreVoltageActual: 1025, coreVoltage: 1000 }, 'voltage')).toBe('text-warning');
-      expect(getMetricColor({ coreVoltageActual: 1050, coreVoltage: 1000 }, 'voltage')).toBe('text-warning');
+    it('accent when diff <= 50 mV', () => {
+      expect(getMetricColor({ coreVoltageActual: 1000, coreVoltage: 1000 }, 'voltage')).toBe('text-accent');
+      expect(getMetricColor({ coreVoltageActual: 1015, coreVoltage: 1000 }, 'voltage')).toBe('text-accent');
+      expect(getMetricColor({ coreVoltageActual: 1050, coreVoltage: 1000 }, 'voltage')).toBe('text-accent');
     });
     it('red when diff > 50 mV', () => {
       expect(getMetricColor({ coreVoltageActual: 1051, coreVoltage: 1000 }, 'voltage')).toBe('text-danger');
@@ -133,15 +111,12 @@ describe('getMetricColor', () => {
   });
 
   describe('fanRpm', () => {
-    it('green < 65%', () => {
-      expect(getMetricColor({ fanspeed: 49 }, 'fanRpm')).toBe('text-success');
-      expect(getMetricColor({ fanspeed: 64 }, 'fanRpm')).toBe('text-success');
+    it('accent when <= 75%', () => {
+      expect(getMetricColor({ fanspeed: 49 }, 'fanRpm')).toBe('text-accent');
+      expect(getMetricColor({ fanspeed: 64 }, 'fanRpm')).toBe('text-accent');
+      expect(getMetricColor({ fanspeed: 75 }, 'fanRpm')).toBe('text-accent');
     });
-    it('orange 65–75%', () => {
-      expect(getMetricColor({ fanspeed: 65 }, 'fanRpm')).toBe('text-warning');
-      expect(getMetricColor({ fanspeed: 75 }, 'fanRpm')).toBe('text-warning');
-    });
-    it('red > 75%', () => {
+    it('red when > 75%', () => {
       expect(getMetricColor({ fanspeed: 76 }, 'fanRpm')).toBe('text-danger');
     });
   });

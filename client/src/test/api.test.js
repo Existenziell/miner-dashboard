@@ -190,7 +190,7 @@ describe('api', () => {
     });
 
     it('sends metricRanges when provided', async () => {
-      const payload = { metricRanges: { hashrate: { greenMin: 6000, orangeMin: 5500, gaugeMax: 7000 } } };
+      const payload = { metricRanges: { hashrate: { min: 5500, gaugeMax: 7000 } } };
       fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(payload) });
       await patchDashboardConfig(payload);
       expect(fetchStub).toHaveBeenCalledWith('/api/config', {
