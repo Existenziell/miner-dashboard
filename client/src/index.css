@@ -75,6 +75,14 @@ a:hover {
 .card-header {
   @apply w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2;
 }
+
+/* Collapsed chart card: no extra space below header */
+.card--collapsed {
+  @apply pb-0;
+}
+.card--collapsed .card-header-wrapper {
+  @apply mb-0;
+}
 .card-header-title {
   @apply text-lg font-semibold text-fg dark:text-fg-dark m-0;
 }

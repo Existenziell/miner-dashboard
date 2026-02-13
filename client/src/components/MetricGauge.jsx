@@ -22,7 +22,7 @@ export default function MetricGauge({ label, value, sub, color = 'text-accent', 
           className="w-full h-full overflow-visible"
           viewBox="-8 -8 116 116"
           fill="none"
-          strokeWidth="8"
+          strokeWidth="5"
           strokeLinecap="round"
         >
           {/* Track (muted) – full 270° arc */}

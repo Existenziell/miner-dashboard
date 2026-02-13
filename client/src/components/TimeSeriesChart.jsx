@@ -73,12 +73,12 @@ export function ChartCard({ title, loading, loadingMessage, collapsed, onToggleC
   }
 
   return (
-    <div className="card">
+    <div className={`card${collapsed ? ' card--collapsed' : ''}`}>
       <div className="card-header-wrapper">
         <button
           type="button"
           onClick={onToggleCollapsed}
-          className="card-header cursor-pointer border-0 focus:outline-none"
+          className={`card-header cursor-pointer border-0 focus:outline-none${collapsed ? ' rounded-b-xl' : ''}`}
           aria-expanded={!collapsed}
         >
           <h3 className="card-header-title">{title}</h3>
