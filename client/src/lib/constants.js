@@ -3,7 +3,7 @@
  */
 
 /** Miner status poll interval (default for useMinerData). */
-export const POLL_MINER_INTERVAL_MS = 15_000;
+export const POLL_MINER_INTERVAL_MS = 10_000;
 
 /** Free internal heap below this (bytes) shows a low-memory warning. */
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
