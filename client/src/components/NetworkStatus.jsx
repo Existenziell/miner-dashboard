@@ -67,7 +67,7 @@ export default function NetworkStatus({ data }) {
         )}
         <div className="text-xs mt-1">
           <span className="text-muted-standalone">Next adjustment: </span>
-          <span className={diffChange > 0 ? 'text-danger dark:text-danger-dark' : 'text-success dark:text-success-dark'}>{diffChangeStr}</span>
+          <span>{diffChangeStr}</span>
         </div>
       </div>
 
@@ -88,15 +88,15 @@ export default function NetworkStatus({ data }) {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span className="text-muted-standalone text-sm">High Priority</span>
-            <span className="text-danger dark:text-danger-dark text-sm font-medium">{fees?.fastestFee ?? '--'} sat/vB</span>
+            <span className="text-sm font-medium">{fees?.fastestFee ?? '--'} sat/vB</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-standalone text-sm">Medium</span>
-            <span className="text-warning dark:text-warning-dark text-sm font-medium">{fees?.halfHourFee ?? '--'} sat/vB</span>
+            <span className="text-sm font-medium">{fees?.halfHourFee ?? '--'} sat/vB</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-standalone text-sm">Low Priority</span>
-            <span className="text-success dark:text-success-dark text-sm font-medium">{fees?.hourFee ?? '--'} sat/vB</span>
+            <span className="text-sm font-medium">{fees?.hourFee ?? '--'} sat/vB</span>
           </div>
         </div>
       </div>
