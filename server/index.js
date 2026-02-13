@@ -3,14 +3,14 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { MINER_IP, PORT } from './config.js';
+import { MINER_IP } from './config.js';
 import minerRoutes from './routes/miner.js';
 import networkRoutes from './routes/network.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-const requiredEnv = ['MINER_IP', 'PORT'];
+const requiredEnv = ['MINER_IP'];
 const missing = requiredEnv.filter((key) => !process.env[key] || String(process.env[key]).trim() === '');
 if (missing.length > 0) {
   console.error('Missing required environment variables. Copy .env.example to .env and set:');
@@ -34,8 +34,8 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(8001, () => {
+  console.log(`Server running on http://localhost:8001`);
   console.log(`Miner API target: http://${MINER_IP}`);
   console.log('Mempool API: https://mempool.space/api');
 });

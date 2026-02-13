@@ -13,7 +13,7 @@ Thanks for your interest in contributing.
    cd client && npm install && cd ..
    ```
 
-2. Copy `.env.example` to `.env` and set at least `MINER_IP` (your NerdQaxe++ miner’s IP). The server will not start without `MINER_IP` and `PORT`.
+2. Copy `.env.example` to `.env` and set `MINER_IP` (your miner’s IP).
 
 3. Run the app in development:
 
