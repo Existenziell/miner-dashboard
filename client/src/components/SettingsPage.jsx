@@ -1030,7 +1030,7 @@ export default function SettingsPage({ onError }) {
                     <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
                   </div>
                 </Field>
-                <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool. For pools with a dedicated TLS port (e.g. Public Pool), port updates automatically.">
+                <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool.">
                   <div className="flex items-center gap-2">
                     <button
                       type="button"

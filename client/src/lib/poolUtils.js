@@ -14,24 +14,26 @@ export function getStratumPayloadFromOption(option) {
 }
 
 /**
- * Find a SOLO_POOLS entry that matches the current miner stratum host/port.
+ * Find a SOLO_POOLS entry that matches the current miner stratum host.
+ * Match by host only (pool identity); port/TLS are read from miner state for the form.
  * @param {string | null | undefined} stratumURL
- * @param {number | null | undefined} stratumPort
+ * @param {number | null | undefined} _stratumPort unused, kept for API compatibility
  * @returns {SoloPool | null}
  */
-export function findSoloPoolOption(stratumURL, stratumPort) {
+export function findSoloPoolOption(stratumURL, _stratumPort) {
   if (!stratumURL) return null;
-  const rawHost = stratumURL.replace(/^stratum\+tcp:\/\//, '').replace(/^stratum2\+tcp:\/\//, '').split(':')[0];
+  const normalized = String(stratumURL)
+    .replace(/^stratum\+tcp:\/\//i, '')
+    .replace(/^stratum2\+tcp:\/\//i, '')
+    .replace(/^stratum\+ssl:\/\//i, '')
+    .replace(/^stratum2\+ssl:\/\//i, '')
+    .trim();
+  const rawHost = normalized.split(':')[0].trim();
   const base = baseDomain(stratumURL) || rawHost;
-  const port = stratumPort ?? DEFAULT_STRATUM_PORT;
   // Prefer exact host match so eusolo.ckpool.org matches CKPool (EU), not CKPool
-  const exact = SOLO_POOLS.find(
-    (opt) => opt.stratumHost === rawHost && opt.port === port
-  );
+  const exact = SOLO_POOLS.find((opt) => opt.stratumHost === rawHost);
   if (exact) return exact;
-  return SOLO_POOLS.find(
-    (opt) => baseDomain(opt.stratumHost) === base && opt.port === port
-  ) ?? null;
+  return SOLO_POOLS.find((opt) => baseDomain(opt.stratumHost) === base) ?? null;
 }
 
 /** Extract the base domain from a stratum URL, stripping common prefixes. */
