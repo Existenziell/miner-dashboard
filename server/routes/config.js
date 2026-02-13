@@ -24,6 +24,15 @@ function validateMetricRanges(ranges) {
   return null;
 }
 
+const HEX_COLOR = /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+function validateAccentColor(value) {
+  if (value === undefined) return null;
+  if (typeof value !== 'string') return 'accentColor must be a string';
+  if (value === '') return null;
+  if (!HEX_COLOR.test(value)) return 'accentColor must be a hex color (e.g. #d946ef) or empty';
+  return null;
+}
+
 // GET /api/config
 router.get('/', (_req, res) => {
   res.json(getConfig());
@@ -55,6 +64,8 @@ router.patch('/', (req, res) => {
   }
   const mrErr = validateMetricRanges(body.metricRanges);
   if (mrErr) errors.push(mrErr);
+  const accentErr = validateAccentColor(body.accentColor);
+  if (accentErr) errors.push(accentErr);
 
   if (errors.length > 0) {
     return res.status(400).json({ error: 'Validation failed', details: errors });

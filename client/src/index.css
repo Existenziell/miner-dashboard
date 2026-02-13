@@ -4,9 +4,9 @@
 
 /* --- Tailwind theme: light (default) + dark variant colors --- */
 @theme inline {
-  /* Accent (fuchsia-500 / fuchsia-600 for hover) */
+  /* Accent; dark shade derived for hover/active (only --color-accent is overridden at runtime) */
   --color-accent: #d946ef;
-  --color-accent-dark: #c026d3;
+  --color-accent-dark: color-mix(in srgb, var(--color-accent) 78%, black);
 
   /* Surface */
   --color-surface: #f5f5f7;

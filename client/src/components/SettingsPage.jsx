@@ -19,6 +19,7 @@ import {
 import { useChartCollapsed } from '../lib/chartUtils';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '../lib/tabUrl';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
+import { normalizeHex } from '../lib/colorUtils';
 import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
 import { toBool } from '../lib/minerApiBools';
 import { ChartCard } from './TimeSeriesChart';
@@ -124,6 +125,7 @@ export default function SettingsPage({ onError }) {
   const [dashboardExpectedHashrate, setDashboardExpectedHashrate] = useState(config.defaultExpectedHashrateGh);
   const [dashboardPollMiner, setDashboardPollMiner] = useState(config.pollMinerIntervalMs);
   const [dashboardPollNetwork, setDashboardPollNetwork] = useState(config.pollNetworkIntervalMs);
+  const [dashboardAccentColor, setDashboardAccentColor] = useState(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
   const [dashboardMetricRanges, setDashboardMetricRanges] = useState(() =>
     deepCopyMetricRanges(config.metricRanges)
   );
@@ -132,6 +134,7 @@ export default function SettingsPage({ onError }) {
     setDashboardExpectedHashrate(config.defaultExpectedHashrateGh);
     setDashboardPollMiner(config.pollMinerIntervalMs);
     setDashboardPollNetwork(config.pollNetworkIntervalMs);
+    setDashboardAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
     setDashboardMetricRanges(deepCopyMetricRanges(config.metricRanges));
   }, [config]);
 
@@ -663,11 +666,14 @@ export default function SettingsPage({ onError }) {
   const hasMetricRangesChange =
     JSON.stringify(dashboardMetricRanges) !== JSON.stringify(config.metricRanges);
 
+  const effectiveAccent = normalizeHex(dashboardAccentColor, DASHBOARD_DEFAULTS.accentColor);
+  const configAccent = normalizeHex(config.accentColor ?? '', DASHBOARD_DEFAULTS.accentColor);
   const hasDashboardChanges =
     dashboardMinerIp !== config.minerIp ||
     dashboardExpectedHashrate !== config.defaultExpectedHashrateGh ||
     dashboardPollMiner !== config.pollMinerIntervalMs ||
     dashboardPollNetwork !== config.pollNetworkIntervalMs ||
+    effectiveAccent !== configAccent ||
     hasMetricRangesChange;
 
   const handleSaveDashboard = async (e) => {
@@ -680,6 +686,7 @@ export default function SettingsPage({ onError }) {
         defaultExpectedHashrateGh: Number(dashboardExpectedHashrate),
         pollMinerIntervalMs: Number(dashboardPollMiner),
         pollNetworkIntervalMs: Number(dashboardPollNetwork),
+        accentColor: effectiveAccent,
       };
       if (hasMetricRangesChange) payload.metricRanges = deepCopyMetricRanges(dashboardMetricRanges);
       await patchDashboardConfig(payload);
@@ -698,6 +705,7 @@ export default function SettingsPage({ onError }) {
     setDashboardExpectedHashrate(DASHBOARD_DEFAULTS.defaultExpectedHashrateGh);
     setDashboardPollMiner(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
     setDashboardPollNetwork(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
+    setDashboardAccentColor(DASHBOARD_DEFAULTS.accentColor);
     setDashboardMetricRanges(deepCopyMetricRanges(DASHBOARD_DEFAULTS.metricRanges));
   };
 
@@ -765,6 +773,25 @@ export default function SettingsPage({ onError }) {
               className="input"
               aria-label="Network poll interval ms"
             />
+          </Field>
+          <Field label="Accent color" hint="Buttons, links, and highlights. Darker shade is derived automatically.">
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={effectiveAccent}
+                onChange={(e) => setDashboardAccentColor(e.target.value)}
+                className="w-10 h-10 rounded border border-edge dark:border-edge-dark cursor-pointer bg-transparent"
+                aria-label="Accent color picker"
+              />
+              <input
+                type="text"
+                value={dashboardAccentColor}
+                onChange={(e) => setDashboardAccentColor(e.target.value)}
+                placeholder={DASHBOARD_DEFAULTS.accentColor}
+                className="input flex-1 min-w-0 font-mono text-sm"
+                aria-label="Accent color hex"
+              />
+            </div>
           </Field>
         </div>
         <div className="space-y-4">

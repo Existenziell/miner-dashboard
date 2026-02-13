@@ -7,6 +7,7 @@ export const DASHBOARD_DEFAULTS = {
   defaultExpectedHashrateGh: 6000,
   pollMinerIntervalMs: 10_000,
   pollNetworkIntervalMs: 60_000,
+  accentColor: '#d946ef',
   metricRanges: {
     hashrate: { greenMin: 5950, orangeMin: 5500, gaugeMax: 7000 },
     efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
