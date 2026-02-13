@@ -130,10 +130,13 @@ export default function DocumentationPage() {
           <li><strong>ASIC</strong>: SHA-256 mining hardware (e.g. S21, S19 series, or other NerdQaxe++-supported units).</li>
           <li><strong>Power</strong>: Adequate PSU and circuit capacity; miners can draw hundreds of watts.</li>
           <li><strong>Cooling</strong>: Good airflow and ambient temperature to keep ASIC and VR temps within safe limits (monitor via this dashboard).</li>
-          <li><strong>Network</strong>: Miner and dashboard host must reach the pool’s Stratum server (and optionally mempool.space for network stats).</li>
+          <li><strong>Network</strong>: Miner and dashboard host must reach the pool's Stratum server (and optionally mempool.space for network stats).</li>
         </ul>
         <p className="doc-body">
-          Set the miner’s IP in the dashboard settings (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
+          Set the miner's IP in the dashboard settings (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
+        </p>
+        <p className="doc-body mt-2">
+          <a href="https://github.com/shufps/qaxe" target="_blank" rel="noopener noreferrer" className="hover:underline">NerdQ Hardware Repository</a>
         </p>
       </section>
 
