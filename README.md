@@ -1,6 +1,6 @@
 # Miner Dashboard
 
-A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, with Bitcoin network status from mempool.space.
+A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or similar devices.
 
 ## Features
 
@@ -57,6 +57,20 @@ Copy `.env.example` to `.env` in the project root and set your values:
 
 The server will not start until `MINER_IP`, `MEMPOOL_API`, and `PORT` are set.
 
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Run backend and frontend in development (watch mode) |
+| `npm run dev:server` | Run Express backend with `--watch` |
+| `npm run dev:client` | Run Vite dev server (client) |
+| `npm run build` | Build frontend for production |
+| `npm start` | Start production server (run after `npm run build`) |
+| `npm run lint` | Lint client code |
+| `npm run test` | Run client tests |
+| `npm run test:watch` | Run client tests in watch mode |
+| `npm run all` | Run build, test, and lint concurrently |
+
 ## Architecture
 
 ```
@@ -68,4 +82,8 @@ The Express backend proxies requests to the miner (avoiding CORS issues) and agg
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+[MIT](LICENSE)
+
+## Contribute
+
+[Docs](CONTRIBUTE.MD)
