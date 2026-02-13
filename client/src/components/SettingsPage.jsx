@@ -25,6 +25,7 @@ import { normalizeHex } from '../lib/colorUtils';
 import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
 import { toBool } from '../lib/minerApiBools';
 import { ChartCard } from './TimeSeriesChart';
+import { IconQuestion } from './Icons';
 
 const POOL_MODE_OPTIONS = [
   { value: 'failover', label: 'Failover (Primary/Fallback)' },
@@ -61,9 +62,18 @@ function deepCopyChartColors(colors) {
 function Field({ label, children, hint }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="label">{label}</label>
+      <div className="flex items-center gap-1.5">
+        <label className="label">{label}</label>
+        {hint && (
+          <span className="field-hint-trigger relative inline-flex shrink-0 rounded-full text-muted dark:text-muted-dark hover:text-black dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:ring-offset-surface dark:focus:ring-offset-surface-dark" aria-label="More info">
+            <IconQuestion className="w-4 h-4" />
+            <span className="field-hint-tooltip" role="tooltip">
+              {hint}
+            </span>
+          </span>
+        )}
+      </div>
       {children}
-      {hint && <p className="text-muted-standalone text-xs">{hint}</p>}
     </div>
   );
 }
@@ -1446,7 +1456,7 @@ export default function SettingsPage({ onError }) {
                 </div>
                 <div>
                   {/* Top: Pool mode + TCP Keepalive */}
-                  <div className="pb-4 border-b border-edge dark:border-edge-dark flex flex-col gap-4">
+                  <div className="flex flex-col gap-4 md:max-w-1/3 mb-4">
                     <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
                       <select
                         value={poolMode}
@@ -1461,7 +1471,7 @@ export default function SettingsPage({ onError }) {
                         ))}
                       </select>
                     </Field>
-                    <Field label="Enable Stratum TCP Keepalive">
+                    <Field label="Enable Stratum TCP Keepalive" hint="Prevents connection timeouts by sending a keepalive packet every 30 seconds." >
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
@@ -1479,7 +1489,7 @@ export default function SettingsPage({ onError }) {
                   </div>
 
                   {/* Pool 1 (left) | Pool 2 (right) with divider */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4 border-t border-edge dark:border-edge-dark">
                     <div className="flex flex-col gap-4 pr-4 md:border-r md:border-edge dark:md:border-edge-dark">
                       <div className="flex items-center gap-2">
                         <p className="label font-semibold text-body mb-0">
@@ -1489,7 +1499,7 @@ export default function SettingsPage({ onError }) {
                           <span className="badge-success">ACTIVE</span>
                         ) : null}
                       </div>
-                      <Field label="Pool" hint="Solo mining pool for block templates.">
+                      <Field label="Pool" hint="Solo mining pool for block templates. See Docs for full list.">
                         <select
                           value={primaryPoolKey}
                           onChange={(e) => {
@@ -1574,7 +1584,7 @@ export default function SettingsPage({ onError }) {
                           </p>
                         )}
                       </Field>
-                      <Field label="Enable Extranonce Subscribe" hint="">
+                      <Field label="Enable Extranonce Subscribe" hint="Improves mining efficiency by allowing the miner to use a longer extranonce.">
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
@@ -1589,7 +1599,7 @@ export default function SettingsPage({ onError }) {
                           <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
                         </div>
                       </Field>
-                      <Field label="Encrypted connection (TLS)">
+                      <Field label="Encrypted connection (TLS)" hint="Improves security by encrypting the connection to the pool." >
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
@@ -1705,7 +1715,7 @@ export default function SettingsPage({ onError }) {
                           </p>
                         )}
                       </Field>
-                      <Field label="Enable Extranonce Subscribe" hint="">
+                      <Field label="Enable Extranonce Subscribe" hint="Improves mining efficiency by allowing the miner to use a longer extranonce.">
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
@@ -1720,7 +1730,7 @@ export default function SettingsPage({ onError }) {
                           <span className="text-sm text-body">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
                         </div>
                       </Field>
-                      <Field label="Encrypted connection (TLS)">
+                      <Field label="Encrypted connection (TLS)" hint="Improves security by encrypting the connection to the pool." >
                         <div className="flex items-center gap-2">
                           <button
                             type="button"

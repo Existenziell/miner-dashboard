@@ -221,6 +221,18 @@ input[type="number"] {
     border border-edge dark:border-edge-dark;
 }
 
+/* Field label hint tooltip (hover on info icon) */
+.field-hint-tooltip {
+  @apply absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20
+    px-3 py-2 min-w-[15rem] max-w-sm rounded-lg text-sm text-muted dark:text-muted-dark
+    bg-surface-card dark:bg-surface-card-dark border border-edge dark:border-edge-dark
+    shadow-lg pointer-events-none
+    opacity-0 invisible transition-opacity duration-150;
+}
+.field-hint-trigger:hover .field-hint-tooltip {
+  @apply opacity-100 visible;
+}
+
 /* Chart legend toggle button */
 .legend-btn {
   @apply flex items-center gap-1.5 text-xs cursor-pointer select-none transition-opacity;
