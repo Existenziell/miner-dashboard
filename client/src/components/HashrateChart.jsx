@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
+import { CHART_LEGEND_STORAGE_KEY_HASHRATE, CHART_COLLAPSED_STORAGE_KEY_HASHRATE } from '../lib/constants';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
 const formatHashrateValue = (entry) =>
@@ -16,13 +17,11 @@ const SERIES = [
   { key: 'hashRate_1d',  name: '1d Avg',   color: '#a21caf', width: 1 },
 ];
 
-const LEGEND_STORAGE_KEY = 'chartLegend_hashrate';
-const COLLAPSED_STORAGE_KEY = 'chartCollapsed_hashrate';
 const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
 
 function HashrateChart({ history }) {
-  const { hidden, toggle } = useChartLegend(LEGEND_STORAGE_KEY, SERIES_KEYS);
-  const { collapsed, toggleCollapsed } = useChartCollapsed(COLLAPSED_STORAGE_KEY);
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_HASHRATE, SERIES_KEYS);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_HASHRATE);
   const { resolved } = useTheme();
   const chartColors = getChartColors(resolved === 'dark');
 

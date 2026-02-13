@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchMinerInfo } from '../lib/api';
-import { POLL_MINER_INTERVAL_MS } from '../lib/constants';
-
-const CHART_HISTORY_HASHRATE = 'chartHistory_hashrate';
-const CHART_HISTORY_TEMPERATURE = 'chartHistory_temperature';
-const CHART_HISTORY_POWER = 'chartHistory_power';
-const LEGACY_CHART_HISTORY_KEY = 'chartHistory';
-const MAX_HISTORY = 500; // cap per chart
-const PERSIST_INTERVAL_MS = 60_000; // throttle localStorage writes to at most every 60s
-const POINTS_1M = 6;   // 1 min at 10s
-const POINTS_10M = 60;
-const POINTS_1H = 360;
+import {
+  POLL_MINER_INTERVAL_MS,
+  CHART_HISTORY_HASHRATE,
+  CHART_HISTORY_TEMPERATURE,
+  CHART_HISTORY_POWER,
+  LEGACY_CHART_HISTORY_KEY,
+  MAX_CHART_HISTORY,
+  CHART_PERSIST_INTERVAL_MS,
+  CHART_POINTS_1M,
+  CHART_POINTS_10M,
+  CHART_POINTS_1H,
+} from '../lib/constants';
 
 function parseStored(key) {
   if (typeof localStorage === 'undefined') return null;
@@ -28,7 +29,7 @@ function loadStored(key, validate) {
   const arr = parseStored(key);
   if (arr == null || arr.length === 0) return [];
   if (!validate(arr)) return [];
-  return arr.length > MAX_HISTORY ? arr.slice(-MAX_HISTORY) : arr;
+  return arr.length > MAX_CHART_HISTORY ? arr.slice(-MAX_CHART_HISTORY) : arr;
 }
 
 function loadLegacy() {
@@ -39,7 +40,7 @@ function loadLegacy() {
     if (!Array.isArray(parsed) || parsed.length === 0) return null;
     const first = parsed[0];
     if (first == null || typeof first.time !== 'number') return null;
-    return parsed.length > MAX_HISTORY ? parsed.slice(-MAX_HISTORY) : parsed;
+    return parsed.length > MAX_CHART_HISTORY ? parsed.slice(-MAX_CHART_HISTORY) : parsed;
   } catch {
     return null;
   }
@@ -118,7 +119,7 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
   }, []);
 
   const maybePersistChartHistory = useCallback(() => {
-    if (Date.now() - lastPersistRef.current >= PERSIST_INTERVAL_MS) {
+    if (Date.now() - lastPersistRef.current >= CHART_PERSIST_INTERVAL_MS) {
       persistChartHistory();
     }
   }, [persistChartHistory]);
@@ -135,10 +136,10 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
 
       const now = Date.now();
       const instant = info.hashRate != null && Number.isFinite(info.hashRate) ? info.hashRate : undefined;
-      const bufHr = historyHashrateRef.current.slice(-(MAX_HISTORY - 1));
-      const hashRate_1m = info.hashRate_1m ?? rollingAvg(bufHr, 'hashRate', POINTS_1M, instant);
-      const hashRate_10m = info.hashRate_10m ?? rollingAvg(bufHr, 'hashRate', POINTS_10M, instant);
-      const hashRate_1h = info.hashRate_1h ?? rollingAvg(bufHr, 'hashRate', POINTS_1H, instant);
+      const bufHr = historyHashrateRef.current.slice(-(MAX_CHART_HISTORY - 1));
+      const hashRate_1m = info.hashRate_1m ?? rollingAvg(bufHr, 'hashRate', CHART_POINTS_1M, instant);
+      const hashRate_10m = info.hashRate_10m ?? rollingAvg(bufHr, 'hashRate', CHART_POINTS_10M, instant);
+      const hashRate_1h = info.hashRate_1h ?? rollingAvg(bufHr, 'hashRate', CHART_POINTS_1H, instant);
       const hashRate_1d = info.hashRate_1d;
 
       const nextHr = [
@@ -154,14 +155,14 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
       ];
       historyHashrateRef.current = nextHr;
 
-      const bufTemp = historyTemperatureRef.current.slice(-(MAX_HISTORY - 1));
+      const bufTemp = historyTemperatureRef.current.slice(-(MAX_CHART_HISTORY - 1));
       const nextTemp = [
         ...bufTemp,
         { time: now, temp: info.temp, vrTemp: info.vrTemp },
       ];
       historyTemperatureRef.current = nextTemp;
 
-      const bufPower = historyPowerRef.current.slice(-(MAX_HISTORY - 1));
+      const bufPower = historyPowerRef.current.slice(-(MAX_CHART_HISTORY - 1));
       const nextPower = [
         ...bufPower,
         {

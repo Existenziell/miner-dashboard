@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
+import { CHART_LEGEND_STORAGE_KEY_TEMPERATURE, CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE } from '../lib/constants';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
 const formatTempValue = (entry) =>
@@ -13,13 +14,11 @@ const SERIES = [
   { key: 'vrTemp',  name: 'VR Temp',   color: '#2563eb', width: 1, axis: 'temp' },
 ];
 
-const LEGEND_STORAGE_KEY = 'chartLegend_temperature';
-const COLLAPSED_STORAGE_KEY = 'chartCollapsed_temperature';
 const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
 
 function TemperatureChart({ history }) {
-  const { hidden, toggle } = useChartLegend(LEGEND_STORAGE_KEY, SERIES_KEYS);
-  const { collapsed, toggleCollapsed } = useChartCollapsed(COLLAPSED_STORAGE_KEY);
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_TEMPERATURE, SERIES_KEYS);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE);
   const { resolved } = useTheme();
   const chartColors = getChartColors(resolved === 'dark');
 

@@ -1,19 +1,24 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
-import { SUCCESS_MESSAGE_DISMISS_MS, DEFAULT_STRATUM_PORT, MIN_STRATUM_PORT, MAX_STRATUM_PORT, SOLO_POOLS } from '../lib/constants';
+import {
+  SUCCESS_MESSAGE_DISMISS_MS,
+  DEFAULT_STRATUM_PORT,
+  MIN_STRATUM_PORT,
+  MAX_STRATUM_PORT,
+  SOLO_POOLS,
+  MAX_STRATUM_USER_LENGTH,
+  MAX_STRATUM_PASSWORD_LENGTH,
+  MAX_STRATUM_URL_LENGTH,
+  MAX_HOSTNAME_LENGTH,
+  MAX_WIFI_SSID_LENGTH,
+  MIN_WIFI_PASSWORD_LENGTH,
+  MAX_WIFI_PASSWORD_LENGTH,
+} from '../lib/constants';
 import { useChartCollapsed } from '../lib/chartUtils';
 import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
 import { toBool } from '../lib/minerApiBools';
 import { ChartCard } from './TimeSeriesChart';
-
-const MAX_STRATUM_USER_LENGTH = 128;
-const MAX_STRATUM_PASSWORD_LENGTH = 128;
-const MAX_STRATUM_URL_LENGTH = 512;
-const MAX_HOSTNAME_LENGTH = 64;
-const MAX_WIFI_SSID_LENGTH = 32;
-const MIN_WIFI_PASSWORD_LENGTH = 8;
-const MAX_WIFI_PASSWORD_LENGTH = 63;
 
 const POOL_MODE_OPTIONS = [
   { value: 'failover', label: 'Failover (Primary/Fallback)' },

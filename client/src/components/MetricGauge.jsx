@@ -2,14 +2,15 @@
  * Circular gauge for a single metric: 270° arc open at the bottom (speedometer style).
  * Ring fill is 0–100%; ring and value use the given Tailwind color.
  */
-const GAUGE_R = 48;
+import { GAUGE_RADIUS } from '../lib/constants';
+
 // 270° arc from bottom-left, up left side, over top, down right side to bottom-right (gap at bottom)
 // SVG: 0° = right, 90° = down. So 135° = bottom-left, 45° = bottom-right.
-const startX = 50 + GAUGE_R * Math.cos((135 * Math.PI) / 180);
-const startY = 50 + GAUGE_R * Math.sin((135 * Math.PI) / 180);
-const endX = 50 + GAUGE_R * Math.cos((45 * Math.PI) / 180);
-const endY = 50 + GAUGE_R * Math.sin((45 * Math.PI) / 180);
-const ARC_PATH = `M ${startX} ${startY} A ${GAUGE_R} ${GAUGE_R} 0 1 1 ${endX} ${endY}`;
+const startX = 50 + GAUGE_RADIUS * Math.cos((135 * Math.PI) / 180);
+const startY = 50 + GAUGE_RADIUS * Math.sin((135 * Math.PI) / 180);
+const endX = 50 + GAUGE_RADIUS * Math.cos((45 * Math.PI) / 180);
+const endY = 50 + GAUGE_RADIUS * Math.sin((45 * Math.PI) / 180);
+const ARC_PATH = `M ${startX} ${startY} A ${GAUGE_RADIUS} ${GAUGE_RADIUS} 0 1 1 ${endX} ${endY}`;
 
 export default function MetricGauge({ label, value, sub, color = 'text-accent', percent = null }) {
   const fillPercent = percent != null ? Math.max(0, Math.min(100, percent)) : 0;

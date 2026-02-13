@@ -11,6 +11,40 @@ export const NOTIFICATION_AUTO_CLOSE_MS = 8_000;
 export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
 
+// —— Chart history & persistence ——————————————————————————————————————————————
+export const CHART_HISTORY_HASHRATE = 'chartHistory_hashrate';
+export const CHART_HISTORY_TEMPERATURE = 'chartHistory_temperature';
+export const CHART_HISTORY_POWER = 'chartHistory_power';
+export const LEGACY_CHART_HISTORY_KEY = 'chartHistory';
+export const MAX_CHART_HISTORY = 500; // cap per chart
+export const CHART_PERSIST_INTERVAL_MS = 60_000; // throttle localStorage writes to at most every 60s
+export const CHART_POINTS_1M = 6;   // 1 min at 10s interval
+export const CHART_POINTS_10M = 60;
+export const CHART_POINTS_1H = 360;
+
+// —— Chart legend / collapsed state (localStorage keys) ————————————————————————
+export const CHART_LEGEND_STORAGE_KEY_HASHRATE = 'chartLegend_hashrate';
+export const CHART_LEGEND_STORAGE_KEY_TEMPERATURE = 'chartLegend_temperature';
+export const CHART_LEGEND_STORAGE_KEY_POWER = 'chartLegend_power';
+export const CHART_COLLAPSED_STORAGE_KEY_HASHRATE = 'chartCollapsed_hashrate';
+export const CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE = 'chartCollapsed_temperature';
+export const CHART_COLLAPSED_STORAGE_KEY_POWER = 'chartCollapsed_power';
+
+// —— Theme ————————————————————————————————————————————————————————————————————
+export const THEME_STORAGE_KEY = 'theme';
+
+// —— Settings / validation lengths —————————————————————————————————────────————
+export const MAX_STRATUM_USER_LENGTH = 128;
+export const MAX_STRATUM_PASSWORD_LENGTH = 128;
+export const MAX_STRATUM_URL_LENGTH = 512;
+export const MAX_HOSTNAME_LENGTH = 64;
+export const MAX_WIFI_SSID_LENGTH = 32;
+export const MIN_WIFI_PASSWORD_LENGTH = 8;
+export const MAX_WIFI_PASSWORD_LENGTH = 63;
+
+// —— UI (gauges) ————————————————————————————————————————————————————————————
+export const GAUGE_RADIUS = 48; // MetricGauge arc radius (viewBox units)
+
 // —— Stratum / pools ——————————————————————————————————————————————————————————
 export const DEFAULT_STRATUM_PORT = 3333;
 export const MIN_STRATUM_PORT = 1;
