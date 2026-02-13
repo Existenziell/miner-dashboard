@@ -34,7 +34,7 @@ export const MAX_STRATUM_PORT = 65535;
 
 /**
  * Used by poolUtils (dropdown, getPoolInfo, findSoloPoolOption) and Documentation page.
- * @typedef {{ identifier: string, name: string, stratumHost: string, port: number, tls: boolean, webUrl: string }} SoloPool
+ * @typedef {{ identifier: string, name: string, stratumHost: string, port: number, tls: boolean, webUrl: string, [tlsPort]: number }} SoloPool
  */
 export const SOLO_POOLS = [
     { identifier: 'braiins', name: 'Braiins', stratumHost: 'solo.stratum.braiins.com', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://braiins.com' },
@@ -43,7 +43,7 @@ export const SOLO_POOLS = [
     { identifier: 'ckpool-oceania', name: 'CKPool (Oceania)', stratumHost: 'ausolo.ckpool.org', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://ausolo.ckpool.org/' },
     { identifier: 'kano', name: 'Kano', stratumHost: 'stratum.kano.is', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://kano.is' },
     { identifier: 'ocean', name: 'OCEAN', stratumHost: 'mine.ocean.xyz', port: 3334, tls: false, webUrl: 'https://ocean.xyz' },
-    { identifier: 'public-pool', name: 'Public Pool', stratumHost: 'public-pool.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://web.public-pool.io' },
+    { identifier: 'public-pool', name: 'Public Pool', stratumHost: 'public-pool.io', port: DEFAULT_STRATUM_PORT, tls: false, tlsPort: 4333, webUrl: 'https://web.public-pool.io' },
     { identifier: 'solo-pool-eu', name: 'Solo-Pool', stratumHost: 'btc-eu.solo-pool.org', port: 3334, tls: false, webUrl: 'https://btc.solo-pool.org/' },
     { identifier: 'solopool-org', name: 'SoloPool.org', stratumHost: 'eu3.solopool.org', port: 8005, tls: false, webUrl: 'https://btc.solopool.org' },
     { identifier: 'viabtc', name: 'ViaBTC', stratumHost: 'btc.viabtc.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://www.viabtc.com' },

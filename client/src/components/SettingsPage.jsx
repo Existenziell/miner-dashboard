@@ -936,7 +936,7 @@ export default function SettingsPage({ onError }) {
                     const v = e.target.value;
                     setPrimaryPoolKey(v);
                     const opt = v && v !== 'other' ? SOLO_POOLS.find((o) => o.identifier === v) : null;
-                    if (opt) setPrimaryStratumPort(opt.port);
+                    if (opt) setPrimaryStratumPort(primaryTLS && opt.tlsPort != null ? opt.tlsPort : opt.port);
                   }}
                   className="input"
                   aria-label="Primary pool"
@@ -1030,14 +1030,19 @@ export default function SettingsPage({ onError }) {
                     <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
                   </div>
                 </Field>
-                <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool.">
+                <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool. For pools with a dedicated TLS port (e.g. Public Pool), port updates automatically.">
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       role="switch"
                       aria-checked={primaryTLS}
                       aria-label="Primary pool Encrypted connection TLS"
-                      onClick={() => setPrimaryTLS((v) => !v)}
+                      onClick={() => {
+                        const nextTLS = !primaryTLS;
+                        setPrimaryTLS(nextTLS);
+                        const opt = primaryPoolKey && primaryPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === primaryPoolKey) : null;
+                        if (opt?.tlsPort != null) setPrimaryStratumPort(nextTLS ? opt.tlsPort : opt.port);
+                      }}
                       className={`switch ${primaryTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
                     >
                       <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
@@ -1063,7 +1068,7 @@ export default function SettingsPage({ onError }) {
                     const v = e.target.value;
                     setFallbackPoolKey(v);
                     const opt = v && v !== 'other' ? SOLO_POOLS.find((o) => o.identifier === v) : null;
-                    if (opt) setFallbackStratumPort(opt.port);
+                    if (opt) setFallbackStratumPort(fallbackTLS && opt.tlsPort != null ? opt.tlsPort : opt.port);
                   }}
                   className="input"
                   aria-label="Fallback pool"
@@ -1165,7 +1170,12 @@ export default function SettingsPage({ onError }) {
                       role="switch"
                       aria-checked={fallbackTLS}
                       aria-label="Fallback pool Encrypted connection TLS"
-                      onClick={() => setFallbackTLS((v) => !v)}
+                      onClick={() => {
+                        const nextTLS = !fallbackTLS;
+                        setFallbackTLS(nextTLS);
+                        const opt = fallbackPoolKey && fallbackPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === fallbackPoolKey) : null;
+                        if (opt?.tlsPort != null) setFallbackStratumPort(nextTLS ? opt.tlsPort : opt.port);
+                      }}
                       className={`switch ${fallbackTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
                     >
                       <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
