@@ -92,4 +92,4 @@ The Express backend proxies requests to the miner (avoiding CORS issues) and agg
 
 ## Contribute
 
-[Docs](CONTRIBUTE.MD)
+[Docs](CONTRIBUTE.md)

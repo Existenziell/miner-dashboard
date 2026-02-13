@@ -84,7 +84,7 @@ function AppContent({ activeTab, onTabChange }) {
               <MetricGauge
                 label="Hashrate"
                 value={formatHashrate(miner?.hashRate)}
-                sub={miner?.hashRate_10m != null ? `10m avg: ${formatHashrate(miner.hashRate_10m)}` : undefined}
+                sub={miner?.hashRate_1h != null ? `1h avg: ${formatHashrate(miner.hashRate_1h)}` : undefined}
                 color={getMetricColor(miner, 'hashrate')}
                 percent={getMetricGaugePercent(miner, 'hashrate')}
               />

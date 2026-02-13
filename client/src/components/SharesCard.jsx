@@ -74,9 +74,9 @@ export default function SharesCard() {
             const raw = data.sharesRejectedReasons ?? data.shares_rejected_reasons;
             const reasons = Array.isArray(raw)
               ? raw.map((r) => ({
-                  message: r.message ?? r.reason ?? r.msg ?? 'Unknown',
-                  count: Number(r.count ?? r.cnt ?? 0) || 0,
-                })).filter((r) => r.count > 0)
+                message: r.message ?? r.reason ?? r.msg ?? 'Unknown',
+                count: Number(r.count ?? r.cnt ?? 0) || 0,
+              })).filter((r) => r.count > 0)
               : [];
             if (reasons.length > 0) {
               return (
