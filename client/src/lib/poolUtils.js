@@ -17,10 +17,9 @@ export function getStratumPayloadFromOption(option) {
  * Find a SOLO_POOLS entry that matches the current miner stratum host.
  * Match by host only (pool identity); port/TLS are read from miner state for the form.
  * @param {string | null | undefined} stratumURL
- * @param {number | null | undefined} _stratumPort unused, kept for API compatibility
  * @returns {SoloPool | null}
  */
-export function findSoloPoolOption(stratumURL, _stratumPort) {
+export function findSoloPoolOption(stratumURL) {
   if (!stratumURL) return null;
   const normalized = String(stratumURL)
     .replace(/^stratum\+tcp:\/\//i, '')
