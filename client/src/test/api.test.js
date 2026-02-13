@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  fetchMinerInfo,
+  fetchDashboardConfig,
   fetchMinerAsic,
+  fetchMinerInfo,
   fetchNetworkStatus,
+  patchDashboardConfig,
   patchMinerSettings,
   restartMiner,
   shutdownMiner,
-  fetchDashboardConfig,
-  patchDashboardConfig,
 } from '@/lib/api.js';
 
 describe('api', () => {

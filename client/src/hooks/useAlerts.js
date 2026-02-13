@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useState, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { evaluateAlerts } from '@/lib/alerts';
 import { ALERT_COOLDOWN_MS, NOTIFICATION_AUTO_CLOSE_MS } from '@/lib/constants';
 

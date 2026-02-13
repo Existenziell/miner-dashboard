@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchNetworkStatus } from '@/lib/api';
 import { POLL_NETWORK_INTERVAL_MS } from '@/lib/constants';
 

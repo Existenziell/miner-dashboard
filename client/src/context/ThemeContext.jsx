@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useCallback,useContext, useEffect, useState } from 'react';
 import { THEME_KEY } from '@/lib/constants';
 
 function getSystemPreference() {

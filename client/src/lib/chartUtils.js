@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CHART_GRID_AXIS_COLORS } from '@/lib/constants.js';
 
 /** Format timestamp for chart axis/tooltip in 24h format (e.g. "20:41") */

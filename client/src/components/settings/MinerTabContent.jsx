@@ -1,12 +1,12 @@
+import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import {
   MAX_HOSTNAME_LENGTH,
-  MAX_WIFI_SSID_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
+  MAX_WIFI_SSID_LENGTH,
   MIN_WIFI_PASSWORD_LENGTH,
 } from '@/lib/constants';
-import { Field } from '@/components/settings/Field';
 import { ChartCard } from '@/components/charts/TimeSeriesChart';
-import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
+import { Field } from '@/components/settings/Field';
 
 export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
   const form = useMinerSettingsContext();

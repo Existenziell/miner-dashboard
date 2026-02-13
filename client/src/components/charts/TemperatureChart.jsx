@@ -1,11 +1,11 @@
 import React, { memo, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useTheme } from '@/hooks/useTheme';
-import { useConfig } from '@/context/ConfigContext';
-import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '@/lib/chartUtils';
-import { CHART_LEGEND_TMP, CHART_COLLAPSED_TMP } from '@/lib/constants';
+import { CartesianGrid, Line, LineChart, ResponsiveContainer,Tooltip, XAxis, YAxis } from 'recharts';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
-import { ClickableLegend, ChartCard, ChartTooltip } from '@/components/charts/TimeSeriesChart';
+import { useConfig } from '@/context/ConfigContext';
+import { useTheme } from '@/hooks/useTheme';
+import { formatTime, getChartGridAxisColors, useChartCollapsed,useChartLegend } from '@/lib/chartUtils';
+import { CHART_COLLAPSED_TMP,CHART_LEGEND_TMP } from '@/lib/constants';
+import { ChartCard, ChartTooltip,ClickableLegend } from '@/components/charts/TimeSeriesChart';
 
 const formatTempValue = (entry) =>
   entry.value != null ? `${entry.value.toFixed(1)}\u00B0C` : '--';

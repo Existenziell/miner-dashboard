@@ -1,6 +1,6 @@
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
-import { Field } from '@/components/settings/Field';
 import { useDashboardSettingsContext } from '@/context/DashboardSettingsContext';
+import { Field } from '@/components/settings/Field';
 
 export function DashboardConfigCard() {
   const {

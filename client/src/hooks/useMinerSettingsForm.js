@@ -1,21 +1,21 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '@/lib/api';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { fetchMinerAsic, patchMinerSettings, restartMiner, shutdownMiner } from '@/lib/api';
 import {
-  SUCCESS_MESSAGE_DISMISS_MS,
   DEFAULT_STRATUM_PORT,
-  MIN_STRATUM_PORT,
-  MAX_STRATUM_PORT,
-  SOLO_POOLS,
-  MAX_STRATUM_USER_LENGTH,
-  MAX_STRATUM_PASSWORD_LENGTH,
-  MAX_STRATUM_URL_LENGTH,
   MAX_HOSTNAME_LENGTH,
-  MAX_WIFI_SSID_LENGTH,
-  MIN_WIFI_PASSWORD_LENGTH,
+  MAX_STRATUM_PASSWORD_LENGTH,
+  MAX_STRATUM_PORT,
+  MAX_STRATUM_URL_LENGTH,
+  MAX_STRATUM_USER_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
+  MAX_WIFI_SSID_LENGTH,
+  MIN_STRATUM_PORT,
+  MIN_WIFI_PASSWORD_LENGTH,
+  SOLO_POOLS,
+  SUCCESS_MESSAGE_DISMISS_MS,
 } from '@/lib/constants';
-import { findSoloPoolOption, getStratumPayloadFromOption } from '@/lib/poolUtils';
 import { toBool } from '@/lib/minerApiBools';
+import { findSoloPoolOption, getStratumPayloadFromOption } from '@/lib/poolUtils';
 
 const POOL_MODE_OPTIONS = [
   { value: 'failover', label: 'Failover (Primary/Fallback)' },

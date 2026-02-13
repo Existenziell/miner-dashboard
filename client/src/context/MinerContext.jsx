@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
 import { createContext, useContext, useMemo } from 'react';
-import { useMinerData } from '@/hooks/useMinerData';
 import { useConfig } from '@/context/ConfigContext';
+import { useMinerData } from '@/hooks/useMinerData';
 
 const MinerContext = createContext(null);
 

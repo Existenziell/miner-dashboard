@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { patchDashboardConfig } from '@/lib/api';
-import { SUCCESS_MESSAGE_DISMISS_MS, CHART_COLOR_SPEC } from '@/lib/constants';
+import { useCallback,useEffect, useMemo, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
+import { patchDashboardConfig } from '@/lib/api';
 import { normalizeHex } from '@/lib/colorUtils';
+import { CHART_COLOR_SPEC,SUCCESS_MESSAGE_DISMISS_MS } from '@/lib/constants';
 
 const METRIC_LABELS = {
   hashrate: 'Hashrate',

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SETTINGS_SECTION_KEY } from '@/lib/constants.js';
-import { getTabFromUrl, setTabInUrl, getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl.js';
+import { getSettingsSectionFromUrl, getTabFromUrl, setSettingsSectionInUrl, setTabInUrl } from '@/lib/tabUrl.js';
 
 const _originalWindow = globalThis.window;
 const _originalLocation = globalThis.location;

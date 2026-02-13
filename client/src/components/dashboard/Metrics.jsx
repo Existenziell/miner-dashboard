@@ -1,9 +1,9 @@
-import MetricGauge from '@/components/charts/MetricGauge';
-import { useMiner } from '@/context/MinerContext';
 import { useConfig } from '@/context/ConfigContext';
-import { formatHashrate, formatTemp, formatPower } from '@/lib/formatters';
+import { useMiner } from '@/context/MinerContext';
+import { formatHashrate, formatPower,formatTemp } from '@/lib/formatters';
 import { getMetricColor, getMetricGaugePercent } from '@/lib/metricRanges';
 import { computeEfficiency } from '@/lib/minerMetrics';
+import MetricGauge from '@/components/charts/MetricGauge';
 
 export default function Metrics() {
     const { data: miner } = useMiner();

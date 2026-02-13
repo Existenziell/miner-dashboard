@@ -1,5 +1,5 @@
-import { computeEfficiency } from '@/lib/minerMetrics';
 import { METRIC_RANGES } from '@/lib/constants';
+import { computeEfficiency } from '@/lib/minerMetrics';
 
 /** Optional override from dashboard config (set by ConfigProvider). */
 let metricRangesOverride = null;

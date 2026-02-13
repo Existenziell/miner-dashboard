@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect,useState } from 'react';
+import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
 import { fetchMinerAsic, fetchNetworkStatus } from '@/lib/api';
-import { useConfig } from '@/context/ConfigContext';
 
 function ResponseCard({ title, path, data, error, loading }) {
   return (

@@ -1,7 +1,7 @@
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
+import { useDashboardSettingsContext } from '@/context/DashboardSettingsContext';
 import { normalizeHex } from '@/lib/colorUtils';
 import { Field } from '@/components/settings/Field';
-import { useDashboardSettingsContext } from '@/context/DashboardSettingsContext';
 
 export function DashboardColorsCard() {
   const {

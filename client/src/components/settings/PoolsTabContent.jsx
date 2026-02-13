@@ -1,13 +1,13 @@
+import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import {
-  SOLO_POOLS,
   DEFAULT_STRATUM_PORT,
-  MIN_STRATUM_PORT,
+  MAX_STRATUM_PASSWORD_LENGTH,
   MAX_STRATUM_PORT,
   MAX_STRATUM_USER_LENGTH,
-  MAX_STRATUM_PASSWORD_LENGTH,
+  MIN_STRATUM_PORT,
+  SOLO_POOLS,
 } from '@/lib/constants';
 import { Field } from '@/components/settings/Field';
-import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 
 export function PoolsTabContent({ miner }) {
   const form = useMinerSettingsContext();

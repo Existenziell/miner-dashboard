@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
-import { useMiner } from '@/context/MinerContext';
+import { useEffect, useState } from 'react';
 import { useConfig } from '@/context/ConfigContext';
-import { MinerSettingsProvider } from '@/context/MinerSettingsContext';
 import { DashboardSettingsProvider } from '@/context/DashboardSettingsContext';
-import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
-import { SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
-import { useChartCollapsed } from '@/lib/chartUtils';
-import { useMinerSettingsForm } from '@/hooks/useMinerSettingsForm';
+import { useMiner } from '@/context/MinerContext';
+import { MinerSettingsProvider } from '@/context/MinerSettingsContext';
 import { useDashboardSettingsForm } from '@/hooks/useDashboardSettingsForm';
-import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
-import { MinerTabContent } from '@/components/settings/MinerTabContent';
-import { PoolsTabContent } from '@/components/settings/PoolsTabContent';
-import { PendingChangesBox } from '@/components/settings/PendingChangesBox';
-import { DashboardConfigCard } from '@/components/settings/DashboardConfigCard';
+import { useMinerSettingsForm } from '@/hooks/useMinerSettingsForm';
+import { useChartCollapsed } from '@/lib/chartUtils';
+import { SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
+import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { DashboardColorsCard } from '@/components/settings/DashboardColorsCard';
+import { DashboardConfigCard } from '@/components/settings/DashboardConfigCard';
 import { DashboardSettingsFormFooter } from '@/components/settings/DashboardSettingsFormFooter';
+import { MinerTabContent } from '@/components/settings/MinerTabContent';
+import { PendingChangesBox } from '@/components/settings/PendingChangesBox';
+import { PoolsTabContent } from '@/components/settings/PoolsTabContent';
+import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
 
 export default function SettingsPage({ onError }) {
   const { data: miner, refetch } = useMiner();

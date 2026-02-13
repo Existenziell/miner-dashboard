@@ -1,18 +1,18 @@
-import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
-import { useMiner, MinerProvider } from '@/context/MinerContext';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { useConfig } from '@/context/ConfigContext';
+import { MinerProvider, useMiner } from '@/context/MinerContext';
 import { useNetworkData } from '@/hooks/useNetworkData';
 import { getTabFromUrl, setTabInUrl } from '@/lib/tabUrl';
-import { useConfig } from '@/context/ConfigContext';
-import MinerStatus from '@/components/dashboard/MinerStatus';
 import HashrateChart from '@/components/charts/HashrateChart';
-import TemperatureChart from '@/components/charts/TemperatureChart';
 import PowerChart from '@/components/charts/PowerChart';
-import SharesCard from '@/components/dashboard/SharesCard';
+import TemperatureChart from '@/components/charts/TemperatureChart';
 import MinerSettings from '@/components/dashboard/MinerSettings';
+import MinerStatus from '@/components/dashboard/MinerStatus';
 import NetworkStatus from '@/components/dashboard/NetworkStatus';
+import SharesCard from '@/components/dashboard/SharesCard';
+import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import Notifications from '@/components/notifications/Notifications';
-import Footer from '@/components/layout/Footer';
 
 const SettingsPage = lazy(() => import('@/components/pages/SettingsPage'));
 const DocsPage = lazy(() => import('@/components/pages/DocsPage'));

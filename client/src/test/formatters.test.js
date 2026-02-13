@@ -1,16 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { RESET_REASONS } from '@/lib/constants.js';
 import {
-  formatHashrate,
-  formatUptime,
-  formatTemp,
-  formatPower,
-  formatBytes,
-  formatNumber,
-  formatDifficulty,
-  formatPrice,
   formatBestDiff,
+  formatBytes,
+  formatDifficulty,
+  formatHashrate,
+  formatNumber,
+  formatPower,
+  formatPrice,
   formatResetReason,
+  formatTemp,
+  formatUptime,
 } from '@/lib/formatters.js';
 
 describe('formatHashrate', () => {

@@ -72,7 +72,7 @@ The backend listens on port 8001.
 | `npm run dev:client` | Run Vite dev server (client) |
 | `npm run build` | Build frontend for production |
 | `npm start` | Start production server (run after `npm run build`) |
-| `npm run lint` | Lint client code |
+| `npm run lint` | Lint client code (use `--fix` to auto-sort imports to the project order) |
 | `npm run test` | Run client tests |
 | `npm run test:watch` | Run client tests in watch mode |
 | `npm run all` | Run build, test, and lint concurrently |

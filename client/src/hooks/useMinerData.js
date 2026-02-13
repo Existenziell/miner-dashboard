@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback,useEffect, useRef, useState } from 'react';
 import { fetchMinerInfo } from '@/lib/api';
 import {
-  POLL_MINER_INTERVAL_MS,
   CHART_HISTORY_HR,
-  CHART_HISTORY_TMP,
   CHART_HISTORY_PW,
-  MAX_CHART_HISTORY,
+  CHART_HISTORY_TMP,
   CHART_PERSIST_INTERVAL_MS,
+  CHART_POINTS_1H,
   CHART_POINTS_1M,
   CHART_POINTS_10M,
-  CHART_POINTS_1H,
+  MAX_CHART_HISTORY,
+  POLL_MINER_INTERVAL_MS,
 } from '@/lib/constants';
 
 function parseStored(key) {
