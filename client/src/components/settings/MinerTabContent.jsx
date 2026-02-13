@@ -137,23 +137,6 @@ export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Overheat limit (°C)" hint="Miner shuts down above this temperature.">
-              <input
-                type="number"
-                min={50}
-                max={80}
-                value={overheatTemp}
-                onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
-                className={`input ${overheatTempError ? 'input-danger' : ''}`}
-                aria-invalid={!!overheatTempError}
-                aria-describedby={overheatTempError ? 'overheat-temp-error' : undefined}
-              />
-              {overheatTempError && (
-                <p id="overheat-temp-error" className="text-danger text-xs mt-1" role="alert">
-                  {overheatTempError}
-                </p>
-              )}
-            </Field>
             <div className="flex flex-col gap-4">
               {fanAuto ? (
                 <Field label="PID target temperature (°C)" hint="Fan aims to keep ASIC at this temp.">
@@ -209,6 +192,23 @@ export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
                 </div>
               </Field>
             </div>
+            <Field label="Overheat limit (°C)" hint="Miner shuts down above this temperature.">
+              <input
+                type="number"
+                min={50}
+                max={80}
+                value={overheatTemp}
+                onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
+                className={`input ${overheatTempError ? 'input-danger' : ''}`}
+                aria-invalid={!!overheatTempError}
+                aria-describedby={overheatTempError ? 'overheat-temp-error' : undefined}
+              />
+              {overheatTempError && (
+                <p id="overheat-temp-error" className="text-danger text-xs mt-1" role="alert">
+                  {overheatTempError}
+                </p>
+              )}
+            </Field>
           </div>
         </div>
 

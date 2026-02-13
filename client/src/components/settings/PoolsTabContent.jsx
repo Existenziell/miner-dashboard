@@ -102,7 +102,7 @@ export function PoolsTabContent({ miner }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4 border-t border-edge dark:border-edge-dark">
             <div className="flex flex-col gap-4 pr-4 md:border-r md:border-edge dark:md:border-edge-dark">
               <div className="flex items-center gap-2">
-                <p className="label font-semibold text-body mb-0">
+                <p className="font-semibold text-lg mb-0">
                   {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
                 </p>
                 {!(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.stratumURL || '').trim() ? (
@@ -232,7 +232,7 @@ export function PoolsTabContent({ miner }) {
             </div>
             <div className="flex flex-col gap-4 pt-4 md:pt-0 md:pl-4">
               <div className="flex items-center gap-2">
-                <p className="label font-semibold text-body mb-0">
+                <p className="font-semibold text-lg mb-0">
                   {poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
                 </p>
                 {(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.fallbackStratumURL || '').trim() ? (
