@@ -33,6 +33,25 @@ function validateAccentColor(value) {
   return null;
 }
 
+function validateChartColors(value) {
+  if (value === undefined) return null;
+  if (typeof value !== 'object' || value === null) return 'chartColors must be an object';
+  const knownCharts = Object.keys(DASHBOARD_DEFAULTS.chartColors);
+  for (const chartKey of Object.keys(value)) {
+    if (!knownCharts.includes(chartKey)) return `chartColors: unknown chart "${chartKey}"`;
+    const chart = value[chartKey];
+    if (typeof chart !== 'object' || chart === null) return `chartColors.${chartKey} must be an object`;
+    const knownSeries = Object.keys(DASHBOARD_DEFAULTS.chartColors[chartKey]);
+    for (const seriesKey of Object.keys(chart)) {
+      if (!knownSeries.includes(seriesKey)) return `chartColors.${chartKey}: unknown series "${seriesKey}"`;
+      if (typeof chart[seriesKey] !== 'string' || !HEX_COLOR.test(chart[seriesKey])) {
+        return `chartColors.${chartKey}.${seriesKey} must be a hex color`;
+      }
+    }
+  }
+  return null;
+}
+
 // GET /api/config
 router.get('/', (_req, res) => {
   res.json(getConfig());
@@ -66,6 +85,8 @@ router.patch('/', (req, res) => {
   if (mrErr) errors.push(mrErr);
   const accentErr = validateAccentColor(body.accentColor);
   if (accentErr) errors.push(accentErr);
+  const chartErr = validateChartColors(body.chartColors);
+  if (chartErr) errors.push(chartErr);
 
   if (errors.length > 0) {
     return res.status(400).json({ error: 'Validation failed', details: errors });

@@ -8,6 +8,17 @@ export const DASHBOARD_DEFAULTS = {
   pollMinerIntervalMs: 10_000,
   pollNetworkIntervalMs: 60_000,
   accentColor: '#d946ef',
+  chartColors: {
+    power: { power: '#d946ef', currentA: '#06b6d4' },
+    temperature: { temp: '#d946ef', vrTemp: '#06b6d4' },
+    hashrate: {
+      hashRate: '#d946ef',
+      hashRate_1m: '#06b6d4',
+      hashRate_10m: '#eff2bd',
+      hashRate_1h: '#16a34a',
+      hashRate_1d: '#f7931a',
+    },
+  },
   metricRanges: {
     hashrate: { greenMin: 5950, orangeMin: 5500, gaugeMax: 7000 },
     efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },

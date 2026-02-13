@@ -23,16 +23,40 @@ function deepMergeMetricRanges(defaults, fromFile) {
   return out;
 }
 
+function deepMergeChartColors(defaults, fromFile) {
+  if (!fromFile || typeof fromFile !== 'object') return { ...defaults };
+  const out = {};
+  for (const chartKey of Object.keys(defaults)) {
+    const d = defaults[chartKey];
+    const f = fromFile[chartKey];
+    if (typeof d !== 'object' || d === null) continue;
+    out[chartKey] = { ...d };
+    if (f && typeof f === 'object') {
+      for (const seriesKey of Object.keys(f)) {
+        if (d[seriesKey] !== undefined && typeof f[seriesKey] === 'string') {
+          out[chartKey][seriesKey] = f[seriesKey];
+        }
+      }
+    }
+  }
+  return out;
+}
+
 function mergeWithDefaults(fileObj) {
   if (!fileObj || typeof fileObj !== 'object') return { ...DASHBOARD_DEFAULTS };
   const metricRanges = deepMergeMetricRanges(
     DASHBOARD_DEFAULTS.metricRanges,
     fileObj.metricRanges
   );
+  const chartColors = deepMergeChartColors(
+    DASHBOARD_DEFAULTS.chartColors,
+    fileObj.chartColors
+  );
   return {
     ...DASHBOARD_DEFAULTS,
     ...fileObj,
     metricRanges,
+    chartColors,
   };
 }
 

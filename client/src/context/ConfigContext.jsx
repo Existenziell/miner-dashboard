@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { fetchDashboardConfig } from '../lib/api';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { setMetricRanges } from '../lib/metricRanges';
-import { normalizeHex, hexWithAlpha } from '../lib/colorUtils';
+import { normalizeHex, hexWithAlpha, getContrastColor } from '../lib/colorUtils';
 
 const ConfigContext = createContext(null);
 
@@ -14,16 +14,18 @@ function buildAccentOverrideCSS(accent) {
   const a20 = hexWithAlpha(accent, 0.2);
   const a25 = hexWithAlpha(accent, 0.25);
   const a50 = hexWithAlpha(accent, 0.5);
+  const contrastFg = getContrastColor(accent);
   return `/* Accent override - Tailwind compiles to literal hex */
 .bg-accent{background-color:${accent} !important}
 .text-accent{color:${accent} !important}
-.btn-primary{background-color:${accent} !important}
+.btn-primary{background-color:${accent} !important;color:${contrastFg} !important}
 @media (hover: hover){.btn-primary:hover{background-color:color-mix(in srgb,${accent} 78%,black) !important}}
 .btn-ghost-accent{background-color:${a10} !important;border-color:${accent} !important}
 @media (hover: hover){.btn-ghost-accent:hover{background-color:${a20} !important}}
 .input:focus{--tw-ring-color:${accent} !important}
 .switch:focus{--tw-ring-color:${accent} !important}
 .switch-on{background-color:${accent} !important;border-color:${accent} !important}
+.switch-on .switch-thumb{background-color:${contrastFg} !important}
 @media (hover: hover){.hover\\:border-accent\\/20:hover{border-color:${a20} !important}}
 .highlight-box{background-color:${a10} !important;border-color:${a50} !important}
 .option-row-selected{background-color:${a15} !important;border-left-color:${accent} !important}

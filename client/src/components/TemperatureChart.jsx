@@ -1,26 +1,32 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
-import { getChartColors } from '../lib/themeColors';
-import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
+import { useConfig } from '../context/ConfigContext';
+import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
 import { CHART_LEGEND_STORAGE_KEY_TEMPERATURE, CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE } from '../lib/constants';
+import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
 const formatTempValue = (entry) =>
   entry.value != null ? `${entry.value.toFixed(1)}\u00B0C` : '--';
 
-const SERIES = [
-  { key: 'temp',    name: 'ASIC Temp', color: '#d946ef', width: 1,   axis: 'temp' },
-  { key: 'vrTemp',  name: 'VR Temp',   color: '#2563eb', width: 1, axis: 'temp' },
+const SERIES_DEFAULTS = [
+  { key: 'temp', name: 'ASIC Temp', color: DASHBOARD_DEFAULTS.chartColors.temperature.temp, width: 1, axis: 'temp' },
+  { key: 'vrTemp', name: 'VR Temp', color: DASHBOARD_DEFAULTS.chartColors.temperature.vrTemp, width: 1, axis: 'temp' },
 ];
-
-const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
+const TEMPERATURE_SERIES_KEYS = new Set(SERIES_DEFAULTS.map((s) => s.key));
 
 function TemperatureChart({ history }) {
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_TEMPERATURE, SERIES_KEYS);
+  const { config } = useConfig();
+  const colors = config.chartColors?.temperature ?? DASHBOARD_DEFAULTS.chartColors.temperature;
+  const SERIES = useMemo(
+    () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
+    [colors]
+  );
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_TEMPERATURE, TEMPERATURE_SERIES_KEYS);
   const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE);
   const { resolved } = useTheme();
-  const chartColors = getChartColors(resolved === 'dark');
+  const chartColors = getChartGridAxisColors(resolved === 'dark');
 
   const showTempAxis = SERIES.some((s) => s.axis === 'temp' && !hidden.has(s.key));
 

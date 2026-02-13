@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { CHART_GRID_AXIS_COLORS } from './constants.js';
 
 /** Format timestamp for chart axis/tooltip in 24h format (e.g. "20:41") */
 export function formatTime(ts) {
@@ -72,4 +73,9 @@ export function useChartCollapsed(storageKey) {
   }, [storageKey]);
 
   return { collapsed, toggleCollapsed };
+}
+
+/** Return grid/axis colors for Recharts by theme. */
+export function getChartGridAxisColors(isDark) {
+  return CHART_GRID_AXIS_COLORS[isDark ? 'dark' : 'light'];
 }

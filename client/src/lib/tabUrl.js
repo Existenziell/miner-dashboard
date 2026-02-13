@@ -1,10 +1,22 @@
 /**
  * Tab state synced with URL query (?tab=settings|docs|api).
  * Valid tab ids: 'dashboard' | 'settings' | 'docs' | 'api'
- * Settings sub-tabs use ?tab=settings&section=miner|pools|dashboard
+ * Settings sub-tabs use ?tab=settings&section=miner|pools|dashboard|colors
+ * Last settings section is persisted so reopening Settings restores that sub-tab.
  */
 
-const VALID_SETTINGS_SECTIONS = new Set(['miner', 'pools', 'dashboard']);
+const VALID_SETTINGS_SECTIONS = new Set(['miner', 'pools', 'dashboard', 'colors']);
+const SETTINGS_SECTION_STORAGE_KEY = 'settingsSection';
+
+function getStoredSettingsSection() {
+  if (typeof window === 'undefined') return 'miner';
+  try {
+    const s = window.localStorage.getItem(SETTINGS_SECTION_STORAGE_KEY);
+    return VALID_SETTINGS_SECTIONS.has(s) ? s : 'miner';
+  } catch {
+    return 'miner';
+  }
+}
 
 export function getTabFromUrl() {
   if (typeof window === 'undefined') return 'dashboard';
@@ -24,8 +36,9 @@ export function setTabInUrl(tab) {
   } else {
     url.searchParams.set('tab', tab);
     if (tab === 'settings') {
-      if (!VALID_SETTINGS_SECTIONS.has(url.searchParams.get('section'))) {
-        url.searchParams.set('section', 'miner');
+      const currentSection = url.searchParams.get('section');
+      if (!VALID_SETTINGS_SECTIONS.has(currentSection)) {
+        url.searchParams.set('section', getStoredSettingsSection());
       }
     } else {
       url.searchParams.delete('section');
@@ -49,4 +62,9 @@ export function setSettingsSectionInUrl(section) {
   url.searchParams.set('section', section);
   const newUrl = `${url.pathname}?${url.searchParams}`;
   window.history.replaceState({ tab: 'settings', section }, '', newUrl);
+  try {
+    window.localStorage.setItem(SETTINGS_SECTION_STORAGE_KEY, section);
+  } catch {
+    // ignore
+  }
 }

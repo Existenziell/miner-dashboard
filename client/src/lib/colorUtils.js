@@ -17,3 +17,16 @@ export function hexWithAlpha(hex, alpha) {
   const a = n.toString(16).padStart(2, '0');
   return hex.slice(0, 7) + a;
 }
+
+/**
+ * Return black or white for readable text on the given background hex.
+ * Uses relative luminance (sRGB); threshold 0.45 so light accents get dark text.
+ */
+export function getContrastColor(hex) {
+  const h = hex.replace(/^#/, '');
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance > 0.45 ? '#000000' : '#ffffff';
+}

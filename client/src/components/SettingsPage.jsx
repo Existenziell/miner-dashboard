@@ -15,6 +15,7 @@ import {
   MAX_WIFI_SSID_LENGTH,
   MIN_WIFI_PASSWORD_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
+  CHART_COLOR_SPEC,
 } from '../lib/constants';
 import { useChartCollapsed } from '../lib/chartUtils';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '../lib/tabUrl';
@@ -54,6 +55,10 @@ const METRIC_KEY_LABELS = {
 
 function deepCopyMetricRanges(ranges) {
   return JSON.parse(JSON.stringify(ranges));
+}
+
+function deepCopyChartColors(colors) {
+  return JSON.parse(JSON.stringify(colors ?? DASHBOARD_DEFAULTS.chartColors));
 }
 
 function Field({ label, children, hint }) {
@@ -126,6 +131,9 @@ export default function SettingsPage({ onError }) {
   const [dashboardPollMiner, setDashboardPollMiner] = useState(config.pollMinerIntervalMs);
   const [dashboardPollNetwork, setDashboardPollNetwork] = useState(config.pollNetworkIntervalMs);
   const [dashboardAccentColor, setDashboardAccentColor] = useState(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
+  const [dashboardChartColors, setDashboardChartColors] = useState(() =>
+    deepCopyChartColors(config.chartColors)
+  );
   const [dashboardMetricRanges, setDashboardMetricRanges] = useState(() =>
     deepCopyMetricRanges(config.metricRanges)
   );
@@ -135,6 +143,7 @@ export default function SettingsPage({ onError }) {
     setDashboardPollMiner(config.pollMinerIntervalMs);
     setDashboardPollNetwork(config.pollNetworkIntervalMs);
     setDashboardAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
+    setDashboardChartColors(deepCopyChartColors(config.chartColors));
     setDashboardMetricRanges(deepCopyMetricRanges(config.metricRanges));
   }, [config]);
 
@@ -665,6 +674,8 @@ export default function SettingsPage({ onError }) {
 
   const hasMetricRangesChange =
     JSON.stringify(dashboardMetricRanges) !== JSON.stringify(config.metricRanges);
+  const hasChartColorsChange =
+    JSON.stringify(dashboardChartColors) !== JSON.stringify(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors);
 
   const effectiveAccent = normalizeHex(dashboardAccentColor, DASHBOARD_DEFAULTS.accentColor);
   const configAccent = normalizeHex(config.accentColor ?? '', DASHBOARD_DEFAULTS.accentColor);
@@ -674,6 +685,7 @@ export default function SettingsPage({ onError }) {
     dashboardPollMiner !== config.pollMinerIntervalMs ||
     dashboardPollNetwork !== config.pollNetworkIntervalMs ||
     effectiveAccent !== configAccent ||
+    hasChartColorsChange ||
     hasMetricRangesChange;
 
   const handleSaveDashboard = async (e) => {
@@ -688,6 +700,19 @@ export default function SettingsPage({ onError }) {
         pollNetworkIntervalMs: Number(dashboardPollNetwork),
         accentColor: effectiveAccent,
       };
+      if (hasChartColorsChange) {
+        const normalized = deepCopyChartColors(DASHBOARD_DEFAULTS.chartColors);
+        CHART_COLOR_SPEC.forEach(({ id }) => {
+          const fromForm = dashboardChartColors[id];
+          if (fromForm) {
+            Object.keys(normalized[id]).forEach((k) => {
+              const v = fromForm[k];
+              normalized[id][k] = (v && String(v).trim()) ? normalizeHex(v, DASHBOARD_DEFAULTS.chartColors[id][k]) : DASHBOARD_DEFAULTS.chartColors[id][k];
+            });
+          }
+        });
+        payload.chartColors = normalized;
+      }
       if (hasMetricRangesChange) payload.metricRanges = deepCopyMetricRanges(dashboardMetricRanges);
       await patchDashboardConfig(payload);
       await refetchConfig();
@@ -706,7 +731,18 @@ export default function SettingsPage({ onError }) {
     setDashboardPollMiner(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
     setDashboardPollNetwork(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
     setDashboardAccentColor(DASHBOARD_DEFAULTS.accentColor);
+    setDashboardChartColors(deepCopyChartColors(DASHBOARD_DEFAULTS.chartColors));
     setDashboardMetricRanges(deepCopyMetricRanges(DASHBOARD_DEFAULTS.metricRanges));
+  };
+
+  const setChartColorValue = (chartId, seriesKey, value) => {
+    setDashboardChartColors((prev) => ({
+      ...prev,
+      [chartId]: {
+        ...prev[chartId],
+        [seriesKey]: value,
+      },
+    }));
   };
 
   const setMetricRangeValue = (metric, key, value) => {
@@ -721,6 +757,7 @@ export default function SettingsPage({ onError }) {
 
   const dashboardCard = (
     <form onSubmit={handleSaveDashboard} className="space-y-4">
+      {settingsSubTab === 'dashboard' && (
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
@@ -774,25 +811,6 @@ export default function SettingsPage({ onError }) {
               aria-label="Network poll interval ms"
             />
           </Field>
-          <Field label="Accent color" hint="Buttons, links, and highlights. Darker shade is derived automatically.">
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={effectiveAccent}
-                onChange={(e) => setDashboardAccentColor(e.target.value)}
-                className="w-10 h-10 rounded border border-edge dark:border-edge-dark cursor-pointer bg-transparent"
-                aria-label="Accent color picker"
-              />
-              <input
-                type="text"
-                value={dashboardAccentColor}
-                onChange={(e) => setDashboardAccentColor(e.target.value)}
-                placeholder={DASHBOARD_DEFAULTS.accentColor}
-                className="input flex-1 min-w-0 font-mono text-sm"
-                aria-label="Accent color hex"
-              />
-            </div>
-          </Field>
         </div>
         <div className="space-y-4">
           <div>
@@ -840,6 +858,82 @@ export default function SettingsPage({ onError }) {
           </div>
         </div>
       </div>
+      )}
+
+      {settingsSubTab === 'colors' && (
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h3 className="card-header-title">Colors</h3>
+          </div>
+        </div>
+        <p className="text-muted-standalone text-sm mb-4">
+          Custom accent and chart line colors.
+        </p>
+        <div className="space-y-4">
+          <Field label="Accent color" hint="Buttons, links, and highlights. Darker shade is derived automatically.">
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={effectiveAccent}
+                onChange={(e) => setDashboardAccentColor(e.target.value)}
+                className="w-10 h-10 rounded border border-edge dark:border-edge-dark cursor-pointer bg-transparent"
+                aria-label="Accent color picker"
+              />
+              <input
+                type="text"
+                value={dashboardAccentColor}
+                onChange={(e) => setDashboardAccentColor(e.target.value)}
+                placeholder={DASHBOARD_DEFAULTS.accentColor}
+                className="input flex-1 min-w-0 font-mono text-sm"
+                aria-label="Accent color hex"
+              />
+            </div>
+          </Field>
+          <div>
+            <p className="text-sm font-medium text-body mb-1">Chart colors</p>
+            <p className="text-muted-standalone text-xs mb-3">Line colors for Power, Temperature, and Hashrate charts.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {CHART_COLOR_SPEC.map((chart) => {
+                const chartColors = dashboardChartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
+                return (
+                  <div key={chart.id} className="border border-edge dark:border-edge-dark rounded-lg p-3 space-y-3">
+                    <p className="text-sm font-medium text-body">{chart.label}</p>
+                    {chart.series.map(({ key, label }) => {
+                      const value = chartColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];
+                      const effective = normalizeHex(value, DASHBOARD_DEFAULTS.chartColors[chart.id][key]);
+                      return (
+                        <div key={key} className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={effective}
+                            onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
+                            className="w-8 h-8 rounded border border-edge dark:border-edge-dark cursor-pointer bg-transparent shrink-0"
+                            aria-label={`${chart.label} ${label} color`}
+                          />
+                          <label className="text-xs text-muted shrink-0 min-w-16" htmlFor={`chart-${chart.id}-${key}`}>
+                            {label}
+                          </label>
+                          <input
+                            id={`chart-${chart.id}-${key}`}
+                            type="text"
+                            value={chartColors[key] ?? ''}
+                            onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
+                            placeholder={DASHBOARD_DEFAULTS.chartColors[chart.id][key]}
+                            className="input text-sm flex-1 min-w-0 font-mono"
+                            aria-label={`${chart.label} ${label} hex`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+      )}
 
       <div className="card">
         <div className="flex flex-wrap items-center gap-4">
@@ -874,6 +968,7 @@ export default function SettingsPage({ onError }) {
     { id: 'miner', label: 'Miner' },
     { id: 'pools', label: 'Pools' },
     { id: 'dashboard', label: 'Dashboard' },
+    { id: 'colors', label: 'Colors' },
   ];
 
   const tabBar = (
@@ -899,7 +994,7 @@ export default function SettingsPage({ onError }) {
     return (
       <div className="space-y-4">
         {tabBar}
-        {settingsSubTab === 'dashboard' && dashboardCard}
+        {(settingsSubTab === 'dashboard' || settingsSubTab === 'colors') && dashboardCard}
         {settingsSubTab === 'miner' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to change device settings. Set Miner IP in the <button type="button" onClick={() => { setSettingsSubTab('dashboard'); setSettingsSectionInUrl('dashboard'); }} className="link-text text-body cursor-pointer underline">Dashboard</button> tab if the dashboard cannot reach the miner.
@@ -917,7 +1012,7 @@ export default function SettingsPage({ onError }) {
   return (
     <div className="space-y-4">
       {tabBar}
-      {settingsSubTab === 'dashboard' && dashboardCard}
+      {(settingsSubTab === 'dashboard' || settingsSubTab === 'colors') && dashboardCard}
       {(settingsSubTab === 'miner' || settingsSubTab === 'pools') && (
       <form onSubmit={handleSave} className="space-y-4">
         {settingsSubTab === 'miner' && (

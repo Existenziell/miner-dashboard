@@ -1,28 +1,34 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
-import { getChartColors } from '../lib/themeColors';
-import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
+import { useConfig } from '../context/ConfigContext';
+import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
 import { CHART_LEGEND_STORAGE_KEY_POWER, CHART_COLLAPSED_STORAGE_KEY_POWER } from '../lib/constants';
+import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
-const SERIES = [
-  { key: 'power', name: 'Power', color: '#d946ef', width: 1, axis: 'power', fmt: (v) => (v != null ? `${v.toFixed(1)} W` : '--') },
-  { key: 'currentA', name: 'Current', color: '#2563eb', width: 1, axis: 'current', fmt: (v) => (v != null ? `${v.toFixed(2)} A` : '--') },
+const SERIES_DEFAULTS = [
+  { key: 'power', name: 'Power', color: DASHBOARD_DEFAULTS.chartColors.power.power, width: 1, axis: 'power', fmt: (v) => (v != null ? `${v.toFixed(1)} W` : '--') },
+  { key: 'currentA', name: 'Current', color: DASHBOARD_DEFAULTS.chartColors.power.currentA, width: 1, axis: 'current', fmt: (v) => (v != null ? `${v.toFixed(2)} A` : '--') },
 ];
+const POWER_SERIES_KEYS = new Set(SERIES_DEFAULTS.map((s) => s.key));
 
-const formatPowerValue = (entry) => {
-  const s = SERIES.find((x) => x.key === entry.dataKey);
+const formatPowerValue = (entry, series) => {
+  const s = series.find((x) => x.key === entry.dataKey);
   return s?.fmt(entry.value) ?? (entry.value != null ? String(entry.value) : '--');
 };
 
-const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
-
 function PowerChart({ history }) {
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_POWER, SERIES_KEYS);
+  const { config } = useConfig();
+  const colors = config.chartColors?.power ?? DASHBOARD_DEFAULTS.chartColors.power;
+  const SERIES = useMemo(
+    () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
+    [colors]
+  );
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_POWER, POWER_SERIES_KEYS);
   const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_POWER);
   const { resolved } = useTheme();
-  const chartColors = getChartColors(resolved === 'dark');
+  const chartColors = getChartGridAxisColors(resolved === 'dark');
 
   const showPowerAxis = SERIES.some((s) => s.axis === 'power' && !hidden.has(s.key));
   const showCurrentAxis = SERIES.some((s) => s.axis === 'current' && !hidden.has(s.key));
@@ -67,7 +73,7 @@ function PowerChart({ history }) {
               allowDataOverflow
               hide={!showCurrentAxis}
             />
-            <Tooltip content={<ChartTooltip formatValue={formatPowerValue} />} />
+            <Tooltip content={<ChartTooltip formatValue={(entry) => formatPowerValue(entry, SERIES)} />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (
                 <Line

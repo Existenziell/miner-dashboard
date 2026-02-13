@@ -186,3 +186,26 @@ export const SOLO_POOLS = [
     notes: 'Set solo mode in pool dashboard.',
   },
 ];
+
+/** Chart series color spec for dashboard config and Settings UI. Keys must match DASHBOARD_DEFAULTS.chartColors. */
+export const CHART_COLOR_SPEC = [
+  { id: 'power', label: 'Power', series: [{ key: 'power', label: 'Power' }, { key: 'currentA', label: 'Current' }] },
+  { id: 'temperature', label: 'Temperature', series: [{ key: 'temp', label: 'ASIC Temp' }, { key: 'vrTemp', label: 'VR Temp' }] },
+  {
+    id: 'hashrate',
+    label: 'Hashrate',
+    series: [
+      { key: 'hashRate', label: 'Instant' },
+      { key: 'hashRate_1m', label: '1m Avg' },
+      { key: 'hashRate_10m', label: '10m Avg' },
+      { key: 'hashRate_1h', label: '1h Avg' },
+      { key: 'hashRate_1d', label: '1d Avg' },
+    ],
+  },
+];
+
+/** Recharts grid and axis stroke colors by theme (light/dark). Not the data series colors. */
+export const CHART_GRID_AXIS_COLORS = {
+  light: { grid: '#d1d5db', axis: '#9ca3af' },
+  dark: { grid: '#333366', axis: '#666688' },
+};

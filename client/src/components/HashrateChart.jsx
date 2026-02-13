@@ -1,29 +1,36 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../hooks/useTheme';
-import { getChartColors } from '../lib/themeColors';
-import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
+import { useConfig } from '../context/ConfigContext';
+import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
 import { CHART_LEGEND_STORAGE_KEY_HASHRATE, CHART_COLLAPSED_STORAGE_KEY_HASHRATE } from '../lib/constants';
+import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
 const formatHashrateValue = (entry) =>
   entry.value != null ? `${entry.value.toFixed(2)} GH/s` : '--';
 
-const SERIES = [
-  { key: 'hashRate',     name: 'Instant',  color: '#f7931a', width: 1 },
-  { key: 'hashRate_1m',  name: '1m Avg',   color: '#06b6d4', width: 1 },
-  { key: 'hashRate_10m', name: '10m Avg',  color: '#a855f7', width: 1 },
-  { key: 'hashRate_1h',  name: '1h Avg',   color: '#16a34a', width: 1 },
-  { key: 'hashRate_1d',  name: '1d Avg',   color: '#a21caf', width: 1 },
+const h = DASHBOARD_DEFAULTS.chartColors.hashrate;
+const SERIES_DEFAULTS = [
+  { key: 'hashRate', name: 'Instant', color: h.hashRate, width: 1 },
+  { key: 'hashRate_1m', name: '1m Avg', color: h.hashRate_1m, width: 1 },
+  { key: 'hashRate_10m', name: '10m Avg', color: h.hashRate_10m, width: 1 },
+  { key: 'hashRate_1h', name: '1h Avg', color: h.hashRate_1h, width: 1 },
+  { key: 'hashRate_1d', name: '1d Avg', color: h.hashRate_1d, width: 1 },
 ];
-
-const SERIES_KEYS = new Set(SERIES.map((s) => s.key));
+const HASHRATE_SERIES_KEYS = new Set(SERIES_DEFAULTS.map((s) => s.key));
 
 function HashrateChart({ history }) {
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_HASHRATE, SERIES_KEYS);
+  const { config } = useConfig();
+  const colors = config.chartColors?.hashrate ?? DASHBOARD_DEFAULTS.chartColors.hashrate;
+  const SERIES = useMemo(
+    () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
+    [colors]
+  );
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_HASHRATE, HASHRATE_SERIES_KEYS);
   const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_HASHRATE);
   const { resolved } = useTheme();
-  const chartColors = getChartColors(resolved === 'dark');
+  const chartColors = getChartGridAxisColors(resolved === 'dark');
 
   return (
     <ChartCard
