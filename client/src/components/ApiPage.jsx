@@ -41,7 +41,7 @@ const CLIENT_SETTINGS = [
 
 const SERVER_SETTINGS = [
   { name: 'MINER_IP', source: 'env', value: '(env)', description: 'Miner device IP/host for proxy requests' },
-  { name: 'MEMPOOL_API', source: 'env', value: '(env)', description: 'Mempool.space API base URL for network data' },
+  { name: 'MEMPOOL_API', source: 'network.js', value: 'https://mempool.space/api', description: 'Mempool.space API base URL for network data' },
   { name: 'CACHE_TTL_MS', source: 'network.js', value: '30_000', description: 'Network route response cache TTL (ms)' },
 ];
 

@@ -1,15 +1,14 @@
 import { Router } from 'express';
+import { MINER_IP } from '../config.js';
 import { parseMinerSettings } from '../../shared/schemas/minerApi.js';
 
 const router = Router();
-
-const MINER_IP = () => process.env.MINER_IP;
 
 // Proxy GET /api/miner/info -> miner's /api/system/info (optional query: ts, cur)
 router.get('/info', async (req, res) => {
   try {
     const { ts, cur } = req.query;
-    const url = new URL(`http://${MINER_IP()}/api/system/info`);
+    const url = new URL(`http://${MINER_IP}/api/system/info`);
     if (ts != null) url.searchParams.set('ts', String(ts));
     if (cur != null) url.searchParams.set('cur', String(cur));
     const response = await fetch(url.toString());
@@ -36,7 +35,7 @@ router.get('/info', async (req, res) => {
 //   absMaxVoltage: number       - board max core voltage (mV), e.g. 1200 or 1400
 router.get('/asic', async (_req, res) => {
   try {
-    const response = await fetch(`http://${MINER_IP()}/api/system/asic`);
+    const response = await fetch(`http://${MINER_IP}/api/system/asic`);
     if (!response.ok) {
       return res.status(response.status).json({ error: 'Miner ASIC API error', status: response.status });
     }
@@ -58,7 +57,7 @@ router.patch('/settings', async (req, res) => {
     if (Object.keys(payload).length === 0) {
       return res.json({ success: true });
     }
-    const response = await fetch(`http://${MINER_IP()}/api/system`, {
+    const response = await fetch(`http://${MINER_IP}/api/system`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -80,7 +79,7 @@ router.patch('/settings', async (req, res) => {
 // POST /api/miner/restart -> miner's POST /api/system/restart
 router.post('/restart', async (_req, res) => {
   try {
-    const response = await fetch(`http://${MINER_IP()}/api/system/restart`, {
+    const response = await fetch(`http://${MINER_IP}/api/system/restart`, {
       method: 'POST',
     });
     if (!response.ok) {
@@ -96,7 +95,7 @@ router.post('/restart', async (_req, res) => {
 // POST /api/miner/shutdown -> miner's POST /api/system/shutdown
 router.post('/shutdown', async (_req, res) => {
   try {
-    const response = await fetch(`http://${MINER_IP()}/api/system/shutdown`, {
+    const response = await fetch(`http://${MINER_IP}/api/system/shutdown`, {
       method: 'POST',
     });
     if (!response.ok) {

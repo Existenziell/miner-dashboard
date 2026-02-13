@@ -21,7 +21,7 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 npm install
 cd client && npm install && cd ..
 
-# Copy env template and set your miner IP (and optional MEMPOOL_API, PORT)
+# Copy env template and set your miner IP (and optional PORT)
 cp .env.example .env
 # Edit .env: set MINER_IP to your miner's IP address
 
@@ -52,10 +52,9 @@ Then open `http://localhost:8001`.
 Copy `.env.example` to `.env` in the project root and set your values:
 
 - **MINER_IP** – Your miner's IP address (required)
-- **MEMPOOL_API** – Mempool API base URL (default: `https://mempool.space/api`)
 - **PORT** – Backend port (default: `8001`)
 
-The server will not start until `MINER_IP`, `MEMPOOL_API`, and `PORT` are set.
+The server will not start until `MINER_IP` and `PORT` are set. Mempool API URL is hardcoded in `server/routes/network.js`.
 
 ## Commands
 
