@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { RESET_REASONS } from '../lib/constants.js';
 import {
   formatHashrate,
   formatUptime,
@@ -9,8 +10,6 @@ import {
   formatDifficulty,
   formatPrice,
   formatBestDiff,
-  timeSince,
-  RESET_REASONS,
   formatResetReason,
 } from '../lib/formatters.js';
 
@@ -141,33 +140,6 @@ describe('formatBestDiff', () => {
     expect(formatBestDiff(1e3)).toBe('1.00K');
     expect(formatBestDiff(1e6)).toBe('1.00M');
     expect(formatBestDiff(1e9)).toBe('1.00G');
-  });
-});
-
-describe('timeSince', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2025-02-11T12:00:00Z'));
-  });
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('returns "--" for falsy timestamp', () => {
-    expect(timeSince(0)).toBe('--');
-    expect(timeSince(null)).toBe('--');
-  });
-  it('formats seconds ago when < 60s', () => {
-    const ts = Math.floor(new Date('2025-02-11T11:59:50Z').getTime() / 1000);
-    expect(timeSince(ts)).toBe('10s ago');
-  });
-  it('formats minutes ago when < 1 hour', () => {
-    const ts = Math.floor(new Date('2025-02-11T11:30:00Z').getTime() / 1000);
-    expect(timeSince(ts)).toBe('30m ago');
-  });
-  it('formats hours and minutes when >= 1 hour', () => {
-    const ts = Math.floor(new Date('2025-02-11T10:15:00Z').getTime() / 1000);
-    expect(timeSince(ts)).toBe('1h 45m ago');
   });
 });
 

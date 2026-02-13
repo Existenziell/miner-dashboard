@@ -3,7 +3,7 @@
   "defaultExpectedHashrateGh": 6000,
   "pollMinerIntervalMs": 10000,
   "pollNetworkIntervalMs": 60000,
-  "accentColor": "#d946ef",
+  "accentColor": "#0ea6e3",
   "chartColors": {
     "power": {
       "power": "#d946ef",

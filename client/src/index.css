@@ -123,13 +123,6 @@ a:hover {
     disabled:opacity-50 disabled:cursor-not-allowed
     bg-accent text-white hover:bg-accent-dark;
 }
-.btn-danger {
-  @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
-    disabled:opacity-50 disabled:cursor-not-allowed
-    border border-danger dark:border-danger-dark
-    bg-danger/10 dark:bg-danger-dark/10 text-danger dark:text-danger-dark
-    hover:bg-danger/20 dark:hover:bg-danger-dark/20;
-}
 .btn-ghost {
   @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
     disabled:opacity-50 disabled:cursor-not-allowed
@@ -221,7 +214,13 @@ input[type="number"] {
     border border-edge dark:border-edge-dark;
 }
 
-/* Field label hint tooltip (hover on info icon) */
+/* Field label hint (trigger + tooltip on hover) */
+.field-hint-trigger {
+  @apply relative inline-flex shrink-0 rounded-full
+    text-muted dark:text-muted-dark
+    hover:text-fg dark:hover:text-fg-dark
+    focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:ring-offset-surface dark:focus:ring-offset-surface-dark;
+}
 .field-hint-tooltip {
   @apply absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20
     px-3 py-2 min-w-[15rem] max-w-sm rounded-lg text-sm text-muted dark:text-muted-dark

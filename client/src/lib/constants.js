@@ -208,3 +208,20 @@ export const CHART_GRID_AXIS_COLORS = {
   light: { grid: '#d1d5db', axis: '#9ca3af' },
   dark: { grid: '#333366', axis: '#666688' },
 };
+
+// —— Device / firmware (ESP32 reset reasons, NerdQaxe/ESP-IDF) —————————————————
+/** Keys match strings returned by miner API (esp_reset_reason_t). */
+export const RESET_REASONS = {
+  'SYSTEM.RESET_UNKNOWN':        'Unknown',
+  'SYSTEM.RESET_POWERON':        'Power On',
+  'SYSTEM.RESET_EXTERNAL':       'External Reset',
+  'SYSTEM.RESET_SOFTWARE':       'Software Reset',
+  'SYSTEM.RESET_PANIC':          'Panic / Exception',
+  'SYSTEM.RESET_INT_WATCHDOG':   'Interrupt Watchdog',
+  'SYSTEM.RESET_TASK_WATCHDOG':  'Task Watchdog',
+  'SYSTEM.RESET_OTHER_WATCHDOG': 'Other Watchdog',
+  'SYSTEM.RESET_DEEPSLEEP':      'Deep Sleep Wake',
+  'SYSTEM.RESET_BROWNOUT':       'Brownout',
+  'SYSTEM.RESET_SDIO':           'SDIO Reset',
+  'SYSTEM.RESET_NOT_SPECIFIED':  'Not Specified',
+};

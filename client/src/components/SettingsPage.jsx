@@ -25,7 +25,7 @@ import { normalizeHex } from '../lib/colorUtils';
 import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
 import { toBool } from '../lib/minerApiBools';
 import { ChartCard } from './TimeSeriesChart';
-import { IconQuestion } from './Icons';
+import { IconInfo } from './Icons';
 
 const POOL_MODE_OPTIONS = [
   { value: 'failover', label: 'Failover (Primary/Fallback)' },
@@ -51,12 +51,8 @@ const METRIC_KEY_LABELS = {
   maxMv: 'Max (mV)',
 };
 
-function deepCopyMetricRanges(ranges) {
-  return JSON.parse(JSON.stringify(ranges));
-}
-
-function deepCopyChartColors(colors) {
-  return JSON.parse(JSON.stringify(colors ?? DASHBOARD_DEFAULTS.chartColors));
+function deepCopy(obj) {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 function Field({ label, children, hint }) {
@@ -65,8 +61,8 @@ function Field({ label, children, hint }) {
       <div className="flex items-center gap-1.5">
         <label className="label">{label}</label>
         {hint && (
-          <span className="field-hint-trigger relative inline-flex shrink-0 rounded-full text-muted dark:text-muted-dark hover:text-black dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:ring-offset-surface dark:focus:ring-offset-surface-dark" aria-label="More info">
-            <IconQuestion className="w-4 h-4" />
+          <span className="field-hint-trigger" aria-label="More info">
+            <IconInfo className="w-4 h-4" />
             <span className="field-hint-tooltip" role="tooltip">
               {hint}
             </span>
@@ -139,10 +135,10 @@ export default function SettingsPage({ onError }) {
   const [dashboardPollNetwork, setDashboardPollNetwork] = useState(config.pollNetworkIntervalMs);
   const [dashboardAccentColor, setDashboardAccentColor] = useState(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
   const [dashboardChartColors, setDashboardChartColors] = useState(() =>
-    deepCopyChartColors(config.chartColors)
+    deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors)
   );
   const [dashboardMetricRanges, setDashboardMetricRanges] = useState(() =>
-    deepCopyMetricRanges(config.metricRanges)
+    deepCopy(config.metricRanges)
   );
   const [showResetDashboardConfirm, setShowResetDashboardConfirm] = useState(false);
   useEffect(() => {
@@ -151,8 +147,8 @@ export default function SettingsPage({ onError }) {
     setDashboardPollMiner(config.pollMinerIntervalMs);
     setDashboardPollNetwork(config.pollNetworkIntervalMs);
     setDashboardAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
-    setDashboardChartColors(deepCopyChartColors(config.chartColors));
-    setDashboardMetricRanges(deepCopyMetricRanges(config.metricRanges));
+    setDashboardChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
+    setDashboardMetricRanges(deepCopy(config.metricRanges));
   }, [config]);
 
   // Sync form when miner data updates
@@ -764,8 +760,8 @@ export default function SettingsPage({ onError }) {
     setDashboardPollMiner(config.pollMinerIntervalMs);
     setDashboardPollNetwork(config.pollNetworkIntervalMs);
     setDashboardAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
-    setDashboardChartColors(deepCopyChartColors(config.chartColors));
-    setDashboardMetricRanges(deepCopyMetricRanges(config.metricRanges));
+    setDashboardChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
+    setDashboardMetricRanges(deepCopy(config.metricRanges));
   };
 
   const handleSaveDashboard = async (e) => {
@@ -781,7 +777,7 @@ export default function SettingsPage({ onError }) {
         accentColor: effectiveAccent,
       };
       if (hasChartColorsChange) {
-        const normalized = deepCopyChartColors(DASHBOARD_DEFAULTS.chartColors);
+        const normalized = deepCopy(DASHBOARD_DEFAULTS.chartColors);
         CHART_COLOR_SPEC.forEach(({ id }) => {
           const fromForm = dashboardChartColors[id];
           if (fromForm) {
@@ -793,7 +789,7 @@ export default function SettingsPage({ onError }) {
         });
         payload.chartColors = normalized;
       }
-      if (hasMetricRangesChange) payload.metricRanges = deepCopyMetricRanges(dashboardMetricRanges);
+      if (hasMetricRangesChange) payload.metricRanges = deepCopy(dashboardMetricRanges);
       await patchDashboardConfig(payload);
       await refetchConfig();
       setDashboardMessage({ type: 'success', text: 'Dashboard config saved.' });
@@ -816,8 +812,8 @@ export default function SettingsPage({ onError }) {
         pollMinerIntervalMs: Number(DASHBOARD_DEFAULTS.pollMinerIntervalMs),
         pollNetworkIntervalMs: Number(DASHBOARD_DEFAULTS.pollNetworkIntervalMs),
         accentColor: defaultAccent,
-        chartColors: deepCopyChartColors(DASHBOARD_DEFAULTS.chartColors),
-        metricRanges: deepCopyMetricRanges(DASHBOARD_DEFAULTS.metricRanges),
+        chartColors: deepCopy(DASHBOARD_DEFAULTS.chartColors),
+        metricRanges: deepCopy(DASHBOARD_DEFAULTS.metricRanges),
       };
       await patchDashboardConfig(payload);
       await refetchConfig();
@@ -825,8 +821,8 @@ export default function SettingsPage({ onError }) {
       setDashboardPollMiner(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
       setDashboardPollNetwork(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
       setDashboardAccentColor(DASHBOARD_DEFAULTS.accentColor);
-      setDashboardChartColors(deepCopyChartColors(DASHBOARD_DEFAULTS.chartColors));
-      setDashboardMetricRanges(deepCopyMetricRanges(DASHBOARD_DEFAULTS.metricRanges));
+      setDashboardChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
+      setDashboardMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
       setShowResetDashboardConfirm(false);
       setDashboardMessage({ type: 'success', text: 'Dashboard reset to defaults and saved.' });
     } catch (err) {
