@@ -1,7 +1,11 @@
 {
   "name": "miner-dashboard",
   "version": "1.0.0",
-  "private": true,
+  "description": "Real-time monitoring dashboard for NerdQaxe++ Bitcoin Solo Miner with mempool.space network stats",
+  "repository": "github:christof/miner-dashboard",
+  "homepage": "https://github.com/christof/miner-dashboard#readme",
+  "bugs": "https://github.com/christof/miner-dashboard/issues",
+  "engines": { "node": ">=18" },
   "type": "module",
   "scripts": {
     "dev": "concurrently --kill-others \"npm run dev:server\" \"npm run dev:client\"",

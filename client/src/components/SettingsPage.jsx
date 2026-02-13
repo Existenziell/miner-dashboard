@@ -69,7 +69,6 @@ export default function SettingsPage({ onError }) {
   const [fallbackTLS, setFallbackTLS] = useState(!!(miner?.fallbackStratumTLS === 1 || miner?.fallbackStratumTLS === true));
   const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(!!(miner?.stratumEnonceSubscribe === 1 || miner?.stratumEnonceSubscribe === true || miner?.stratumExtranonceSubscribe === 1 || miner?.stratumExtranonceSubscribe === true));
   const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(!!(miner?.fallbackStratumEnonceSubscribe === 1 || miner?.fallbackStratumEnonceSubscribe === true || miner?.fallbackStratumExtranonceSubscribe === 1 || miner?.fallbackStratumExtranonceSubscribe === true));
-
   const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed('settingsCollapsed_wifi');
   const { collapsed: poolCollapsed, toggleCollapsed: togglePoolCollapsed } = useChartCollapsed('settingsCollapsed_pool');
 

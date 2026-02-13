@@ -80,14 +80,14 @@ export default function MinerStatus() {
           Miner Status
         </h2>
         {minerError ? (
-          <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark">
+          <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark text-sm">
             <span className="status-dot status-dot-danger" />
             Miner offline
           </span>
         ) : minerLoading ? (
           <span className="text-muted-standalone">Connecting...</span>
         ) : (
-          <span className="flex items-center gap-1.5 text-success dark:text-success-dark">
+          <span className="flex items-center gap-1.5 text-success dark:text-success-dark text-sm">
             <span className="status-dot status-dot-success" />
             Connected
           </span>

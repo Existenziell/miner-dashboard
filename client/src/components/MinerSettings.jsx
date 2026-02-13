@@ -38,8 +38,12 @@ export default function MinerSettings() {
   const primary = getPoolInfo(data.stratumURL);
   const fallback = getPoolInfo(data.fallbackStratumURL);
 
-  const primaryMisconfigured = !isUsingFallback && (!(data.stratumURL || '').trim() || !(data.stratumUser || '').trim());
-  const fallbackMisconfigured = isUsingFallback && (!(data.fallbackStratumURL || '').trim() || !(data.fallbackStratumUser || '').trim());
+  // Worker may come as stratumUser, stratum_user (snake_case from device), or nested stratum.pools[0].user
+  const primaryWorker = data.stratumUser ?? data.stratum_user ?? poolData?.user ?? '';
+  const fallbackWorker = data.fallbackStratumUser ?? data.fallback_stratum_user ?? data.stratum?.pools?.[1]?.user ?? '';
+
+  const primaryMisconfigured = !isUsingFallback && (!(data.stratumURL || '').trim() || !(primaryWorker || '').trim());
+  const fallbackMisconfigured = isUsingFallback && (!(data.fallbackStratumURL || '').trim() || !(fallbackWorker || '').trim());
 
   return (
     <div className="card">
@@ -65,7 +69,7 @@ export default function MinerSettings() {
         <div className="space-y-0.5">
           <SettingRow label="Name" value={primary.name} href={primary.webUrl} />
           <SettingRow label="URL" value={data.stratumURL ? `${data.stratumURL}:${data.stratumPort || ''}` : '--'} />
-          <SettingRow label="Worker" value={data.stratumUser || '--'} truncate />
+          <SettingRow label="Worker" value={primaryWorker || '--'} truncate />
           <SettingRow label="Pool Difficulty" value={poolData?.poolDifficulty ?? data.stratumDifficulty ?? data.poolDifficulty ?? '--'} />
           <SettingRow label="TLS" value={data.stratumTLS ? 'Enabled' : 'Disabled'} />
         </div>
@@ -87,7 +91,7 @@ export default function MinerSettings() {
         <div className="space-y-0.5">
           <SettingRow label="Name" value={fallback.name === '--' ? 'Not configured' : fallback.name} href={fallback.webUrl} />
           <SettingRow label="URL" value={data.fallbackStratumURL ? `${data.fallbackStratumURL}:${data.fallbackStratumPort || ''}` : '--'} />
-          <SettingRow label="Worker" value={data.fallbackStratumUser || '--'} truncate />
+          <SettingRow label="Worker" value={fallbackWorker || '--'} truncate />
           <SettingRow label="TLS" value={data.fallbackStratumTLS ? 'Enabled' : 'Disabled'} />
         </div>
       </div>

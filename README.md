@@ -9,12 +9,21 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, with Bit
 - **Mining details**: shares accepted/rejected, best difficulty, pool info
 - **Bitcoin network**: block height, difficulty adjustment, BTC price, fee estimates (60s polling)
 
+## Requirements
+
+- **Node.js** 18 or later
+- A NerdQaxe++ miner on your network (for live monitoring)
+
 ## Quick Start
 
 ```bash
 # Install dependencies
 npm install
 cd client && npm install && cd ..
+
+# Copy env template and set your miner IP (and optional MEMPOOL_API, PORT)
+cp .env.example .env
+# Edit .env: set MINER_IP to your miner's IP address
 
 # Run in development mode
 npm run dev
@@ -40,13 +49,13 @@ Then open `http://localhost:8001`.
 
 ## Configuration
 
-Edit `.env` in the project root:
+Copy `.env.example` to `.env` in the project root and set your values:
 
-```
-MINER_IP=192.168.1.3       # Your miner's IP address
-MEMPOOL_API=https://mempool.space/api  # Or your own mempool instance
-PORT=8001                   # Backend port
-```
+- **MINER_IP** – Your miner's IP address (required)
+- **MEMPOOL_API** – Mempool API base URL (default: `https://mempool.space/api`)
+- **PORT** – Backend port (default: `8001`)
+
+The server will not start until `MINER_IP`, `MEMPOOL_API`, and `PORT` are set.
 
 ## Architecture
 
@@ -56,3 +65,7 @@ Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
 ```
 
 The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
