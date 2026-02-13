@@ -3,21 +3,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { ClickableLegend, ChartCard } from './TimeSeriesChart';
+import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="tooltip-card">
-      <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
-      {payload.map((entry) => (
-        <div key={entry.dataKey} style={{ color: entry.color }}>
-          {entry.name}: {entry.value?.toFixed(2)} GH/s
-        </div>
-      ))}
-    </div>
-  );
-}
+const formatHashrateValue = (entry) =>
+  entry.value != null ? `${entry.value.toFixed(2)} GH/s` : '--';
 
 const SERIES = [
   { key: 'hashRate',     name: 'Instant',  color: '#f7931a', width: 1 },
@@ -64,7 +53,7 @@ function HashrateChart({ history }) {
               tickCount={10}
               tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}` : v.toFixed(0))}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ChartTooltip formatValue={formatHashrateValue} />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (
                 <Line

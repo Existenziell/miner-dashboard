@@ -3,30 +3,17 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { ClickableLegend, ChartCard } from './TimeSeriesChart';
+import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
 const SERIES = [
   { key: 'power', name: 'Power', color: '#d946ef', width: 1, axis: 'power', fmt: (v) => (v != null ? `${v.toFixed(1)} W` : '--') },
   { key: 'currentA', name: 'Current', color: '#2563eb', width: 1, axis: 'current', fmt: (v) => (v != null ? `${v.toFixed(2)} A` : '--') },
 ];
 
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
-  const seriesMap = new Map(SERIES.map((s) => [s.key, s]));
-  return (
-    <div className="tooltip-card">
-      <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
-      {payload.map((entry) => {
-        const s = seriesMap.get(entry.dataKey);
-        return (
-          <div key={entry.dataKey} style={{ color: entry.color }}>
-            {entry.name}: {s?.fmt(entry.value) ?? entry.value}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+const formatPowerValue = (entry) => {
+  const s = SERIES.find((x) => x.key === entry.dataKey);
+  return s?.fmt(entry.value) ?? (entry.value != null ? String(entry.value) : '--');
+};
 
 const LEGEND_STORAGE_KEY = 'chartLegend_power';
 const COLLAPSED_STORAGE_KEY = 'chartCollapsed_power';
@@ -81,7 +68,7 @@ function PowerChart({ history }) {
               allowDataOverflow
               hide={!showCurrentAxis}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ChartTooltip formatValue={formatPowerValue} />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (
                 <Line

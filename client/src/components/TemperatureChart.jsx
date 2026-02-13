@@ -3,21 +3,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { getChartColors } from '../lib/themeColors';
 import { formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { ClickableLegend, ChartCard } from './TimeSeriesChart';
+import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="tooltip-card">
-      <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
-      {payload.map((entry) => (
-        <div key={entry.dataKey} style={{ color: entry.color }}>
-          {entry.name}: {entry.value?.toFixed(1)}{'\u00B0C'}
-        </div>
-      ))}
-    </div>
-  );
-}
+const formatTempValue = (entry) =>
+  entry.value != null ? `${entry.value.toFixed(1)}\u00B0C` : '--';
 
 const SERIES = [
   { key: 'temp',    name: 'ASIC Temp', color: '#d946ef', width: 1,   axis: 'temp' },
@@ -60,7 +49,7 @@ function TemperatureChart({ history }) {
               <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} domain={[40, 'auto']} tickFormatter={(v) => `${v}\u00B0`} />
             )}
             {!showTempAxis && <YAxis yAxisId="temp" hide />}
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ChartTooltip formatValue={formatTempValue} />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (
                 <Line

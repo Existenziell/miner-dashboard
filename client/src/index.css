@@ -22,9 +22,9 @@
   --color-surface-hover: #ededf0;
   --color-surface-hover-dark: #1a2744;
 
-  /* Border */
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-dark: rgba(255, 255, 255, 0.05);
+  /* Default border / divider (use border-edge, dark:border-edge-dark) */
+  --color-edge: rgba(0, 0, 0, 0.08);
+  --color-edge-dark: rgba(255, 255, 255, 0.05);
 
   /* Text */
   --color-fg: #1a1a2e;
@@ -46,6 +46,12 @@ html {
   @apply transition-colors duration-200 ease-[ease];
 }
 
+/* Sticky app header bar */
+.header-bar {
+  @apply border-b border-edge dark:border-edge-dark
+    bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10;
+}
+
 /* Links */
 a {
   @apply text-fg dark:text-fg-dark underline decoration-dotted underline-offset-2
@@ -59,20 +65,36 @@ a:hover {
 .card {
   @apply rounded-xl p-5 border
     bg-surface-card dark:bg-surface-card-dark
-    border-border dark:border-border-dark;
+    border-edge dark:border-edge-dark;
+}
+
+/* Card header: full-bleed bar above card content (use inside .card) */
+.card-header-wrapper {
+  @apply -mx-5 -mt-5 mb-4 min-w-0;
+}
+.card-header {
+  @apply w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2;
+}
+.card-header-title {
+  @apply text-lg font-semibold text-fg dark:text-fg-dark m-0;
 }
 
 /* Gauge cards: less padding, no clip, so the ring isn’t cut off at the sides */
 .gauge-card {
   @apply rounded-xl p-2 sm:p-3 border overflow-visible
     bg-surface-card dark:bg-surface-card-dark
-    border-border dark:border-border-dark;
+    border-edge dark:border-edge-dark;
 }
 
 /* Card section heading */
 .card-title {
   @apply text-sm font-semibold uppercase tracking-wide mb-4
     text-muted dark:text-muted-dark;
+}
+
+/* Input error state (combine with .input) */
+.input-danger {
+  @apply border-danger dark:border-danger-dark;
 }
 
 /* Form / field label */
@@ -107,7 +129,7 @@ a:hover {
 .btn-ghost {
   @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
     disabled:opacity-50 disabled:cursor-not-allowed
-    border border-border dark:border-border-dark
+    border border-edge dark:border-edge-dark
     bg-transparent text-fg dark:text-fg-dark
     hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
 }
@@ -125,7 +147,7 @@ a:hover {
 /* Text inputs and selects */
 .input {
   @apply w-full rounded-lg border px-3 py-2 text-sm
-    border-border dark:border-border-dark
+    border-edge dark:border-edge-dark
     bg-surface-light dark:bg-surface-light-dark
     text-fg dark:text-fg-dark
     focus:outline-none focus:ring-2 focus:ring-btc-orange;
@@ -192,7 +214,7 @@ input[type="number"] {
 .tooltip-card {
   @apply rounded-lg p-3 text-sm shadow-xl
     bg-surface-card dark:bg-surface-card-dark
-    border border-border dark:border-border-dark;
+    border border-edge dark:border-edge-dark;
 }
 
 /* Chart legend toggle button */
@@ -208,7 +230,7 @@ input[type="number"] {
   @apply text-muted dark:text-muted-dark;
 }
 .border-default {
-  @apply border-border dark:border-border-dark;
+  @apply border-edge dark:border-edge-dark;
 }
 .bg-surface-subtle {
   @apply bg-surface-light dark:bg-surface-light-dark;
@@ -240,6 +262,12 @@ input[type="number"] {
   @apply relative inline-flex items-center h-6 w-11 shrink-0 rounded-full border transition-colors
     focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark;
 }
+.switch-on {
+  @apply bg-accent border-accent;
+}
+.switch-off {
+  @apply bg-surface-light dark:bg-surface-light-dark border-edge dark:border-edge-dark;
+}
 .switch-thumb {
   @apply pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition translate-x-0.5;
 }
@@ -252,11 +280,11 @@ input[type="number"] {
 
 /* Option list (exclusive radio list) */
 .option-list {
-  @apply flex flex-col rounded-lg border border-border dark:border-border-dark overflow-hidden
+  @apply flex flex-col rounded-lg border border-edge dark:border-edge-dark overflow-hidden
     bg-surface-light dark:bg-surface-light-dark max-h-72 overflow-y-auto;
 }
 .option-row {
-  @apply flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b border-border/50 dark:border-border-dark/50
+  @apply flex items-center gap-3 px-4 py-2.5 cursor-pointer border-b border-edge/50 dark:border-edge-dark/50
     last:border-b-0 transition-colors
     hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
 }
@@ -267,7 +295,7 @@ input[type="number"] {
   @apply sr-only;
 }
 .option-radio-dot {
-  @apply shrink-0 w-4 h-4 rounded-full border-2 border-border dark:border-border-dark
+  @apply shrink-0 w-4 h-4 rounded-full border-2 border-edge dark:border-edge-dark
     transition-colors duration-150;
 }
 .option-row:has(.option-radio-input:checked) .option-radio-dot,
@@ -283,7 +311,7 @@ input[type="number"] {
 
 /* Radio and range inputs */
 .input-radio {
-  @apply rounded-full border-border dark:border-border-dark text-accent focus:ring-accent;
+  @apply rounded-full border-edge dark:border-edge-dark text-accent focus:ring-accent;
 }
 .input-range {
   @apply w-full h-2 rounded-lg appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
@@ -317,6 +345,19 @@ input[type="number"] {
 .doc-page table {
   @apply text-base;
 }
+/* Theme-aware table: border and row styles (use .doc-table or .doc-pools-table on table) */
+.doc-table,
+.doc-pools-table {
+  @apply w-full text-fg dark:text-fg-dark text-sm leading-relaxed border border-edge dark:border-edge-dark text-left;
+}
+.doc-table thead tr,
+.doc-pools-table thead tr {
+  @apply border-b border-edge dark:border-edge-dark bg-surface-light dark:bg-surface-light-dark;
+}
+.doc-table tbody tr,
+.doc-pools-table tbody tr {
+  @apply border-b border-edge dark:border-edge-dark;
+}
 /* Smaller font for solo pools table (overrides .doc-page table above) */
 .doc-page table.doc-pools-table {
   @apply text-xs;
@@ -327,6 +368,13 @@ input[type="number"] {
 }
 .doc-page table.doc-pools-table .code-inline {
   @apply text-xs;
+}
+
+/* API / code block (pre) */
+.api-pre {
+  @apply text-xs text-fg dark:text-fg-dark overflow-auto max-h-96 p-4 rounded-lg
+    bg-surface-light dark:bg-surface-light-dark border border-edge dark:border-edge-dark
+    whitespace-pre-wrap break-all;
 }
 
 /* Status dots (connection indicator) */

@@ -12,7 +12,7 @@ export default function Header({ activeTab, onTabChange }) {
   const { mode, cycle } = useTheme();
 
     return (
-        <header className="border-b border-default bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10">
+        <header className="header-bar">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <img src="/favicon/favicon.svg" alt="NerdQaxe++" className="w-10 h-10 dark:invert" />

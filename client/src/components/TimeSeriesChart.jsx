@@ -1,3 +1,24 @@
+import { formatTime } from '../lib/chartUtils';
+
+/**
+ * Recharts tooltip wrapper: time label + list of series values.
+ * @param {Object} props - Recharts tooltip props (active, payload, label)
+ * @param {(entry: { dataKey: string, name: string, color: string, value?: number }) => string} props.formatValue - Format one payload entry for display
+ */
+export function ChartTooltip({ active, payload, label, formatValue }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="tooltip-card">
+      <div className="text-muted-standalone text-xs mb-1">{formatTime(label)}</div>
+      {payload.map((entry) => (
+        <div key={entry.dataKey} style={{ color: entry.color }}>
+          {entry.name}: {formatValue(entry)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /**
  * Series shape: { key: string, name: string, color: string, width?: number, axis?: string }
  */
@@ -39,8 +60,10 @@ export function ChartCard({ title, loading, loadingMessage, collapsed, onToggleC
   if (loading) {
     return (
       <div className="card">
-        <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
-          <h3 className="text-lg font-semibold text-body m-0">{title}</h3>
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h3 className="card-header-title">{title}</h3>
+          </div>
         </div>
         <div className="h-72 flex items-center justify-center">
           <span className="text-muted-standalone text-sm">{loadingMessage}</span>
@@ -51,14 +74,14 @@ export function ChartCard({ title, loading, loadingMessage, collapsed, onToggleC
 
   return (
     <div className="card">
-      <div className="-mx-5 -mt-5 mb-4 min-w-0">
+      <div className="card-header-wrapper">
         <button
           type="button"
           onClick={onToggleCollapsed}
-          className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2 cursor-pointer border-0 focus:outline-none"
+          className="card-header cursor-pointer border-0 focus:outline-none"
           aria-expanded={!collapsed}
         >
-          <h3 className="text-lg font-semibold text-body m-0">{title}</h3>
+          <h3 className="card-header-title">{title}</h3>
           <span className="text-muted-standalone text-sm shrink-0">{collapsed ? 'Expand' : 'Collapse'}</span>
         </button>
       </div>

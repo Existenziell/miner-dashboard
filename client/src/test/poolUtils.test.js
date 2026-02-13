@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { SOLO_POOLS } from '../lib/constants.js';
-import { baseDomain, getPoolInfo } from '../lib/poolUtils.js';
+import { baseDomain, getPoolInfo, getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils.js';
 
 describe('SOLO_POOLS', () => {
   it('has identifier, name, stratumHost, port, tls, and webUrl for each entry', () => {
@@ -104,5 +104,46 @@ describe('getPoolInfo', () => {
     expect(info.name).toBe('Example');
     expect(info.webUrl).toBe(null);
     expect(info.identifier).toBe(null);
+  });
+});
+
+describe('getStratumPayloadFromOption', () => {
+  it('returns stratumURL, stratumPort, stratumTLS from pool option', () => {
+    const pool = SOLO_POOLS.find((p) => p.identifier === 'viabtc');
+    const payload = getStratumPayloadFromOption(pool);
+    expect(payload).toEqual({
+      stratumURL: 'btc.viabtc.io',
+      stratumPort: 3333,
+      stratumTLS: false,
+    });
+  });
+
+  it('returns custom port when pool has non-default port', () => {
+    const pool = SOLO_POOLS.find((p) => p.identifier === 'ocean');
+    const payload = getStratumPayloadFromOption(pool);
+    expect(payload.stratumPort).toBe(3334);
+  });
+});
+
+describe('findSoloPoolOption', () => {
+  it('returns null for null or undefined URL', () => {
+    expect(findSoloPoolOption(null)).toBe(null);
+    expect(findSoloPoolOption(undefined)).toBe(null);
+  });
+
+  it('matches by exact stratum host', () => {
+    const opt = findSoloPoolOption('stratum+tcp://btc.viabtc.io');
+    expect(opt).not.toBe(null);
+    expect(opt.identifier).toBe('viabtc');
+  });
+
+  it('matches by base domain when host differs', () => {
+    const opt = findSoloPoolOption('stratum+tcp://eusolo.ckpool.org:3333');
+    expect(opt).not.toBe(null);
+    expect(opt.identifier).toBe('ckpool-eu');
+  });
+
+  it('returns null for unknown stratum host', () => {
+    expect(findSoloPoolOption('stratum+tcp://unknown.pool.example.com')).toBe(null);
   });
 });

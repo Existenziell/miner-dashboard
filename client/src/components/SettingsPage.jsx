@@ -4,6 +4,7 @@ import { useMiner } from '../context/MinerContext';
 import { SUCCESS_MESSAGE_DISMISS_MS, DEFAULT_STRATUM_PORT, MIN_STRATUM_PORT, MAX_STRATUM_PORT, SOLO_POOLS } from '../lib/constants';
 import { useChartCollapsed } from '../lib/chartUtils';
 import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
+import { toBool } from '../lib/minerApiBools';
 import { ChartCard } from './TimeSeriesChart';
 
 const MAX_STRATUM_USER_LENGTH = 128;
@@ -44,8 +45,8 @@ export default function SettingsPage({ onError }) {
   const [fanAuto, setFanAuto] = useState(!!(miner?.autofanspeed != null && miner.autofanspeed !== 0));
   const [pidTargetTemp, setPidTargetTemp] = useState(miner?.pidTargetTemp ?? 55);
   const [manualFanSpeed, setManualFanSpeed] = useState(miner?.manualFanSpeed ?? 100);
-  const [autoScreenOff, setAutoScreenOff] = useState(!!(miner?.autoscreenoff === 1 || miner?.autoscreenoff === true));
-  const [flipScreen, setFlipScreen] = useState(!!(miner?.flipscreen === 1 || miner?.flipscreen === true));
+  const [autoScreenOff, setAutoScreenOff] = useState(toBool(miner?.autoscreenoff));
+  const [flipScreen, setFlipScreen] = useState(toBool(miner?.flipscreen));
 
   // WiFi form state (password not returned by API; leave blank to keep current)
   const [hostname, setHostname] = useState(miner?.hostname ?? '');
@@ -64,11 +65,11 @@ export default function SettingsPage({ onError }) {
   const [primaryStratumUser, setPrimaryStratumUser] = useState(miner?.stratumUser ?? '');
   const [fallbackStratumUser, setFallbackStratumUser] = useState(miner?.fallbackStratumUser ?? '');
   const [poolMode, setPoolMode] = useState('failover');
-  const [stratumTcpKeepalive, setStratumTcpKeepalive] = useState(!!(miner?.stratum_keep === 1 || miner?.stratum_keep === true || miner?.stratumTcpKeepalive === 1 || miner?.stratumTcpKeepalive === true));
-  const [primaryTLS, setPrimaryTLS] = useState(!!(miner?.stratumTLS === 1 || miner?.stratumTLS === true));
-  const [fallbackTLS, setFallbackTLS] = useState(!!(miner?.fallbackStratumTLS === 1 || miner?.fallbackStratumTLS === true));
-  const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(!!(miner?.stratumEnonceSubscribe === 1 || miner?.stratumEnonceSubscribe === true || miner?.stratumExtranonceSubscribe === 1 || miner?.stratumExtranonceSubscribe === true));
-  const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(!!(miner?.fallbackStratumEnonceSubscribe === 1 || miner?.fallbackStratumEnonceSubscribe === true || miner?.fallbackStratumExtranonceSubscribe === 1 || miner?.fallbackStratumExtranonceSubscribe === true));
+  const [stratumTcpKeepalive, setStratumTcpKeepalive] = useState(toBool(miner?.stratum_keep, miner?.stratumTcpKeepalive));
+  const [primaryTLS, setPrimaryTLS] = useState(toBool(miner?.stratumTLS));
+  const [fallbackTLS, setFallbackTLS] = useState(toBool(miner?.fallbackStratumTLS));
+  const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(toBool(miner?.stratumEnonceSubscribe, miner?.stratumExtranonceSubscribe));
+  const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(toBool(miner?.fallbackStratumEnonceSubscribe, miner?.fallbackStratumExtranonceSubscribe));
   const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed('settingsCollapsed_wifi');
   const { collapsed: poolCollapsed, toggleCollapsed: togglePoolCollapsed } = useChartCollapsed('settingsCollapsed_pool');
 
@@ -81,8 +82,8 @@ export default function SettingsPage({ onError }) {
     setFanAuto(!!(miner.autofanspeed != null && miner.autofanspeed !== 0));
     setPidTargetTemp(miner.pidTargetTemp ?? 55);
     setManualFanSpeed(miner.manualFanSpeed ?? 100);
-    setAutoScreenOff(!!(miner.autoscreenoff === 1 || miner.autoscreenoff === true));
-    setFlipScreen(!!(miner.flipscreen === 1 || miner.flipscreen === true));
+    setAutoScreenOff(toBool(miner.autoscreenoff));
+    setFlipScreen(toBool(miner.flipscreen));
     setHostname(miner.hostname ?? '');
     setWifiSsid(miner.ssid ?? '');
     setPrimaryStratumPort(miner.stratumPort ?? DEFAULT_STRATUM_PORT);
@@ -103,11 +104,11 @@ export default function SettingsPage({ onError }) {
     setFallbackCustomURL(fallbackOpt ? '' : (miner.fallbackStratumURL ?? ''));
     const mode = miner.poolMode != null ? String(miner.poolMode).toLowerCase() : 'failover';
     setPoolMode(mode === 'dual' ? 'dual' : 'failover');
-    setStratumTcpKeepalive(!!(miner.stratum_keep === 1 || miner.stratum_keep === true || miner.stratumTcpKeepalive === 1 || miner.stratumTcpKeepalive === true));
-    setPrimaryTLS(!!(miner.stratumTLS === 1 || miner.stratumTLS === true));
-    setFallbackTLS(!!(miner.fallbackStratumTLS === 1 || miner.fallbackStratumTLS === true));
-    setPrimaryExtranonceSubscribe(!!(miner.stratumEnonceSubscribe === 1 || miner.stratumEnonceSubscribe === true || miner.stratumExtranonceSubscribe === 1 || miner.stratumExtranonceSubscribe === true));
-    setFallbackExtranonceSubscribe(!!(miner.fallbackStratumEnonceSubscribe === 1 || miner.fallbackStratumEnonceSubscribe === true || miner.fallbackStratumExtranonceSubscribe === 1 || miner.fallbackStratumExtranonceSubscribe === true));
+    setStratumTcpKeepalive(toBool(miner.stratum_keep, miner.stratumTcpKeepalive));
+    setPrimaryTLS(toBool(miner.stratumTLS));
+    setFallbackTLS(toBool(miner.fallbackStratumTLS));
+    setPrimaryExtranonceSubscribe(toBool(miner.stratumEnonceSubscribe, miner.stratumExtranonceSubscribe));
+    setFallbackExtranonceSubscribe(toBool(miner.fallbackStratumEnonceSubscribe, miner.fallbackStratumExtranonceSubscribe));
   }, [miner]);
 
   // Fetch ASIC options (frequency/voltage dropdowns)
@@ -207,8 +208,8 @@ export default function SettingsPage({ onError }) {
       fanAuto: !!(miner.autofanspeed != null && miner.autofanspeed !== 0),
       pidTargetTemp: miner.pidTargetTemp ?? 55,
       manualFanSpeed: miner.manualFanSpeed ?? 100,
-      autoScreenOff: !!(miner.autoscreenoff === 1 || miner.autoscreenoff === true),
-      flipScreen: !!(miner.flipscreen === 1 || miner.flipscreen === true),
+      autoScreenOff: toBool(miner.autoscreenoff),
+      flipScreen: toBool(miner.flipscreen),
       hostname: miner.hostname ?? '',
       wifiSsid: miner.ssid ?? '',
       wifiPassword: '',
@@ -226,11 +227,11 @@ export default function SettingsPage({ onError }) {
         const m = miner.poolMode != null ? String(miner.poolMode).toLowerCase() : 'failover';
         return m === 'dual' ? 'dual' : 'failover';
       })(),
-      stratumTcpKeepalive: !!(miner.stratum_keep === 1 || miner.stratum_keep === true || miner.stratumTcpKeepalive === 1 || miner.stratumTcpKeepalive === true),
-      primaryTLS: !!(miner.stratumTLS === 1 || miner.stratumTLS === true),
-      fallbackTLS: !!(miner.fallbackStratumTLS === 1 || miner.fallbackStratumTLS === true),
-      primaryExtranonceSubscribe: !!(miner.stratumEnonceSubscribe === 1 || miner.stratumEnonceSubscribe === true || miner.stratumExtranonceSubscribe === 1 || miner.stratumExtranonceSubscribe === true),
-      fallbackExtranonceSubscribe: !!(miner.fallbackStratumEnonceSubscribe === 1 || miner.fallbackStratumEnonceSubscribe === true || miner.fallbackStratumExtranonceSubscribe === 1 || miner.fallbackStratumExtranonceSubscribe === true),
+      stratumTcpKeepalive: toBool(miner.stratum_keep, miner.stratumTcpKeepalive),
+      primaryTLS: toBool(miner.stratumTLS),
+      fallbackTLS: toBool(miner.fallbackStratumTLS),
+      primaryExtranonceSubscribe: toBool(miner.stratumEnonceSubscribe, miner.stratumExtranonceSubscribe),
+      fallbackExtranonceSubscribe: toBool(miner.fallbackStratumEnonceSubscribe, miner.fallbackStratumExtranonceSubscribe),
     };
   }, [miner]);
 
@@ -610,9 +611,9 @@ export default function SettingsPage({ onError }) {
       <form onSubmit={handleSave} className="space-y-4">
         {/* ASIC */}
         <div className="card">
-          <div className="-mx-5 -mt-5 mb-4 min-w-0">
-            <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
-              <h3 className="text-lg font-semibold text-body m-0">ASIC</h3>
+          <div className="card-header-wrapper">
+            <div className="card-header">
+              <h3 className="card-header-title">ASIC</h3>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -687,9 +688,9 @@ export default function SettingsPage({ onError }) {
         {/* Temperature & Fan | Display side by side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="card">
-            <div className="-mx-5 -mt-5 mb-4 min-w-0">
-              <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
-                <h3 className="text-lg font-semibold text-body m-0">Temperature & Fan</h3>
+            <div className="card-header-wrapper">
+              <div className="card-header">
+                <h3 className="card-header-title">Temperature & Fan</h3>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -700,7 +701,7 @@ export default function SettingsPage({ onError }) {
                   max={80}
                   value={overheatTemp}
                   onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
-                  className={`input ${overheatTempError ? 'border-danger' : ''}`}
+                  className={`input ${overheatTempError ? 'input-danger' : ''}`}
                   aria-invalid={!!overheatTempError}
                   aria-describedby={overheatTempError ? 'overheat-temp-error' : undefined}
                 />
@@ -719,7 +720,7 @@ export default function SettingsPage({ onError }) {
                       max={75}
                       value={pidTargetTemp}
                       onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
-                      className={`input ${pidTargetTempError ? 'border-danger' : ''}`}
+                      className={`input ${pidTargetTempError ? 'input-danger' : ''}`}
                       aria-invalid={!!pidTargetTempError}
                       aria-describedby={pidTargetTempError ? 'pid-target-temp-error' : undefined}
                     />
@@ -737,7 +738,7 @@ export default function SettingsPage({ onError }) {
                       max={100}
                       value={manualFanSpeed}
                       onChange={(e) => setManualFanSpeed(Number(e.target.value))}
-                      className={`input-range ${manualFanSpeedError ? 'border-danger' : ''}`}
+                      className={`input-range ${manualFanSpeedError ? 'input-danger' : ''}`}
                       aria-invalid={!!manualFanSpeedError}
                       aria-describedby={manualFanSpeedError ? 'manual-fan-speed-error' : undefined}
                     />
@@ -757,7 +758,7 @@ export default function SettingsPage({ onError }) {
                       aria-checked={fanAuto}
                       aria-label="Fan mode: Manual / Auto (PID)"
                       onClick={() => setFanAuto((v) => !v)}
-                      className={`switch ${fanAuto ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                      className={`switch ${fanAuto ? 'switch-on' : 'switch-off'}`}
                     >
                       <span className={`switch-thumb ${fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                     </button>
@@ -769,9 +770,9 @@ export default function SettingsPage({ onError }) {
           </div>
 
           <div className="card">
-            <div className="-mx-5 -mt-5 mb-4 min-w-0">
-              <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
-                <h3 className="text-lg font-semibold text-body m-0">Display</h3>
+            <div className="card-header-wrapper">
+              <div className="card-header">
+                <h3 className="card-header-title">Display</h3>
               </div>
             </div>
             <div className="flex flex-col gap-4">
@@ -782,7 +783,7 @@ export default function SettingsPage({ onError }) {
                     role="switch"
                     aria-checked={autoScreenOff}
                     onClick={() => setAutoScreenOff((v) => !v)}
-                    className={`switch ${autoScreenOff ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    className={`switch ${autoScreenOff ? 'switch-on' : 'switch-off'}`}
                   >
                     <span className={`switch-thumb ${autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
@@ -796,7 +797,7 @@ export default function SettingsPage({ onError }) {
                     role="switch"
                     aria-checked={flipScreen}
                     onClick={() => setFlipScreen((v) => !v)}
-                    className={`switch ${flipScreen ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    className={`switch ${flipScreen ? 'switch-on' : 'switch-off'}`}
                   >
                     <span className={`switch-thumb ${flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
@@ -823,7 +824,7 @@ export default function SettingsPage({ onError }) {
                 onChange={(e) => setHostname(e.target.value)}
                 placeholder="bitaxe"
                 maxLength={MAX_HOSTNAME_LENGTH}
-                className={`input ${hostnameError ? 'border-danger' : ''}`}
+                className={`input ${hostnameError ? 'input-danger' : ''}`}
                 aria-label="Hostname"
                 aria-invalid={!!hostnameError}
                 aria-describedby={hostnameError ? 'hostname-error' : undefined}
@@ -841,7 +842,7 @@ export default function SettingsPage({ onError }) {
                 onChange={(e) => setWifiSsid(e.target.value)}
                 placeholder="WiFi Network (SSID)"
                 maxLength={MAX_WIFI_SSID_LENGTH}
-                className={`input ${wifiSsidError ? 'border-danger' : ''}`}
+                className={`input ${wifiSsidError ? 'input-danger' : ''}`}
                 aria-label="WiFi Network (SSID)"
                 aria-invalid={!!wifiSsidError}
                 aria-describedby={wifiSsidError ? 'wifi-ssid-error' : undefined}
@@ -859,7 +860,7 @@ export default function SettingsPage({ onError }) {
                 onChange={(e) => setWifiPassword(e.target.value)}
                 placeholder="WiFi Password"
                 maxLength={MAX_WIFI_PASSWORD_LENGTH}
-                className={`input ${wifiPasswordError ? 'border-danger' : ''}`}
+                className={`input ${wifiPasswordError ? 'input-danger' : ''}`}
                 aria-label="WiFi Password"
                 aria-invalid={!!wifiPasswordError}
                 aria-describedby={wifiPasswordError ? 'wifi-password-error' : undefined}
@@ -885,7 +886,7 @@ export default function SettingsPage({ onError }) {
           onToggleCollapsed={togglePoolCollapsed}
         >
           {/* Top: Pool mode + TCP Keepalive */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-border dark:border-border-dark">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-edge dark:border-edge-dark">
             <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
               <select
                 value={poolMode}
@@ -908,7 +909,7 @@ export default function SettingsPage({ onError }) {
                   aria-checked={stratumTcpKeepalive}
                   aria-label="Enable Stratum TCP Keepalive"
                   onClick={() => setStratumTcpKeepalive((v) => !v)}
-                  className={`switch ${stratumTcpKeepalive ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                  className={`switch ${stratumTcpKeepalive ? 'switch-on' : 'switch-off'}`}
                 >
                   <span className={`switch-thumb ${stratumTcpKeepalive ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
@@ -919,7 +920,7 @@ export default function SettingsPage({ onError }) {
 
           {/* Pool 1 (left) | Pool 2 (right) with divider */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4">
-            <div className="flex flex-col gap-4 pr-4 md:border-r md:border-border dark:md:border-border-dark">
+            <div className="flex flex-col gap-4 pr-4 md:border-r md:border-edge dark:md:border-edge-dark">
               <div className="flex items-center gap-2">
                 <p className="label font-semibold text-body mb-0">
                   {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
@@ -955,7 +956,7 @@ export default function SettingsPage({ onError }) {
                     value={primaryCustomURL}
                     onChange={(e) => setPrimaryCustomURL(e.target.value)}
                     placeholder="stratum.example.com"
-                    className={`input ${primaryCustomURLError ? 'border-danger' : ''}`}
+                    className={`input ${primaryCustomURLError ? 'input-danger' : ''}`}
                     aria-label="Primary pool URL"
                     aria-invalid={!!primaryCustomURLError}
                     aria-describedby={primaryCustomURLError ? 'primary-custom-url-error' : undefined}
@@ -974,7 +975,7 @@ export default function SettingsPage({ onError }) {
                   max={MAX_STRATUM_PORT}
                   value={primaryStratumPort}
                   onChange={(e) => setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
-                  className={`input ${!primaryPortValid ? 'border-danger' : ''}`}
+                  className={`input ${!primaryPortValid ? 'input-danger' : ''}`}
                   aria-invalid={!primaryPortValid}
                 />
               </Field>
@@ -985,7 +986,7 @@ export default function SettingsPage({ onError }) {
                   onChange={(e) => setPrimaryStratumUser(e.target.value)}
                   placeholder="bc1q..."
                   maxLength={MAX_STRATUM_USER_LENGTH}
-                  className={`input ${primaryStratumUserError ? 'border-danger' : ''}`}
+                  className={`input ${primaryStratumUserError ? 'input-danger' : ''}`}
                   aria-invalid={!!primaryStratumUserError}
                   aria-describedby={primaryStratumUserError ? 'primary-stratum-user-error' : undefined}
                 />
@@ -1001,7 +1002,7 @@ export default function SettingsPage({ onError }) {
                   value={primaryPassword}
                   onChange={(e) => setPrimaryPassword(e.target.value)}
                   maxLength={MAX_STRATUM_PASSWORD_LENGTH}
-                  className={`input ${primaryPasswordError ? 'border-danger' : ''}`}
+                  className={`input ${primaryPasswordError ? 'input-danger' : ''}`}
                   placeholder="Pool Password"
                   aria-label="Primary pool password"
                   aria-invalid={!!primaryPasswordError}
@@ -1022,7 +1023,7 @@ export default function SettingsPage({ onError }) {
                       aria-checked={primaryExtranonceSubscribe}
                       aria-label="Primary pool Enable Extranonce Subscribe"
                       onClick={() => setPrimaryExtranonceSubscribe((v) => !v)}
-                      className={`switch ${primaryExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                      className={`switch ${primaryExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
                     >
                       <span className={`switch-thumb ${primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                     </button>
@@ -1042,7 +1043,7 @@ export default function SettingsPage({ onError }) {
                         const opt = primaryPoolKey && primaryPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === primaryPoolKey) : null;
                         if (opt?.tlsPort != null) setPrimaryStratumPort(nextTLS ? opt.tlsPort : opt.port);
                       }}
-                      className={`switch ${primaryTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                      className={`switch ${primaryTLS ? 'switch-on' : 'switch-off'}`}
                     >
                       <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                     </button>
@@ -1088,7 +1089,7 @@ export default function SettingsPage({ onError }) {
                     value={fallbackCustomURL}
                     onChange={(e) => setFallbackCustomURL(e.target.value)}
                     placeholder="stratum.example.com"
-                    className={`input ${fallbackCustomURLError ? 'border-danger' : ''}`}
+                    className={`input ${fallbackCustomURLError ? 'input-danger' : ''}`}
                     aria-label="Fallback pool URL"
                     aria-invalid={!!fallbackCustomURLError}
                     aria-describedby={fallbackCustomURLError ? 'fallback-custom-url-error' : undefined}
@@ -1107,7 +1108,7 @@ export default function SettingsPage({ onError }) {
                   max={MAX_STRATUM_PORT}
                   value={fallbackStratumPort}
                   onChange={(e) => setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
-                  className={`input ${!fallbackPortValid ? 'border-danger' : ''}`}
+                  className={`input ${!fallbackPortValid ? 'input-danger' : ''}`}
                   aria-invalid={!fallbackPortValid}
                 />
               </Field>
@@ -1118,7 +1119,7 @@ export default function SettingsPage({ onError }) {
                   onChange={(e) => setFallbackStratumUser(e.target.value)}
                   placeholder="bc1q..."
                   maxLength={MAX_STRATUM_USER_LENGTH}
-                  className={`input ${fallbackStratumUserError ? 'border-danger' : ''}`}
+                  className={`input ${fallbackStratumUserError ? 'input-danger' : ''}`}
                   aria-invalid={!!fallbackStratumUserError}
                   aria-describedby={fallbackStratumUserError ? 'fallback-stratum-user-error' : undefined}
                 />
@@ -1134,7 +1135,7 @@ export default function SettingsPage({ onError }) {
                   value={fallbackPassword}
                   onChange={(e) => setFallbackPassword(e.target.value)}
                   maxLength={MAX_STRATUM_PASSWORD_LENGTH}
-                  className={`input ${fallbackPasswordError ? 'border-danger' : ''}`}
+                  className={`input ${fallbackPasswordError ? 'input-danger' : ''}`}
                   placeholder="Pool Password"
                   aria-label="Fallback pool password"
                   aria-invalid={!!fallbackPasswordError}
@@ -1155,7 +1156,7 @@ export default function SettingsPage({ onError }) {
                       aria-checked={fallbackExtranonceSubscribe}
                       aria-label="Fallback pool Enable Extranonce Subscribe"
                       onClick={() => setFallbackExtranonceSubscribe((v) => !v)}
-                      className={`switch ${fallbackExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                      className={`switch ${fallbackExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
                     >
                       <span className={`switch-thumb ${fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                     </button>
@@ -1175,7 +1176,7 @@ export default function SettingsPage({ onError }) {
                         const opt = fallbackPoolKey && fallbackPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === fallbackPoolKey) : null;
                         if (opt?.tlsPort != null) setFallbackStratumPort(nextTLS ? opt.tlsPort : opt.port);
                       }}
-                      className={`switch ${fallbackTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                      className={`switch ${fallbackTLS ? 'switch-on' : 'switch-off'}`}
                     >
                       <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                     </button>

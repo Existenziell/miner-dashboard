@@ -22,6 +22,10 @@ const SettingsPage = lazy(() => import('./components/SettingsPage'));
 const DocumentationPage = lazy(() => import('./components/DocumentationPage'));
 const ApiPage = lazy(() => import('./components/ApiPage'));
 
+function PageFallback({ message }) {
+  return <div className="text-muted-standalone py-8 text-center">{message}</div>;
+}
+
 export default function App() {
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
   const setActiveTab = useCallback((tab) => {
@@ -59,15 +63,15 @@ function AppContent({ activeTab, onTabChange }) {
         />
 
         {activeTab === 'settings' ? (
-          <Suspense fallback={<div className="text-muted-standalone py-8 text-center">Loading settings…</div>}>
+          <Suspense fallback={<PageFallback message="Loading settings…" />}>
             <SettingsPage />
           </Suspense>
         ) : activeTab === 'docs' ? (
-          <Suspense fallback={<div className="text-muted-standalone py-8 text-center">Loading docs…</div>}>
+          <Suspense fallback={<PageFallback message="Loading docs…" />}>
             <DocumentationPage />
           </Suspense>
         ) : activeTab === 'api' ? (
-          <Suspense fallback={<div className="text-muted-standalone py-8 text-center">Loading API…</div>}>
+          <Suspense fallback={<PageFallback message="Loading API…" />}>
             <ApiPage />
           </Suspense>
         ) : (
@@ -150,9 +154,9 @@ function AppContent({ activeTab, onTabChange }) {
             </div>
 
             <div className="card">
-              <div className="-mx-5 -mt-5 mb-4 min-w-0">
-                <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
-                  <h3 className="text-lg font-semibold text-body m-0">Bitcoin Network</h3>
+              <div className="card-header-wrapper">
+                <div className="card-header">
+                  <h3 className="card-header-title">Bitcoin Network</h3>
                 </div>
               </div>
               <NetworkStatus data={network} />

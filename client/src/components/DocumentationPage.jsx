@@ -1,75 +1,5 @@
 import { SOLO_POOLS } from '../lib/constants';
 
-/** Solo pool fee by identifier (for documentation table only). */
-const POOL_FEE_BY_ID = {
-  ocean: '2%',
-  ckpool: '2%',
-  'ckpool-eu': '2%',
-  'ckpool-oceania': '2%',
-  viabtc: '1%',
-  'public-pool': '0%',
-  'solo-pool-eu': '1%',
-  'solopool-org': '2%',
-  kano: '0.9%',
-  braiins: '0.5%',
-};
-
-/** Registration: No signup (address-only) vs Account required. */
-const POOL_REGISTRATION_BY_ID = {
-  ocean: 'No signup',
-  ckpool: 'No signup',
-  'ckpool-eu': 'No signup',
-  'ckpool-oceania': 'No signup',
-  viabtc: 'Account required',
-  'public-pool': 'No signup',
-  'solo-pool-eu': 'No signup',
-  'solopool-org': 'No signup',
-  kano: 'No signup',
-  braiins: 'No signup',
-};
-
-/** Region / server location. */
-const POOL_REGION_BY_ID = {
-  ocean: 'Global',
-  ckpool: 'Americas',
-  'ckpool-eu': 'EU',
-  'ckpool-oceania': 'Oceania',
-  viabtc: 'Global',
-  'public-pool': 'Global',
-  'solo-pool-eu': 'EU',
-  'solopool-org': 'EU',
-  kano: 'Global',
-  braiins: 'Global',
-};
-
-/** Worker / username format. */
-const POOL_WORKER_FORMAT_BY_ID = {
-  ocean: 'Address or Address.Worker',
-  ckpool: 'Address or Address.Worker',
-  'ckpool-eu': 'Address or Address.Worker',
-  'ckpool-oceania': 'Address or Address.Worker',
-  viabtc: 'user.worker (account)',
-  'public-pool': 'Address.Worker, password x',
-  'solo-pool-eu': 'Address or Address.Worker',
-  'solopool-org': 'Address or Address.RIG_ID',
-  kano: 'username.worker (register first)',
-  braiins: 'Address or Address.Worker',
-};
-
-/** Short notes per pool. */
-const POOL_NOTES_BY_ID = {
-  ocean: 'Alternate template ports available.',
-  ckpool: '—',
-  'ckpool-eu': '—',
-  'ckpool-oceania': '—',
-  viabtc: 'Set solo mode in pool dashboard.',
-  'public-pool': 'TLS on port 4333.',
-  'solo-pool-eu': 'Instant coinbase payout.',
-  'solopool-org': 'Low-end port (250K diff); 7005, 9005 for higher hashrate.',
-  kano: '0.9% solo fee.',
-  braiins: '0.5% solo fee; stats at solo.braiins.com.',
-};
-
 export default function DocumentationPage() {
 
   return (
@@ -84,9 +14,9 @@ export default function DocumentationPage() {
         </p>
         <p className="doc-body mb-1">Known solo mining pools:</p>
         <div className="overflow-x-auto my-2">
-          <table className="doc-pools-table w-full doc-body border border-gray-300 dark:border-gray-600 text-left">
+          <table className="doc-pools-table">
             <thead>
-              <tr className="border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+              <tr>
                 <th className="p-2 font-semibold">Pool</th>
                 <th className="p-2 font-semibold">Stratum host</th>
                 <th className="p-2 font-semibold">Port</th>
@@ -100,7 +30,7 @@ export default function DocumentationPage() {
             </thead>
             <tbody>
               {SOLO_POOLS.map((pool) => (
-                <tr key={pool.identifier} className="border-b border-gray-200 dark:border-gray-600">
+                <tr key={pool.identifier}>
                   <td className="p-2">
                     <a href={pool.webUrl} target="_blank" rel="noopener noreferrer" className="font-medium no-underline! hover:underline">
                       {pool.name}
@@ -109,11 +39,11 @@ export default function DocumentationPage() {
                   <td className="p-2"><code className="code-inline">{pool.stratumHost}</code></td>
                   <td className="p-2">{pool.port}</td>
                   <td className="p-2">{pool.tls ? 'Yes' : 'No'}</td>
-                  <td className="p-2">{POOL_FEE_BY_ID[pool.identifier] ?? '—'}</td>
-                  <td className="p-2">{POOL_REGISTRATION_BY_ID[pool.identifier] ?? '—'}</td>
-                  <td className="p-2">{POOL_REGION_BY_ID[pool.identifier] ?? '—'}</td>
-                  <td className="p-2">{POOL_WORKER_FORMAT_BY_ID[pool.identifier] ?? '—'}</td>
-                  <td className="p-2">{POOL_NOTES_BY_ID[pool.identifier] ?? '—'}</td>
+                  <td className="p-2">{pool.fee ?? '—'}</td>
+                  <td className="p-2">{pool.registration ?? '—'}</td>
+                  <td className="p-2">{pool.region ?? '—'}</td>
+                  <td className="p-2">{pool.workerFormat ?? '—'}</td>
+                  <td className="p-2">{pool.notes ?? '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -164,9 +94,9 @@ export default function DocumentationPage() {
           Hash rate is how many double-SHA256 hashes per second the hardware can try. Units use the same prefixes as SI (×1000 per step):
         </p>
         <div className="overflow-x-auto mb-2">
-          <table className="w-full doc-body border border-gray-300 dark:border-gray-600 text-left">
+          <table className="doc-table">
             <thead>
-              <tr className="border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+              <tr>
                 <th className="p-2 font-semibold">Unit</th>
                 <th className="p-2 font-semibold">Name</th>
                 <th className="p-2 font-semibold">10ⁿ (H/s)</th>
@@ -174,37 +104,37 @@ export default function DocumentationPage() {
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-gray-200 dark:border-gray-600"><td className="p-2"><strong>H/s</strong></td><td className="p-2">hashes per second</td><td className="p-2">10⁰</td><td className="p-2">1 H/s</td></tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600"><td className="p-2"><strong>kH/s</strong></td><td className="p-2">kilo</td><td className="p-2">10³</td><td className="p-2">1,000 H/s</td></tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600"><td className="p-2"><strong>MH/s</strong></td><td className="p-2">mega</td><td className="p-2">10⁶</td><td className="p-2">1,000,000 H/s</td></tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600"><td className="p-2"><strong>GH/s</strong></td><td className="p-2">giga</td><td className="p-2">10⁹</td><td className="p-2">1,000,000,000 H/s</td></tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600"><td className="p-2"><strong>TH/s</strong></td><td className="p-2">tera</td><td className="p-2">10¹²</td><td className="p-2">1,000,000,000,000 H/s</td></tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600"><td className="p-2"><strong>PH/s</strong></td><td className="p-2">peta</td><td className="p-2">10¹⁵</td><td className="p-2">1,000,000,000,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>H/s</strong></td><td className="p-2">hashes per second</td><td className="p-2">10⁰</td><td className="p-2">1 H/s</td></tr>
+              <tr><td className="p-2"><strong>kH/s</strong></td><td className="p-2">kilo</td><td className="p-2">10³</td><td className="p-2">1,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>MH/s</strong></td><td className="p-2">mega</td><td className="p-2">10⁶</td><td className="p-2">1,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>GH/s</strong></td><td className="p-2">giga</td><td className="p-2">10⁹</td><td className="p-2">1,000,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>TH/s</strong></td><td className="p-2">tera</td><td className="p-2">10¹²</td><td className="p-2">1,000,000,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>PH/s</strong></td><td className="p-2">peta</td><td className="p-2">10¹⁵</td><td className="p-2">1,000,000,000,000,000 H/s</td></tr>
             </tbody>
           </table>
         </div>
         <h3 className="text-xl font-medium mb-2 mt-6">Electrical basics</h3>
         <div className="overflow-x-auto">
-          <table className="w-full doc-body border border-gray-300 dark:border-gray-600 text-left">
+          <table className="doc-table">
             <thead>
-              <tr className="border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+              <tr>
                 <th className="p-2 font-semibold">Quantity</th>
                 <th className="p-2 font-semibold">Formula</th>
                 <th className="p-2 font-semibold">Description</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-gray-200 dark:border-gray-600">
+              <tr>
                 <td className="p-2"><strong>Power (watts)</strong></td>
                 <td className="p-2"><code className="code-inline">P = U × I</code></td>
                 <td className="p-2">Power = voltage × current (also written <code className="code-inline">P = V × I</code>). Unit: <strong>W</strong>.</td>
               </tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600">
+              <tr>
                 <td className="p-2"><strong>Efficiency</strong></td>
                 <td className="p-2"><strong>W/TH</strong>, <strong>J/TH</strong></td>
                 <td className="p-2">Power per unit hashrate. Lower is better.</td>
               </tr>
-              <tr className="border-b border-gray-200 dark:border-gray-600">
+              <tr>
                 <td className="p-2"><strong>Energy</strong></td>
                 <td className="p-2"><code className="code-inline">E = P × t</code></td>
                 <td className="p-2">Energy = power × time. 1 kWh = 1,000 W for 1 hour. Your bill is in kWh.</td>

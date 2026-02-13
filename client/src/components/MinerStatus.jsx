@@ -5,7 +5,7 @@ import { useMiner } from '../context/MinerContext';
 function StatusDot({ connected }) {
   return (
     <span
-      className={`inline-block w-2 h-2 rounded-full shrink-0 ${connected ? 'bg-green-500' : 'bg-red-500'}`}
+      className={`status-dot shrink-0 ${connected ? 'status-dot-success' : 'status-dot-danger'}`}
       title={connected ? 'WiFi connected' : 'WiFi disconnected'}
       aria-hidden
     />
@@ -75,10 +75,11 @@ export default function MinerStatus() {
 
   return (
     <div className="card">
-      <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-body flex items-center gap-2">
-          Miner Status
-        </h2>
+      <div className="card-header-wrapper">
+        <div className="card-header">
+          <h2 className="card-header-title flex items-center gap-2">
+            Miner Status
+          </h2>
         {minerError ? (
           <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark text-sm">
             <span className="status-dot status-dot-danger" />
@@ -92,13 +93,14 @@ export default function MinerStatus() {
             Connected
           </span>
         )}
+        </div>
       </div>
 
       <section className="mb-5">
         <ItemGrid items={deviceItems} />
       </section>
 
-      <hr className="border-border dark:border-border-dark my-6" />
+      <hr className="border-edge dark:border-edge-dark my-6" />
 
       <section className={hasHeap ? 'mb-5' : ''}>
         <ItemGrid items={networkItems} />
@@ -106,7 +108,7 @@ export default function MinerStatus() {
 
       {hasHeap && (
         <>
-          <hr className="border-border dark:border-border-dark my-6" />
+          <hr className="border-edge dark:border-edge-dark my-6" />
           <section>
             <ItemGrid items={heapItems} />
           </section>
