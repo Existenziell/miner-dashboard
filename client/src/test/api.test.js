@@ -92,8 +92,13 @@ describe('api', () => {
       expect(fetchStub).toHaveBeenCalledWith('/api/miner/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
+        body: JSON.stringify({ frequency: 720 }),
       });
+    });
+
+    it('throws before sending when payload fails schema validation', async () => {
+      await expect(patchMinerSettings({ autofanspeed: 3 })).rejects.toThrow('Validation failed:');
+      expect(fetchStub).not.toHaveBeenCalled();
     });
 
     it('throws when not ok', async () => {
@@ -109,7 +114,7 @@ describe('api', () => {
       expect(fetchStub).toHaveBeenCalledWith('/api/miner/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
+        body: JSON.stringify({ hostname: 'bitaxe', ssid: 'MyNetwork', wifiPass: 'secret123' }),
       });
     });
   });

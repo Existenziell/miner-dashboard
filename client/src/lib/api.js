@@ -1,3 +1,5 @@
+import { parseMinerSettings } from 'shared/schemas/minerApi.js';
+
 const BASE = '';
 
 export async function fetchMinerInfo(opts = {}) {
@@ -23,12 +25,27 @@ export async function fetchNetworkStatus() {
 }
 
 export async function patchMinerSettings(settings) {
+  const { success, payload, error } = parseMinerSettings(settings);
+  if (!success) {
+    throw new Error(`Validation failed: ${error}`);
+  }
+  const body = Object.keys(payload).length === 0 ? {} : payload;
   const res = await fetch(`${BASE}/api/miner/settings`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(settings),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Miner PATCH error: ${res.status}`);
+  if (!res.ok) {
+    let msg = `Miner PATCH error: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.detail) msg += ` — ${data.detail}`;
+      else if (data.error) msg += ` — ${data.error}`;
+    } catch {
+      // ignore non-JSON or empty error response
+    }
+    throw new Error(msg);
+  }
   return res.json();
 }
 
