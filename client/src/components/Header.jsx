@@ -15,8 +15,8 @@ export default function Header({ activeTab, onTabChange }) {
         <header className="header-bar">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <img src="/favicon/favicon.svg" alt="NerdQaxe++" className="w-10 h-10 dark:invert" />
-                    <h1 className="text-xl font-bold text-body">NerdQaxe++ Solo Mining Dashboard</h1>
+                    <img src="/favicon/favicon.svg" alt="Solo Mining Dashboard Logo" className="w-10 h-10 dark:invert" />
+                    <h1 className="text-xl font-bold text-body">Solo Mining Dashboard</h1>
                     <nav className="flex gap-1 ml-4">
                         {TABS.map((tab) => (
                             <button

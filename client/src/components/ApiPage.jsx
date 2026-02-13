@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMiner } from '../context/MinerContext';
 import { fetchMinerAsic, fetchNetworkStatus } from '../lib/api';
-import {
-  POLL_MINER_INTERVAL_MS,
-  POLL_NETWORK_INTERVAL_MS,
-} from '../lib/constants';
-
+import { useConfig } from '../context/ConfigContext';
 
 function ResponseCard({ title, path, data, error, loading }) {
   return (
@@ -25,6 +21,8 @@ function ResponseCard({ title, path, data, error, loading }) {
 }
 
 const API_ENDPOINTS = [
+  { method: 'GET', path: '/api/config', description: 'Dashboard config (poll intervals, metric ranges, miner IP, etc.)' },
+  { method: 'PATCH', path: '/api/config', description: 'Update dashboard config (partial JSON body)' },
   { method: 'GET', path: '/api/miner/info', description: 'Miner system info (optional query: ts, cur)' },
   { method: 'GET', path: '/api/miner/asic', description: 'ASIC options (frequency/voltage)' },
   { method: 'PATCH', path: '/api/miner/settings', description: 'Update miner settings' },
@@ -33,14 +31,8 @@ const API_ENDPOINTS = [
   { method: 'GET', path: '/api/network/status', description: 'Bitcoin network data' },
 ];
 
-const CLIENT_SETTINGS = [
-  { name: 'POLL_MINER_INTERVAL_MS', source: 'constants.js', value: `${POLL_MINER_INTERVAL_MS}`, description: 'Miner status poll interval (reduced to limit load on the miner device)' },
-  { name: 'POLL_NETWORK_INTERVAL_MS', source: 'constants.js', value: `${POLL_NETWORK_INTERVAL_MS}`, description: 'Network status poll interval (useNetworkData)' },
-  { name: 'BASE', source: 'api.js', value: "'' (same-origin)", description: 'Base URL for API requests' },
-];
-
 const SERVER_SETTINGS = [
-  { name: 'MINER_IP', source: 'env', value: '(env)', description: 'Miner device IP/host for proxy requests' },
+  { name: 'MINER_IP', source: 'env or dashboard config', value: '(env or config)', description: 'Miner device IP/host for proxy requests' },
   { name: 'MEMPOOL_API', source: 'network.js', value: 'https://mempool.space/api', description: 'Mempool.space API base URL for network data' },
   { name: 'CACHE_TTL_MS', source: 'network.js', value: '30_000', description: 'Network route response cache TTL (ms)' },
 ];
@@ -57,7 +49,14 @@ const CURL_EXAMPLES = [
 
 export default function ApiPage() {
   const [origin] = useState(() => typeof window !== 'undefined' ? window.location.origin : '');
+  const { config } = useConfig();
   const { data: miner, error: minerError, loading: minerLoading } = useMiner();
+
+  const clientSettings = [
+    { name: 'pollMinerIntervalMs', source: 'dashboard config', value: `${config.pollMinerIntervalMs}`, description: 'Miner status poll interval (ms)' },
+    { name: 'pollNetworkIntervalMs', source: 'dashboard config', value: `${config.pollNetworkIntervalMs}`, description: 'Network status poll interval (ms)' },
+    { name: 'BASE', source: 'api.js', value: "'' (same-origin)", description: 'Base URL for API requests' },
+  ];
   const [asic, setAsic] = useState(null);
   const [asicError, setAsicError] = useState(null);
   const [asicLoading, setAsicLoading] = useState(true);
@@ -151,7 +150,7 @@ export default function ApiPage() {
               </tr>
             </thead>
             <tbody className="text-body">
-              {CLIENT_SETTINGS.map((s) => (
+              {clientSettings.map((s) => (
                 <tr key={s.name} className="border-b border-edge/60 dark:border-edge-dark/60">
                   <td className="py-2 pr-4 font-mono text-xs">{s.name}</td>
                   <td className="py-2 pr-4">{s.source}</td>

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 const router = Router();
-const MEMPOOL_API = 'https://mempool.space/api';
 
 // Simple in-memory cache
 const cache = new Map();
@@ -31,7 +30,7 @@ async function cachedFetch(url) {
 // GET /api/network/status - aggregated Bitcoin network data
 router.get('/status', async (_req, res) => {
   try {
-    const api = MEMPOOL_API;
+    const api = 'https://mempool.space/api';
 
     const [blockHeight, difficulty, fees, prices, blocks] = await Promise.all([
       cachedFetch(`${api}/blocks/tip/height`),

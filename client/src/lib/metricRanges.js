@@ -1,6 +1,17 @@
 import { computeEfficiency } from './minerMetrics';
 import { METRIC_RANGES } from './constants';
 
+/** Optional override from dashboard config (set by ConfigProvider). */
+let metricRangesOverride = null;
+
+export function setMetricRanges(ranges) {
+  metricRangesOverride = ranges && typeof ranges === 'object' ? ranges : null;
+}
+
+function getRanges() {
+  return metricRangesOverride ?? METRIC_RANGES;
+}
+
 /** Low-is-good: value ≤ greenMax → success, ≤ orangeMax → warning, else danger */
 function colorLowGood(value, greenMax, orangeMax) {
   if (value == null) return null;
@@ -27,7 +38,7 @@ function clamp01(v) {
 
 export function getMetricGaugePercent(miner, metric, efficiency = null) {
   if (!miner) return null;
-  const r = METRIC_RANGES;
+  const r = getRanges();
   switch (metric) {
     case 'temp':
       return miner.temp != null ? clamp01((miner.temp / r.temp.gaugeMax) * 100) : null;
@@ -65,7 +76,7 @@ export function getMetricGaugePercent(miner, metric, efficiency = null) {
 export function getMetricColor(miner, metric, efficiency = null) {
   if (!miner) return DEFAULT_ACCENT_COLOR;
 
-  const r = METRIC_RANGES;
+  const r = getRanges();
   let out = null;
 
   switch (metric) {

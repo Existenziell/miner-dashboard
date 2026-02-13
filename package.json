@@ -1,7 +1,7 @@
 {
   "name": "miner-dashboard",
   "version": "1.0.0",
-  "description": "Real-time monitoring dashboard for NerdQaxe++ Bitcoin Solo Miner with mempool.space network stats",
+  "description": "Real-time monitoring dashboard for NerdQaxe++ Bitcoin Solo Miner and similar devices",
   "repository": "github:christof/miner-dashboard",
   "homepage": "https://github.com/christof/miner-dashboard#readme",
   "bugs": "https://github.com/christof/miner-dashboard/issues",

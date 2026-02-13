@@ -4,7 +4,7 @@ import { useNetworkData } from './hooks/useNetworkData';
 import { formatHashrate, formatTemp, formatPower } from './lib/formatters';
 import { getMetricColor, getMetricGaugePercent } from './lib/metricRanges';
 import { getTabFromUrl, setTabInUrl } from './lib/tabUrl';
-import { POLL_NETWORK_INTERVAL_MS, DEFAULT_EXPECTED_HASHRATE_GH } from './lib/constants';
+import { useConfig } from './context/ConfigContext';
 import { computeEfficiency } from './lib/minerMetrics';
 import MinerStatus from './components/MinerStatus';
 import MetricGauge from './components/MetricGauge';
@@ -47,8 +47,9 @@ export default function App() {
 }
 
 function AppContent({ activeTab, onTabChange }) {
+  const { config } = useConfig();
   const { data: miner, error: minerError, historyHashrate, historyTemperature, historyPower } = useMiner();
-  const { data: network, error: networkError } = useNetworkData(POLL_NETWORK_INTERVAL_MS);
+  const { data: network, error: networkError } = useNetworkData(config.pollNetworkIntervalMs);
   const efficiency = computeEfficiency(miner);
 
   return (
@@ -90,7 +91,7 @@ function AppContent({ activeTab, onTabChange }) {
               <MetricGauge
                 label="Efficiency"
                 value={efficiency != null ? `${efficiency.toFixed(1)} J/TH` : '--'}
-                sub={miner != null ? `Expected: ${formatHashrate(miner.expectedHashrate ?? DEFAULT_EXPECTED_HASHRATE_GH)}` : undefined}
+                sub={miner != null ? `Expected: ${formatHashrate(miner.expectedHashrate ?? config.defaultExpectedHashrateGh)}` : undefined}
                 color={getMetricColor(miner, 'efficiency', efficiency)}
                 percent={getMetricGaugePercent(miner, 'efficiency', efficiency)}
               />

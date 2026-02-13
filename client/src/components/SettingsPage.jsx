@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
+import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic, patchDashboardConfig } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
+import { useConfig } from '../context/ConfigContext';
 import {
   SUCCESS_MESSAGE_DISMISS_MS,
   DEFAULT_STRATUM_PORT,
@@ -16,6 +17,8 @@ import {
   MAX_WIFI_PASSWORD_LENGTH,
 } from '../lib/constants';
 import { useChartCollapsed } from '../lib/chartUtils';
+import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '../lib/tabUrl';
+import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
 import { toBool } from '../lib/minerApiBools';
 import { ChartCard } from './TimeSeriesChart';
@@ -24,6 +27,33 @@ const POOL_MODE_OPTIONS = [
   { value: 'failover', label: 'Failover (Primary/Fallback)' },
   { value: 'dual', label: 'Dual Pool' },
 ];
+
+const METRIC_LABELS = {
+  hashrate: 'Hashrate',
+  efficiency: 'Efficiency',
+  temp: 'Temp',
+  fanRpm: 'Fan RPM',
+  current: 'Current',
+  frequency: 'Frequency',
+  voltage: 'Voltage',
+  power: 'Power',
+};
+
+const METRIC_KEY_LABELS = {
+  greenMin: 'Green min',
+  orangeMin: 'Orange min',
+  gaugeMax: 'Gauge max',
+  greenMax: 'Green max',
+  orangeMax: 'Orange max',
+  orangeMinPct: 'Orange min %',
+  orangeMaxPct: 'Orange max %',
+  greenMv: 'Green (mV)',
+  orangeMv: 'Orange (mV)',
+};
+
+function deepCopyMetricRanges(ranges) {
+  return JSON.parse(JSON.stringify(ranges));
+}
 
 function Field({ label, children, hint }) {
   return (
@@ -76,7 +106,34 @@ export default function SettingsPage({ onError }) {
   const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(toBool(miner?.stratumEnonceSubscribe, miner?.stratumExtranonceSubscribe));
   const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(toBool(miner?.fallbackStratumEnonceSubscribe, miner?.fallbackStratumExtranonceSubscribe));
   const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed('settingsCollapsed_wifi');
-  const { collapsed: poolCollapsed, toggleCollapsed: togglePoolCollapsed } = useChartCollapsed('settingsCollapsed_pool');
+
+  // Settings sub-tabs: Miner | Pools | Dashboard (synced with URL ?tab=settings&section=...)
+  const [settingsSubTab, setSettingsSubTab] = useState(getSettingsSectionFromUrl);
+
+  useEffect(() => {
+    const onPopState = () => setSettingsSubTab(getSettingsSectionFromUrl());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  // Dashboard config (server-persisted; can be edited even when miner is offline)
+  const { config, refetch: refetchConfig } = useConfig();
+  const [savingDashboard, setSavingDashboard] = useState(false);
+  const [dashboardMessage, setDashboardMessage] = useState(null);
+  const [dashboardMinerIp, setDashboardMinerIp] = useState(config.minerIp);
+  const [dashboardExpectedHashrate, setDashboardExpectedHashrate] = useState(config.defaultExpectedHashrateGh);
+  const [dashboardPollMiner, setDashboardPollMiner] = useState(config.pollMinerIntervalMs);
+  const [dashboardPollNetwork, setDashboardPollNetwork] = useState(config.pollNetworkIntervalMs);
+  const [dashboardMetricRanges, setDashboardMetricRanges] = useState(() =>
+    deepCopyMetricRanges(config.metricRanges)
+  );
+  useEffect(() => {
+    setDashboardMinerIp(config.minerIp);
+    setDashboardExpectedHashrate(config.defaultExpectedHashrateGh);
+    setDashboardPollMiner(config.pollMinerIntervalMs);
+    setDashboardPollNetwork(config.pollNetworkIntervalMs);
+    setDashboardMetricRanges(deepCopyMetricRanges(config.metricRanges));
+  }, [config]);
 
   // Sync form when miner data updates
   useEffect(() => {
@@ -603,17 +660,241 @@ export default function SettingsPage({ onError }) {
     }
   };
 
+  const hasMetricRangesChange =
+    JSON.stringify(dashboardMetricRanges) !== JSON.stringify(config.metricRanges);
+
+  const hasDashboardChanges =
+    dashboardMinerIp !== config.minerIp ||
+    dashboardExpectedHashrate !== config.defaultExpectedHashrateGh ||
+    dashboardPollMiner !== config.pollMinerIntervalMs ||
+    dashboardPollNetwork !== config.pollNetworkIntervalMs ||
+    hasMetricRangesChange;
+
+  const handleSaveDashboard = async (e) => {
+    e.preventDefault();
+    setDashboardMessage(null);
+    setSavingDashboard(true);
+    try {
+      const payload = {
+        minerIp: dashboardMinerIp.trim(),
+        defaultExpectedHashrateGh: Number(dashboardExpectedHashrate),
+        pollMinerIntervalMs: Number(dashboardPollMiner),
+        pollNetworkIntervalMs: Number(dashboardPollNetwork),
+      };
+      if (hasMetricRangesChange) payload.metricRanges = deepCopyMetricRanges(dashboardMetricRanges);
+      await patchDashboardConfig(payload);
+      await refetchConfig();
+      setDashboardMessage({ type: 'success', text: 'Dashboard config saved.' });
+    } catch (err) {
+      setDashboardMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSavingDashboard(false);
+    }
+  };
+
+  const handleResetDashboard = () => {
+    setDashboardMinerIp(DASHBOARD_DEFAULTS.minerIp);
+    setDashboardExpectedHashrate(DASHBOARD_DEFAULTS.defaultExpectedHashrateGh);
+    setDashboardPollMiner(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
+    setDashboardPollNetwork(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
+    setDashboardMetricRanges(deepCopyMetricRanges(DASHBOARD_DEFAULTS.metricRanges));
+  };
+
+  const setMetricRangeValue = (metric, key, value) => {
+    setDashboardMetricRanges((prev) => ({
+      ...prev,
+      [metric]: {
+        ...prev[metric],
+        [key]: value,
+      },
+    }));
+  };
+
+  const dashboardCard = (
+    <form onSubmit={handleSaveDashboard} className="space-y-4">
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h3 className="card-header-title">Configuration</h3>
+          </div>
+        </div>
+        <p className="text-muted-standalone text-sm mb-4">
+          Server-persisted config.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Miner IP or hostname" hint="Address of the miner. Leave empty if using .env MINER_IP.">
+            <input
+              type="text"
+              value={dashboardMinerIp}
+              onChange={(e) => setDashboardMinerIp(e.target.value)}
+              placeholder="192.168.1.3"
+              className="input"
+              aria-label="Miner IP"
+            />
+          </Field>
+          <Field label="Expected hashrate (GH/s)" hint="Used for gauge and display.">
+            <input
+              type="number"
+              min={1}
+              max={100000}
+              value={dashboardExpectedHashrate}
+              onChange={(e) => setDashboardExpectedHashrate(Number(e.target.value) || DASHBOARD_DEFAULTS.defaultExpectedHashrateGh)}
+              className="input"
+              aria-label="Expected hashrate GH/s"
+            />
+          </Field>
+          <Field label="Miner poll interval (ms)" hint="How often to fetch miner status.">
+            <input
+              type="number"
+              min={1000}
+              max={300000}
+              value={dashboardPollMiner}
+              onChange={(e) => setDashboardPollMiner(Number(e.target.value) || DASHBOARD_DEFAULTS.pollMinerIntervalMs)}
+              className="input"
+              aria-label="Miner poll interval ms"
+            />
+          </Field>
+          <Field label="Network poll interval (ms)" hint="How often to fetch network stats.">
+            <input
+              type="number"
+              min={5000}
+              max={600000}
+              value={dashboardPollNetwork}
+              onChange={(e) => setDashboardPollNetwork(Number(e.target.value) || DASHBOARD_DEFAULTS.pollNetworkIntervalMs)}
+              className="input"
+              aria-label="Network poll interval ms"
+            />
+          </Field>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium text-body mb-1 mt-4">Metric ranges</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Object.keys(DASHBOARD_DEFAULTS.metricRanges).map((metric) => {
+                const keys = Object.keys(DASHBOARD_DEFAULTS.metricRanges[metric]);
+                const values = dashboardMetricRanges[metric] ?? {};
+                return (
+                  <div key={metric} className="border border-edge dark:border-edge-dark rounded-lg p-3 space-y-2">
+                    <p className="text-sm font-medium text-body capitalize">
+                      {METRIC_LABELS[metric] ?? metric}
+                    </p>
+                    {keys.map((key) => (
+                      <div key={key} className="flex items-center gap-2">
+                        <label className="text-xs text-muted shrink-0 min-w-[100px]" htmlFor={`metric-${metric}-${key}`}>
+                          {METRIC_KEY_LABELS[key] ?? key}
+                        </label>
+                        <input
+                          id={`metric-${metric}-${key}`}
+                          type="number"
+                          step={key.includes('Mv') || key.includes('Pct') ? 1 : 0.1}
+                          value={values[key] ?? ''}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v === '') return;
+                            const num = Number(v);
+                            if (!Number.isNaN(num)) setMetricRangeValue(metric, key, num);
+                          }}
+                          className="input text-sm w-24"
+                          aria-label={`${METRIC_LABELS[metric] ?? metric} ${METRIC_KEY_LABELS[key] ?? key}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-muted-standalone text-xs my-3 space-y-1.5">
+              <span className="block"><strong>Gauge max</strong> — value that maps to 100% on the needle (the scale).</span>
+              <span className="block"><strong>Min</strong> (hashrate, frequency): “higher is better” — at/above green min = green, at/above orange min = orange, below = red.</span>
+              <span className="block"><strong>Max</strong> (temp, power, efficiency): “lower is better” — at/below green max = green, at/below orange max = orange, above = red.</span>
+              <span className="block"><strong>Voltage</strong> — green/orange are the allowed <em>deviation</em> in mV from the set voltage; if actual creeps away from set beyond those limits, the gauge goes orange then red.</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="submit"
+            disabled={savingDashboard || !hasDashboardChanges}
+            className="btn-primary"
+          >
+            {savingDashboard ? 'Saving…' : 'Save settings'}
+          </button>
+          <button type="button" onClick={handleResetDashboard} className="link-text text-body cursor-pointer">
+            Reset to defaults
+          </button>
+          {dashboardMessage?.type === 'success' && (
+            <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
+              <span aria-hidden>√</span>
+              <span>{dashboardMessage.text}</span>
+            </span>
+          )}
+          {dashboardMessage?.type === 'error' && (
+            <span role="alert" className="toast-danger inline-flex items-center gap-2 px-3 py-2">
+              <span>{dashboardMessage.text}</span>
+              <button type="button" onClick={() => setDashboardMessage(null)} className="link-text font-medium opacity-90 hover:opacity-100">Dismiss</button>
+            </span>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+
+  const settingsTabs = [
+    { id: 'miner', label: 'Miner' },
+    { id: 'pools', label: 'Pools' },
+    { id: 'dashboard', label: 'Dashboard' },
+  ];
+
+  const tabBar = (
+    <nav className="flex gap-1 border-b border-edge dark:border-edge-dark pb-3 mb-4" aria-label="Settings sections">
+      {settingsTabs.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          onClick={() => {
+            setSettingsSubTab(tab.id);
+            setSettingsSectionInUrl(tab.id);
+          }}
+          aria-current={settingsSubTab === tab.id ? 'page' : undefined}
+          className={`btn-tab ${settingsSubTab === tab.id ? 'btn-tab-active' : 'btn-tab-inactive'}`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </nav>
+  );
+
   if (!miner) {
     return (
-      <div className="card p-8 text-center text-muted-standalone">
-        Connect to the miner to change settings.
+      <div className="space-y-4">
+        {tabBar}
+        {settingsSubTab === 'dashboard' && dashboardCard}
+        {settingsSubTab === 'miner' && (
+          <div className="card p-8 text-center text-muted-standalone">
+            Connect to the miner to change device settings. Set Miner IP in the <button type="button" onClick={() => { setSettingsSubTab('dashboard'); setSettingsSectionInUrl('dashboard'); }} className="link-text text-body cursor-pointer underline">Dashboard</button> tab if the dashboard cannot reach the miner.
+          </div>
+        )}
+        {settingsSubTab === 'pools' && (
+          <div className="card p-8 text-center text-muted-standalone">
+            Connect to the miner to change pool settings. Set Miner IP in the <button type="button" onClick={() => { setSettingsSubTab('dashboard'); setSettingsSectionInUrl('dashboard'); }} className="link-text text-body cursor-pointer underline">Dashboard</button> tab if the dashboard cannot reach the miner.
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
+      {tabBar}
+      {settingsSubTab === 'dashboard' && dashboardCard}
+      {(settingsSubTab === 'miner' || settingsSubTab === 'pools') && (
       <form onSubmit={handleSave} className="space-y-4">
+        {settingsSubTab === 'miner' && (
+        <>
         {/* ASIC */}
         <div className="card">
           <div className="card-header-wrapper">
@@ -881,15 +1162,19 @@ export default function SettingsPage({ onError }) {
             </p>
           </div>
         </ChartCard>
+        </>
+        )}
 
-        {/* Pool (last settings section) */}
-        <ChartCard
-          title="Pool"
-          loading={false}
-          loadingMessage=""
-          collapsed={poolCollapsed}
-          onToggleCollapsed={togglePoolCollapsed}
-        >
+        {settingsSubTab === 'pools' && (
+        <>
+        {/* Pools */}
+        <div className="card">
+          <div className="card-header-wrapper">
+            <div className="card-header">
+              <h3 className="card-header-title">Configuration</h3>
+            </div>
+          </div>
+          <div>
           {/* Top: Pool mode + TCP Keepalive */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-edge dark:border-edge-dark">
             <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
@@ -1191,7 +1476,10 @@ export default function SettingsPage({ onError }) {
               </div>
             </div>
           </div>
-        </ChartCard>
+          </div>
+        </div>
+        </>
+        )}
 
         {/* Pending changes */}
         {hasChanges && (
@@ -1219,9 +1507,9 @@ export default function SettingsPage({ onError }) {
           </div>
         )}
 
-        {/* Save (left) & Restart & Shutdown (right) */}
+        {/* Save (and on Miner tab: Restart & Shutdown) */}
         <div className="card">
-          <h3 className="card-title">Restart & Shutdown</h3>
+          {settingsSubTab === 'miner' && <h3 className="card-title">Restart & Shutdown</h3>}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-4">
               {hasChanges && !isFormValid && (
@@ -1255,6 +1543,7 @@ export default function SettingsPage({ onError }) {
                 </span>
               )}
             </div>
+            {settingsSubTab === 'miner' && (
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
@@ -1273,9 +1562,11 @@ export default function SettingsPage({ onError }) {
                 {shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
               </button>
             </div>
+            )}
           </div>
         </div>
       </form>
+      )}
     </div>
   );
 }

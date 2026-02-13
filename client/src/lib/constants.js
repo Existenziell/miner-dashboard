@@ -1,11 +1,13 @@
 /**
  * Centralized app constants and config.
+ * Config defaults (poll intervals, gauge, metric ranges) come from shared/dashboardDefaults.
  */
+import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 
-// —— Polling & UI timing ———————————————————————————————————————————————————————
-export const DEFAULT_EXPECTED_HASHRATE_GH = 6000; // 6 GH/s
-export const POLL_MINER_INTERVAL_MS = 10_000;
-export const POLL_NETWORK_INTERVAL_MS = 60_000; // 1 minute
+// —— Polling & UI timing (from shared dashboard defaults) ——————————————————————
+export const DEFAULT_EXPECTED_HASHRATE_GH = DASHBOARD_DEFAULTS.defaultExpectedHashrateGh;
+export const POLL_MINER_INTERVAL_MS = DASHBOARD_DEFAULTS.pollMinerIntervalMs;
+export const POLL_NETWORK_INTERVAL_MS = DASHBOARD_DEFAULTS.pollNetworkIntervalMs;
 export const ALERT_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
 export const NOTIFICATION_AUTO_CLOSE_MS = 8_000;
 export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
@@ -42,21 +44,9 @@ export const MAX_WIFI_SSID_LENGTH = 32;
 export const MIN_WIFI_PASSWORD_LENGTH = 8;
 export const MAX_WIFI_PASSWORD_LENGTH = 63;
 
-// —— UI (gauges) ————————————————————————————————————————————————————————————
+// —— UI (gauges) & metric ranges ——————————————————————————————————————————————
 export const GAUGE_RADIUS = 48; // MetricGauge arc radius (viewBox units)
-
-// Metric range thresholds (green / orange / red) and gauge display max.
-// Color classes: text-success (green), text-warning (orange), text-danger (red).
-export const METRIC_RANGES = {
-  hashrate:   { greenMin: 5950, orangeMin: 5500, gaugeMax: 7000 },
-  efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
-  temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
-  fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
-  current:    { greenMax: 9.4, orangeMax: 9.75, gaugeMax: 10.5 },
-  frequency:  { greenMin: 700, orangeMin: 650, gaugeMax: 850 },
-  voltage:    { greenMv: 20, orangeMv: 50, gaugeMax: 1400 },
-  power:      { greenMax: 115, orangeMax: 117.5, gaugeMax: 130 },
-};
+export const METRIC_RANGES = DASHBOARD_DEFAULTS.metricRanges;
 
 // —— Stratum / pools ——————————————————————————————————————————————————————————
 export const DEFAULT_STRATUM_PORT = 3333;

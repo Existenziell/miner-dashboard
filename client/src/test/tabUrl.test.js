@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getTabFromUrl, setTabInUrl } from '../lib/tabUrl.js';
+import { getTabFromUrl, setTabInUrl, getSettingsSectionFromUrl, setSettingsSectionInUrl } from '../lib/tabUrl.js';
 
 const _originalWindow = globalThis.window;
 const _originalLocation = globalThis.location;
@@ -66,10 +66,10 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'dashboard' }, '', '/');
     });
 
-    it('sets tab=settings in URL', () => {
+    it('sets tab=settings and section=miner in URL', () => {
       const { replaceState } = mockWindow({ href: 'http://localhost/', pathname: '/' });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=miner');
     });
 
     it('sets tab=docs in URL', () => {
@@ -78,22 +78,77 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'docs' }, '', '/?tab=docs');
     });
 
-    it('replaces existing tab param when switching to settings', () => {
+    it('replaces existing tab param when switching to settings and adds section=miner', () => {
       const { replaceState } = mockWindow({
         href: 'http://localhost/?tab=docs',
         pathname: '/',
       });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=miner');
+    });
+
+    it('removes tab and section when switching to dashboard', () => {
+      const { replaceState } = mockWindow({
+        href: 'http://localhost/?tab=settings&section=pools',
+        pathname: '/',
+      });
+      setTabInUrl('dashboard');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'dashboard' }, '', '/');
     });
 
     it('removes tab param but keeps other params when switching to dashboard', () => {
       const { replaceState } = mockWindow({
-        href: 'http://localhost/?tab=settings&other=1',
+        href: 'http://localhost/?tab=settings&section=miner&other=1',
         pathname: '/',
       });
       setTabInUrl('dashboard');
       expect(replaceState).toHaveBeenCalledWith({ tab: 'dashboard' }, '', '/?other=1');
+    });
+  });
+
+  describe('getSettingsSectionFromUrl', () => {
+    it('returns miner when window is undefined', () => {
+      vi.stubGlobal('window', undefined);
+      expect(getSettingsSectionFromUrl()).toBe('miner');
+    });
+
+    it('returns miner when section param is missing', () => {
+      mockWindow({ search: '', href: 'http://localhost/' });
+      expect(getSettingsSectionFromUrl()).toBe('miner');
+    });
+
+    it('returns miner when section param is invalid', () => {
+      mockWindow({ search: '?tab=settings&section=invalid', href: 'http://localhost/?tab=settings&section=invalid' });
+      expect(getSettingsSectionFromUrl()).toBe('miner');
+    });
+
+    it('returns section when valid (miner, pools, dashboard)', () => {
+      mockWindow({ search: '?tab=settings&section=miner', href: 'http://localhost/?tab=settings&section=miner' });
+      expect(getSettingsSectionFromUrl()).toBe('miner');
+      mockWindow({ search: '?tab=settings&section=pools', href: 'http://localhost/?tab=settings&section=pools' });
+      expect(getSettingsSectionFromUrl()).toBe('pools');
+      mockWindow({ search: '?tab=settings&section=dashboard', href: 'http://localhost/?tab=settings&section=dashboard' });
+      expect(getSettingsSectionFromUrl()).toBe('dashboard');
+    });
+  });
+
+  describe('setSettingsSectionInUrl', () => {
+    it('does nothing when current tab is not settings', () => {
+      const { replaceState } = mockWindow({ href: 'http://localhost/?tab=docs', pathname: '/' });
+      setSettingsSectionInUrl('pools');
+      expect(replaceState).not.toHaveBeenCalled();
+    });
+
+    it('sets section param when on settings tab', () => {
+      const { replaceState } = mockWindow({ href: 'http://localhost/?tab=settings&section=miner', pathname: '/' });
+      setSettingsSectionInUrl('pools');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings', section: 'pools' }, '', '/?tab=settings&section=pools');
+    });
+
+    it('does nothing for invalid section', () => {
+      const { replaceState } = mockWindow({ href: 'http://localhost/?tab=settings', pathname: '/' });
+      setSettingsSectionInUrl('invalid');
+      expect(replaceState).not.toHaveBeenCalled();
     });
   });
 });

@@ -2,17 +2,19 @@
  * Circular gauge for a single metric: 270° arc open at the bottom (speedometer style).
  * Ring fill is 0–100%; ring and value use the given Tailwind color.
  */
+import { useMemo } from 'react';
 import { GAUGE_RADIUS } from '../lib/constants';
 
-// 270° arc from bottom-left, up left side, over top, down right side to bottom-right (gap at bottom)
-// SVG: 0° = right, 90° = down. So 135° = bottom-left, 45° = bottom-right.
-const startX = 50 + GAUGE_RADIUS * Math.cos((135 * Math.PI) / 180);
-const startY = 50 + GAUGE_RADIUS * Math.sin((135 * Math.PI) / 180);
-const endX = 50 + GAUGE_RADIUS * Math.cos((45 * Math.PI) / 180);
-const endY = 50 + GAUGE_RADIUS * Math.sin((45 * Math.PI) / 180);
-const ARC_PATH = `M ${startX} ${startY} A ${GAUGE_RADIUS} ${GAUGE_RADIUS} 0 1 1 ${endX} ${endY}`;
+function getArcPath(radius) {
+  const startX = 50 + radius * Math.cos((135 * Math.PI) / 180);
+  const startY = 50 + radius * Math.sin((135 * Math.PI) / 180);
+  const endX = 50 + radius * Math.cos((45 * Math.PI) / 180);
+  const endY = 50 + radius * Math.sin((45 * Math.PI) / 180);
+  return `M ${startX} ${startY} A ${radius} ${radius} 0 1 1 ${endX} ${endY}`;
+}
 
 export default function MetricGauge({ label, value, sub, color = 'text-accent', percent = null }) {
+  const arcPath = useMemo(() => getArcPath(GAUGE_RADIUS), []);
   const fillPercent = percent != null ? Math.max(0, Math.min(100, percent)) : 0;
 
   return (
@@ -28,7 +30,7 @@ export default function MetricGauge({ label, value, sub, color = 'text-accent', 
         >
           {/* Track (muted) – full 270° arc */}
           <path
-            d={ARC_PATH}
+            d={arcPath}
             pathLength="100"
             strokeDasharray="100 0"
             className="stroke-muted/40"
@@ -36,7 +38,7 @@ export default function MetricGauge({ label, value, sub, color = 'text-accent', 
           />
           {/* Fill (green/orange/red) */}
           <path
-            d={ARC_PATH}
+            d={arcPath}
             pathLength="100"
             strokeDasharray={`${fillPercent} ${100 - fillPercent}`}
             stroke="currentColor"

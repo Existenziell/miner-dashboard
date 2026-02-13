@@ -21,9 +21,8 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 npm install
 cd client && npm install && cd ..
 
-# Copy env template and set your miner IP
+# Copy env template (optional: set MINER_IP in .env or later in Dashboard Settings)
 cp .env.example .env
-# Edit .env: set MINER_IP to your miner's IP address
 
 # Run in development mode
 npm run dev
@@ -49,11 +48,20 @@ Then open `http://localhost:8001`.
 
 ## Configuration
 
-Copy `.env.example` to `.env` in the project root and set your values:
+**Miner connection:** Set your miner's IP in **Settings → Dashboard** (Miner IP), or in `.env` as `MINER_IP`. The server starts without it; miner routes return a clear message if the miner address is not configured. `.env` overrides the value stored in the config file.
 
-- **MINER_IP** – Your miner's IP address (required)
+**Dashboard config (server-persisted):** Stored in `config/dashboard.json` (created when you save from **Settings → Dashboard**):
 
-The server will not start until `MINER_IP` is set. The backend listens on port 8001. Mempool API URL is hardcoded in `server/routes/network.js`.
+- **Miner IP or hostname** — fallback if not set in `.env`
+- **Expected hashrate (GH/s)** — used for the hashrate gauge scale and the Efficiency “Expected” display
+- **Miner / Network poll intervals (ms)** — how often the dashboard fetches miner status and network stats
+- **Metric ranges** — green/orange/red thresholds and gauge max per metric (hashrate, temp, power, efficiency, etc.). Each value is editable in the Dashboard tab; the hashrate gauge uses the larger of “Expected hashrate” and “Hashrate → Gauge max”.
+
+**Settings tabs:** Settings has three sections (Miner, Pools, Dashboard). The active section is reflected in the URL (`?tab=settings&section=miner|pools|dashboard`) so you can bookmark or share a link to a specific tab.
+
+**Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it (JSON body with any of the allowed keys above). Used by the Settings UI.
+
+The backend listens on port 8001.
 
 ## Commands
 

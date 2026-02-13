@@ -1,11 +1,15 @@
 import { Router } from 'express';
-import { MINER_IP } from '../config.js';
+import { getMinerIp } from '../config/dashboardConfig.js';
 import { parseMinerSettings } from '../../shared/schemas/minerApi.js';
 
 const router = Router();
 
 // Proxy GET /api/miner/info -> miner's /api/system/info (optional query: ts, cur)
 router.get('/info', async (req, res) => {
+  const MINER_IP = getMinerIp();
+  if (!MINER_IP) {
+    return res.status(502).json({ error: 'Miner address not configured', detail: 'Set miner IP in Dashboard Settings or in .env (MINER_IP).' });
+  }
   try {
     const { ts, cur } = req.query;
     const url = new URL(`http://${MINER_IP}/api/system/info`);
@@ -34,6 +38,10 @@ router.get('/info', async (req, res) => {
 //   absMinVoltage: number       - board min core voltage (mV), optional
 //   absMaxVoltage: number       - board max core voltage (mV), e.g. 1200 or 1400
 router.get('/asic', async (_req, res) => {
+  const MINER_IP = getMinerIp();
+  if (!MINER_IP) {
+    return res.status(502).json({ error: 'Miner address not configured', detail: 'Set miner IP in Dashboard Settings or in .env (MINER_IP).' });
+  }
   try {
     const response = await fetch(`http://${MINER_IP}/api/system/asic`);
     if (!response.ok) {
@@ -49,6 +57,10 @@ router.get('/asic', async (_req, res) => {
 
 // PATCH /api/miner/settings -> miner's PATCH /api/system
 router.patch('/settings', async (req, res) => {
+  const MINER_IP = getMinerIp();
+  if (!MINER_IP) {
+    return res.status(502).json({ error: 'Miner address not configured', detail: 'Set miner IP in Dashboard Settings or in .env (MINER_IP).' });
+  }
   try {
     const { success, payload, error } = parseMinerSettings(req.body);
     if (!success) {
@@ -78,6 +90,10 @@ router.patch('/settings', async (req, res) => {
 
 // POST /api/miner/restart -> miner's POST /api/system/restart
 router.post('/restart', async (_req, res) => {
+  const MINER_IP = getMinerIp();
+  if (!MINER_IP) {
+    return res.status(502).json({ error: 'Miner address not configured', detail: 'Set miner IP in Dashboard Settings or in .env (MINER_IP).' });
+  }
   try {
     const response = await fetch(`http://${MINER_IP}/api/system/restart`, {
       method: 'POST',
@@ -94,6 +110,10 @@ router.post('/restart', async (_req, res) => {
 
 // POST /api/miner/shutdown -> miner's POST /api/system/shutdown
 router.post('/shutdown', async (_req, res) => {
+  const MINER_IP = getMinerIp();
+  if (!MINER_IP) {
+    return res.status(502).json({ error: 'Miner address not configured', detail: 'Set miner IP in Dashboard Settings or in .env (MINER_IP).' });
+  }
   try {
     const response = await fetch(`http://${MINER_IP}/api/system/shutdown`, {
       method: 'POST',

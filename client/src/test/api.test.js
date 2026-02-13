@@ -6,6 +6,8 @@ import {
   patchMinerSettings,
   restartMiner,
   shutdownMiner,
+  fetchDashboardConfig,
+  patchDashboardConfig,
 } from '../lib/api.js';
 
 describe('api', () => {
@@ -146,6 +148,56 @@ describe('api', () => {
     it('throws when not ok', async () => {
       fetchStub.mockResolvedValueOnce({ ok: false, status: 502 });
       await expect(shutdownMiner()).rejects.toThrow('Miner shutdown error: 502');
+    });
+  });
+
+  describe('fetchDashboardConfig', () => {
+    it('GETs /api/config and returns JSON', async () => {
+      const data = { minerIp: '', defaultExpectedHashrateGh: 6000, pollMinerIntervalMs: 10000, metricRanges: {} };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(data) });
+      const result = await fetchDashboardConfig();
+      expect(result).toEqual(data);
+      expect(fetchStub).toHaveBeenCalledWith('/api/config');
+    });
+
+    it('throws with message when not ok', async () => {
+      fetchStub.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(fetchDashboardConfig()).rejects.toThrow('Config API error: 500');
+    });
+  });
+
+  describe('patchDashboardConfig', () => {
+    it('PATCHes /api/config with JSON body and returns updated config', async () => {
+      const payload = { minerIp: '192.168.1.3', defaultExpectedHashrateGh: 6500 };
+      const response = { ...payload, pollMinerIntervalMs: 10000, metricRanges: {} };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(response) });
+      const result = await patchDashboardConfig(payload);
+      expect(result).toEqual(response);
+      expect(fetchStub).toHaveBeenCalledWith('/api/config', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    });
+
+    it('throws when not ok and parses error body', async () => {
+      fetchStub.mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: () => Promise.resolve({ error: 'Validation failed', details: ['minerIp must be a string'] }),
+      });
+      await expect(patchDashboardConfig({ minerIp: 123 })).rejects.toThrow(/Config PATCH error: 400.*Validation failed/);
+    });
+
+    it('sends metricRanges when provided', async () => {
+      const payload = { metricRanges: { hashrate: { greenMin: 6000, orangeMin: 5500, gaugeMax: 7000 } } };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(payload) });
+      await patchDashboardConfig(payload);
+      expect(fetchStub).toHaveBeenCalledWith('/api/config', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
     });
   });
 });

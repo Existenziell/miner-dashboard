@@ -2,6 +2,33 @@ import { parseMinerSettings } from 'shared/schemas/minerApi.js';
 
 const BASE = '';
 
+export async function fetchDashboardConfig() {
+  const res = await fetch(`${BASE}/api/config`);
+  if (!res.ok) throw new Error(`Config API error: ${res.status}`);
+  return res.json();
+}
+
+export async function patchDashboardConfig(partial) {
+  const res = await fetch(`${BASE}/api/config`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(partial),
+  });
+  if (!res.ok) {
+    let msg = `Config PATCH error: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.detail) msg += ` — ${data.detail}`;
+      else if (data.error) msg += ` — ${data.error}`;
+      else if (data.details) msg += ` — ${data.details.join(', ')}`;
+    } catch {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
 export async function fetchMinerInfo(opts = {}) {
   const { ts, cur } = opts;
   const url = new URL(`${BASE}/api/miner/info`, window.location.origin);

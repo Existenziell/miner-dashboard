@@ -1,5 +1,6 @@
 import { formatUptime, formatResetReason, formatBytes } from '../lib/formatters';
-import { POLL_MINER_INTERVAL_MS, LOW_HEAP_INT_THRESHOLD_BYTES } from '../lib/constants';
+import { LOW_HEAP_INT_THRESHOLD_BYTES } from '../lib/constants';
+import { useConfig } from '../context/ConfigContext';
 import { useMiner } from '../context/MinerContext';
 
 function StatusDot({ connected }) {
@@ -34,6 +35,7 @@ function ItemGrid({ items }) {
 }
 
 export default function MinerStatus() {
+  const { config } = useConfig();
   const { data, error: minerError, loading: minerLoading } = useMiner();
   if (!data) return null;
 
@@ -70,7 +72,7 @@ export default function MinerStatus() {
       warningTitle: data.freeHeapInt != null && data.freeHeapInt < LOW_HEAP_INT_THRESHOLD_BYTES ? 'Internal RAM free heap is below 50 KB; device may become unstable.' : undefined,
     },
     { label: 'Running Partition', value: data.runningPartition ?? '--' },
-    { label: 'Poll interval', value: `${(POLL_MINER_INTERVAL_MS / 1000).toFixed(0)} s` },
+    { label: 'Poll interval', value: `${(config.pollMinerIntervalMs / 1000).toFixed(0)} s` },
   ];
 
   return (
