@@ -45,6 +45,19 @@ export const MAX_WIFI_PASSWORD_LENGTH = 63;
 // —— UI (gauges) ————————————————————————————————————————————————————————————
 export const GAUGE_RADIUS = 48; // MetricGauge arc radius (viewBox units)
 
+// Metric range thresholds (green / orange / red) and gauge display max.
+// Color classes: text-success (green), text-warning (orange), text-danger (red).
+export const METRIC_RANGES = {
+  hashrate:   { greenMin: 5950, orangeMin: 5500, gaugeMax: 7000 },
+  efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
+  temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
+  fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
+  current:    { greenMax: 9.4, orangeMax: 9.75, gaugeMax: 10.5 },
+  frequency:  { greenMin: 700, orangeMin: 650, gaugeMax: 850 },
+  voltage:    { greenMv: 20, orangeMv: 50, gaugeMax: 1400 },
+  power:      { greenMax: 115, orangeMax: 117.5, gaugeMax: 130 },
+};
+
 // —— Stratum / pools ——————————————————————————————————————————————————————————
 export const DEFAULT_STRATUM_PORT = 3333;
 export const MIN_STRATUM_PORT = 1;
