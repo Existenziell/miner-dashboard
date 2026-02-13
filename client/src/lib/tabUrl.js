@@ -3,7 +3,7 @@
  * Valid tab ids: 'dashboard' | 'settings' | 'docs' | 'api'
  * Settings sub-tabs use ?tab=settings&section=miner|pools|dashboard|colors
  */
-import { SETTINGS_SECTION_KEY } from './constants.js';
+import { SETTINGS_SECTION_KEY } from '@/lib/constants.js';
 
 const VALID_SETTINGS_SECTIONS = new Set(['miner', 'pools', 'dashboard', 'colors']);
 

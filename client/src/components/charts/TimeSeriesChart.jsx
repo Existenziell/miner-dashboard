@@ -1,4 +1,4 @@
-import { formatTime } from '../lib/chartUtils';
+import { formatTime } from '@/lib/chartUtils';
 
 /**
  * Recharts tooltip wrapper: time label + list of series values.

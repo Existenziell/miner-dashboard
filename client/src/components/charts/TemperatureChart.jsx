@@ -1,42 +1,40 @@
 import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useTheme } from '../hooks/useTheme';
-import { useConfig } from '../context/ConfigContext';
-import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { CHART_LEGEND_HR, CHART_COLLAPSED_HR } from '../lib/constants';
+import { useTheme } from '@/hooks/useTheme';
+import { useConfig } from '@/context/ConfigContext';
+import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '@/lib/chartUtils';
+import { CHART_LEGEND_TMP, CHART_COLLAPSED_TMP } from '@/lib/constants';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
-import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
+import { ClickableLegend, ChartCard, ChartTooltip } from '@/components/charts/TimeSeriesChart';
 
-const formatHashrateValue = (entry) =>
-  entry.value != null ? `${entry.value.toFixed(2)} GH/s` : '--';
+const formatTempValue = (entry) =>
+  entry.value != null ? `${entry.value.toFixed(1)}\u00B0C` : '--';
 
-const h = DASHBOARD_DEFAULTS.chartColors.hashrate;
 const SERIES_DEFAULTS = [
-  { key: 'hashRate', name: 'Instant', color: h.hashRate, width: 1 },
-  { key: 'hashRate_1m', name: '1m Avg', color: h.hashRate_1m, width: 1 },
-  { key: 'hashRate_10m', name: '10m Avg', color: h.hashRate_10m, width: 1 },
-  { key: 'hashRate_1h', name: '1h Avg', color: h.hashRate_1h, width: 1 },
-  { key: 'hashRate_1d', name: '1d Avg', color: h.hashRate_1d, width: 1 },
+  { key: 'temp', name: 'ASIC Temp', color: DASHBOARD_DEFAULTS.chartColors.temperature.temp, width: 1, axis: 'temp' },
+  { key: 'vrTemp', name: 'VR Temp', color: DASHBOARD_DEFAULTS.chartColors.temperature.vrTemp, width: 1, axis: 'temp' },
 ];
-const HASHRATE_SERIES_KEYS = new Set(SERIES_DEFAULTS.map((s) => s.key));
+const TEMPERATURE_SERIES_KEYS = new Set(SERIES_DEFAULTS.map((s) => s.key));
 
-function HashrateChart({ history }) {
+function TemperatureChart({ history }) {
   const { config } = useConfig();
-  const colors = config.chartColors?.hashrate ?? DASHBOARD_DEFAULTS.chartColors.hashrate;
+  const colors = config.chartColors?.temperature ?? DASHBOARD_DEFAULTS.chartColors.temperature;
   const SERIES = useMemo(
     () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
     [colors]
   );
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_HR, HASHRATE_SERIES_KEYS);
-  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_HR);
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_TMP, TEMPERATURE_SERIES_KEYS);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_TMP);
   const { resolved } = useTheme();
   const chartColors = getChartGridAxisColors(resolved === 'dark');
 
+  const showTempAxis = SERIES.some((s) => s.axis === 'temp' && !hidden.has(s.key));
+
   return (
     <ChartCard
-      title="Hashrate"
+      title="Temperature"
       loading={!history || history.length < 2}
-      loadingMessage="Collecting hashrate data..."
+      loadingMessage="Collecting temperature data..."
       collapsed={collapsed}
       onToggleCollapsed={toggleCollapsed}
     >
@@ -52,18 +50,16 @@ function HashrateChart({ history }) {
               fontSize={11}
               tickCount={6}
             />
-            <YAxis
-              stroke={chartColors.axis}
-              fontSize={11}
-              domain={[5000, 'auto']}
-              tickCount={10}
-              tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}` : v.toFixed(0))}
-            />
-            <Tooltip content={<ChartTooltip formatValue={formatHashrateValue} />} />
+            {showTempAxis && (
+              <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} domain={[40, 'auto']} tickFormatter={(v) => `${v}\u00B0`} />
+            )}
+            {!showTempAxis && <YAxis yAxisId="temp" hide />}
+            <Tooltip content={<ChartTooltip formatValue={formatTempValue} />} />
             {SERIES.map((s) =>
               hidden.has(s.key) ? null : (
                 <Line
                   key={s.key}
+                  yAxisId={s.axis}
                   type="monotone"
                   dataKey={s.key}
                   name={s.name}
@@ -82,4 +78,4 @@ function HashrateChart({ history }) {
   );
 }
 
-export default memo(HashrateChart);
+export default memo(TemperatureChart);

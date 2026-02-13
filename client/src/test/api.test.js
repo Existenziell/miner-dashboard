@@ -8,7 +8,7 @@ import {
   shutdownMiner,
   fetchDashboardConfig,
   patchDashboardConfig,
-} from '../lib/api.js';
+} from '@/lib/api.js';
 
 describe('api', () => {
   let fetchStub;

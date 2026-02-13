@@ -1,4 +1,4 @@
-import { RESET_REASONS } from './constants.js';
+import { RESET_REASONS } from '@/lib/constants.js';
 
 /**
  * Format hashrate to human-readable string.

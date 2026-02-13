@@ -1,23 +1,23 @@
 import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
-import { useMiner, MinerProvider } from './context/MinerContext';
-import { useNetworkData } from './hooks/useNetworkData';
-import { getTabFromUrl, setTabInUrl } from './lib/tabUrl';
-import { useConfig } from './context/ConfigContext';
-import MinerStatus from './components/MinerStatus';
-import HashrateChart from './components/HashrateChart';
-import TemperatureChart from './components/TemperatureChart';
-import PowerChart from './components/PowerChart';
-import SharesCard from './components/SharesCard';
-import MinerSettings from './components/MinerSettings';
-import NetworkStatus from './components/NetworkStatus';
-import Header from './components/Header';
-import Notifications from './components/Notifications';
-import Footer from './components/Footer';
+import { useMiner, MinerProvider } from '@/context/MinerContext';
+import { useNetworkData } from '@/hooks/useNetworkData';
+import { getTabFromUrl, setTabInUrl } from '@/lib/tabUrl';
+import { useConfig } from '@/context/ConfigContext';
+import MinerStatus from '@/components/dashboard/MinerStatus';
+import HashrateChart from '@/components/charts/HashrateChart';
+import TemperatureChart from '@/components/charts/TemperatureChart';
+import PowerChart from '@/components/charts/PowerChart';
+import SharesCard from '@/components/dashboard/SharesCard';
+import MinerSettings from '@/components/dashboard/MinerSettings';
+import NetworkStatus from '@/components/dashboard/NetworkStatus';
+import Header from '@/components/layout/Header';
+import Notifications from '@/components/notifications/Notifications';
+import Footer from '@/components/layout/Footer';
 
-const SettingsPage = lazy(() => import('./components/SettingsPage'));
-const DocumentationPage = lazy(() => import('./components/DocumentationPage'));
-const ApiPage = lazy(() => import('./components/ApiPage'));
-const Metrics = lazy(() => import('./components/Metrics'));
+const SettingsPage = lazy(() => import('@/components/pages/SettingsPage'));
+const DocsPage = lazy(() => import('@/components/pages/DocsPage'));
+const ApiPage = lazy(() => import('@/components/pages/ApiPage'));
+const Metrics = lazy(() => import('@/components/dashboard/Metrics'));
 
 function PageFallback({ message }) {
   return <div className="text-muted-standalone py-8 text-center">{message}</div>;
@@ -65,7 +65,7 @@ function AppContent({ activeTab, onTabChange }) {
           </Suspense>
         ) : activeTab === 'docs' ? (
           <Suspense fallback={<PageFallback message="Loading docs…" />}>
-            <DocumentationPage />
+            <DocsPage />
           </Suspense>
         ) : activeTab === 'api' ? (
           <Suspense fallback={<PageFallback message="Loading API…" />}>

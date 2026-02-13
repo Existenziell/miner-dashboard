@@ -1,4 +1,4 @@
-import { ThemeIcon } from './Icons';
+import { ThemeIcon } from '@/components/Icons';
 
 const labels = { light: 'Light', dark: 'Dark', system: 'System' };
 

@@ -1,11 +1,11 @@
 import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useTheme } from '../hooks/useTheme';
-import { useConfig } from '../context/ConfigContext';
-import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { CHART_LEGEND_PW, CHART_COLLAPSED_PW } from '../lib/constants';
+import { useTheme } from '@/hooks/useTheme';
+import { useConfig } from '@/context/ConfigContext';
+import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '@/lib/chartUtils';
+import { CHART_LEGEND_PW, CHART_COLLAPSED_PW } from '@/lib/constants';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
-import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
+import { ClickableLegend, ChartCard, ChartTooltip } from '@/components/charts/TimeSeriesChart';
 
 const SERIES_DEFAULTS = [
   { key: 'power', name: 'Power', color: DASHBOARD_DEFAULTS.chartColors.power.power, width: 1, axis: 'power', fmt: (v) => (v != null ? `${v.toFixed(1)} W` : '--') },

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchNetworkStatus } from '../lib/api';
-import { POLL_NETWORK_INTERVAL_MS } from '../lib/constants';
+import { fetchNetworkStatus } from '@/lib/api';
+import { POLL_NETWORK_INTERVAL_MS } from '@/lib/constants';
 
 export function useNetworkData(intervalMs = POLL_NETWORK_INTERVAL_MS) {
   const [data, setData] = useState(null);

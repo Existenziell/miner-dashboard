@@ -86,6 +86,8 @@ Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
 
 The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
 
+**Client (React):** Live miner data and dashboard config are provided via `MinerContext` and `ConfigContext`. The Settings page uses scoped settings contexts (`MinerSettingsContext`, `DashboardSettingsContext`) so the miner/pool and dashboard/colors forms avoid prop drilling; tab content components consume form state via the corresponding hooks.
+
 ## License
 
 [MIT](LICENSE)

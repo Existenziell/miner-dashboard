@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { CHART_GRID_AXIS_COLORS } from './constants.js';
+import { CHART_GRID_AXIS_COLORS } from '@/lib/constants.js';
 
 /** Format timestamp for chart axis/tooltip in 24h format (e.g. "20:41") */
 export function formatTime(ts) {

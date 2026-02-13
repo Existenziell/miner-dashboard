@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatTime } from '../lib/chartUtils.js';
+import { formatTime } from '@/lib/chartUtils.js';
 
 describe('formatTime', () => {
   it('formats timestamp as locale time with hour and minute', () => {

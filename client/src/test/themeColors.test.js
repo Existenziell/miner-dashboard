@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { CHART_GRID_AXIS_COLORS } from '../lib/constants.js';
-import { getChartGridAxisColors } from '../lib/chartUtils.js';
+import { CHART_GRID_AXIS_COLORS } from '@/lib/constants.js';
+import { getChartGridAxisColors } from '@/lib/chartUtils.js';
 
 describe('CHART_GRID_AXIS_COLORS', () => {
   it('defines light theme with grid and axis hex colors', () => {

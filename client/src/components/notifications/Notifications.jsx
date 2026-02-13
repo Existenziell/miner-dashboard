@@ -1,6 +1,6 @@
-import { useMiner } from '../context/MinerContext';
-import { useAlerts } from '../hooks/useAlerts';
-import NotificationBanner from './NotificationBanner';
+import { useMiner } from '@/context/MinerContext';
+import { useAlerts } from '@/hooks/useAlerts';
+import NotificationBanner from '@/components/notifications/NotificationBanner';
 
 /**
  * Dashboard-level notifications: block found, metric alerts, connection errors.

@@ -1,5 +1,5 @@
-import { formatNumber, formatBestDiff } from '../lib/formatters';
-import { useMiner } from '../context/MinerContext';
+import { formatNumber, formatBestDiff } from '@/lib/formatters';
+import { useMiner } from '@/context/MinerContext';
 
 export default function SharesCard() {
   const { data } = useMiner();

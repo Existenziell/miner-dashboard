@@ -1,4 +1,4 @@
-import { formatNumber, formatDifficulty, formatPrice } from '../lib/formatters';
+import { formatNumber, formatDifficulty, formatPrice } from '@/lib/formatters';
 
 export default function NetworkStatus({ data }) {
   if (!data) return null;

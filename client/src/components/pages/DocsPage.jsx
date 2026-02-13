@@ -1,6 +1,6 @@
-import { SOLO_POOLS } from '../lib/constants';
+import { SOLO_POOLS } from '@/lib/constants';
 
-export default function DocumentationPage() {
+export default function DocsPage() {
 
   return (
     <div className="doc-page space-y-8 card mx-auto text-lg px-8!">
@@ -10,7 +10,7 @@ export default function DocumentationPage() {
           Solo mining means you mine blocks on your own: when your miner finds a valid block, you receive the full block reward (plus fees) instead of sharing it with other miners. To do that without running a full node, you connect to a <strong>solo pool</strong>.
         </p>
         <p className="doc-body mb-2">
-          The pool gives you work (block templates) and validates your shares, but it does not merge your hashrate with others. You are still competing for the next block; the pool just handles the Stratum protocol and block template distribution. Configure your miner with the pool’s Stratum URL and your payout address to start solo mining.
+          The pool gives you work (block templates) and validates your shares, but it does not merge your hashrate with others. You are still competing for the next block; the pool just handles the Stratum protocol and block template distribution. Configure your miner with the pool's Stratum URL and your payout address to start solo mining.
         </p>
         <p className="doc-body mb-1">Known solo mining pools:</p>
         <div className="overflow-x-auto my-2">
@@ -80,10 +80,10 @@ export default function DocumentationPage() {
           <li><strong>mining.set_difficulty</strong>: Difficulty for share validation.</li>
         </ul>
         <p className="doc-body mb-2">
-          The miner submits <strong>mining.submit</strong> with a share (nonce, job id, etc.). The pool replies with accept/reject. For solo mining, the pool still uses Stratum; when your share meets the full block difficulty, it’s a block and you get the reward.
+          The miner submits <strong>mining.submit</strong> with a share (nonce, job id, etc.). The pool replies with accept/reject. For solo mining, the pool still uses Stratum; when your share meets the full block difficulty, it's a block and you get the reward.
         </p>
         <p className="doc-body">
-          Configure your miner with the pool’s Stratum endpoint (e.g. <code className="code-inline">stratum+tcp://pool.example.com:3333</code> or <code className="code-inline">stratum+ssl://...</code>) and your Bitcoin address. The dashboard does not replace Stratum; it only monitors the miner’s status and the Bitcoin network.
+          Configure your miner with the pool's Stratum endpoint (e.g. <code className="code-inline">stratum+tcp://pool.example.com:3333</code> or <code className="code-inline">stratum+ssl://...</code>) and your Bitcoin address. The dashboard does not replace Stratum; it only monitors the miner's status and the Bitcoin network.
         </p>
       </section>
 

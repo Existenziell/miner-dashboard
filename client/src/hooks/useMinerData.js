@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { fetchMinerInfo } from '../lib/api';
+import { fetchMinerInfo } from '@/lib/api';
 import {
   POLL_MINER_INTERVAL_MS,
   CHART_HISTORY_HR,
@@ -10,7 +10,7 @@ import {
   CHART_POINTS_1M,
   CHART_POINTS_10M,
   CHART_POINTS_1H,
-} from '../lib/constants';
+} from '@/lib/constants';
 
 function parseStored(key) {
   if (typeof localStorage === 'undefined') return null;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RESET_REASONS } from '../lib/constants.js';
+import { RESET_REASONS } from '@/lib/constants.js';
 import {
   formatHashrate,
   formatUptime,
@@ -11,7 +11,7 @@ import {
   formatPrice,
   formatBestDiff,
   formatResetReason,
-} from '../lib/formatters.js';
+} from '@/lib/formatters.js';
 
 describe('formatHashrate', () => {
   it('returns "--" for null or undefined', () => {

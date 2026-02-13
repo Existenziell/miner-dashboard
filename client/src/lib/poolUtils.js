@@ -1,4 +1,4 @@
-import { SOLO_POOLS, DEFAULT_STRATUM_PORT } from './constants.js';
+import { SOLO_POOLS, DEFAULT_STRATUM_PORT } from '@/lib/constants.js';
 
 /**
  * Build stratum payload for miner PATCH from a solo pool option.

@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { THEME_KEY } from '../lib/constants';
+import { THEME_KEY } from '@/lib/constants';
 
 function getSystemPreference() {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

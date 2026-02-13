@@ -9,7 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    alias: { shared: path.resolve(__dirname, '../shared') },
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      shared: path.resolve(__dirname, '../shared'),
+    },
   },
   build: {
     rollupOptions: {

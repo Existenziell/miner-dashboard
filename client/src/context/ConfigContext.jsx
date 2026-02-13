@@ -1,9 +1,9 @@
 /* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { fetchDashboardConfig } from '../lib/api';
+import { fetchDashboardConfig } from '@/lib/api';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
-import { setMetricRanges } from '../lib/metricRanges';
-import { normalizeHex, hexWithAlpha, getContrastColor } from '../lib/colorUtils';
+import { setMetricRanges } from '@/lib/metricRanges';
+import { normalizeHex, hexWithAlpha, getContrastColor } from '@/lib/colorUtils';
 
 const ConfigContext = createContext(null);
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { SOLO_POOLS } from '../lib/constants.js';
-import { baseDomain, getPoolInfo, getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils.js';
+import { SOLO_POOLS } from '@/lib/constants.js';
+import { baseDomain, getPoolInfo, getStratumPayloadFromOption, findSoloPoolOption } from '@/lib/poolUtils.js';
 
 describe('SOLO_POOLS', () => {
   it('has identifier, name, stratumHost, port, tls, and webUrl for each entry', () => {

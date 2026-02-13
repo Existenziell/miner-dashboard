@@ -1,5 +1,5 @@
-import { useMiner } from '../context/MinerContext';
-import { getPoolInfo } from '../lib/poolUtils';
+import { useMiner } from '@/context/MinerContext';
+import { getPoolInfo } from '@/lib/poolUtils';
 
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (

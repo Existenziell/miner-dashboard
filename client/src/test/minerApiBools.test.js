@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toBool } from '../lib/minerApiBools.js';
+import { toBool } from '@/lib/minerApiBools.js';
 
 describe('toBool', () => {
   it('returns false when no arguments', () => {

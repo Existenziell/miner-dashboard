@@ -3,7 +3,7 @@
  * Ring fill is 0–100%; ring and value use the given Tailwind color.
  */
 import { useMemo } from 'react';
-import { GAUGE_RADIUS } from '../lib/constants';
+import { GAUGE_RADIUS } from '@/lib/constants';
 
 function getArcPath(radius) {
   const startX = 50 + radius * Math.cos((135 * Math.PI) / 180);
@@ -19,7 +19,7 @@ export default function MetricGauge({ label, value, sub, color = 'text-accent', 
 
   return (
     <div className="gauge-card hover:border-accent/20 transition-colors flex flex-col items-center">
-      {/* Centered, with max size so ring stays inside card and isn’t cut off */}
+      {/* Centered, with max size so ring stays inside card and isn't cut off */}
       <div className={`relative w-52 h-52 sm:w-52 sm:h-52 max-w-full flex shrink-0 ${color}`} aria-hidden>
         <svg
           className="w-full h-full overflow-visible"

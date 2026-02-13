@@ -1,5 +1,5 @@
-import ThemeToggle from './ThemeToggle';
-import { useTheme } from '../hooks/useTheme';
+import ThemeToggle from '@/components/layout/ThemeToggle';
+import { useTheme } from '@/hooks/useTheme';
 
 const TABS = [
     { id: 'dashboard', label: 'Dashboard' },
