@@ -3,13 +3,13 @@
  */
 
 // —— Polling & UI timing ———————————————————————————————————————————————————————
+export const DEFAULT_EXPECTED_HASHRATE_GH = 6000; // 6 GH/s
 export const POLL_MINER_INTERVAL_MS = 10_000;
-export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
 export const POLL_NETWORK_INTERVAL_MS = 60_000; // 1 minute
 export const ALERT_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
 export const NOTIFICATION_AUTO_CLOSE_MS = 8_000;
 export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
-export const DEFAULT_EXPECTED_HASHRATE_GH = 6000; // 6 GH/s
+export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
 
 // —— Stratum / pools ——————————————————————————————————————————————————————————
 export const DEFAULT_STRATUM_PORT = 3333;
