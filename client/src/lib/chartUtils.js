@@ -9,7 +9,7 @@ export function formatTime(ts) {
 
 /**
  * Persist which legend series are hidden in localStorage.
- * @param {string} storageKey - localStorage key (e.g. 'chartLegend_power')
+ * @param {string} storageKey - localStorage key
  * @param {Set<string>} seriesKeys - valid series keys
  * @returns {{ hidden: Set<string>, toggle: (key: string) => void }}
  */
@@ -48,7 +48,7 @@ export function useChartLegend(storageKey, seriesKeys) {
 
 /**
  * Persist chart collapsed/expanded state in localStorage.
- * @param {string} storageKey - localStorage key (e.g. 'chartCollapsed_hashrate')
+ * @param {string} storageKey - localStorage key
  * @returns {{ collapsed: boolean, toggleCollapsed: () => void }}
  */
 export function useChartCollapsed(storageKey) {

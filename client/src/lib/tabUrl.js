@@ -2,16 +2,15 @@
  * Tab state synced with URL query (?tab=settings|docs|api).
  * Valid tab ids: 'dashboard' | 'settings' | 'docs' | 'api'
  * Settings sub-tabs use ?tab=settings&section=miner|pools|dashboard|colors
- * Last settings section is persisted so reopening Settings restores that sub-tab.
  */
+import { SETTINGS_SECTION_KEY } from './constants.js';
 
 const VALID_SETTINGS_SECTIONS = new Set(['miner', 'pools', 'dashboard', 'colors']);
-const SETTINGS_SECTION_STORAGE_KEY = 'settingsSection';
 
 function getStoredSettingsSection() {
   if (typeof window === 'undefined') return 'miner';
   try {
-    const s = window.localStorage.getItem(SETTINGS_SECTION_STORAGE_KEY);
+    const s = window.localStorage.getItem(SETTINGS_SECTION_KEY);
     return VALID_SETTINGS_SECTIONS.has(s) ? s : 'miner';
   } catch {
     return 'miner';
@@ -63,7 +62,7 @@ export function setSettingsSectionInUrl(section) {
   const newUrl = `${url.pathname}?${url.searchParams}`;
   window.history.replaceState({ tab: 'settings', section }, '', newUrl);
   try {
-    window.localStorage.setItem(SETTINGS_SECTION_STORAGE_KEY, section);
+    window.localStorage.setItem(SETTINGS_SECTION_KEY, section);
   } catch {
     // ignore
   }

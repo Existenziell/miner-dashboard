@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { useConfig } from '../context/ConfigContext';
 import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { CHART_LEGEND_STORAGE_KEY_HASHRATE, CHART_COLLAPSED_STORAGE_KEY_HASHRATE } from '../lib/constants';
+import { CHART_LEGEND_HR, CHART_COLLAPSED_HR } from '../lib/constants';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
@@ -27,8 +27,8 @@ function HashrateChart({ history }) {
     () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
     [colors]
   );
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_HASHRATE, HASHRATE_SERIES_KEYS);
-  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_HASHRATE);
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_HR, HASHRATE_SERIES_KEYS);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_HR);
   const { resolved } = useTheme();
   const chartColors = getChartGridAxisColors(resolved === 'dark');
 

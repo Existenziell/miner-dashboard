@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { useConfig } from '../context/ConfigContext';
 import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { CHART_LEGEND_STORAGE_KEY_POWER, CHART_COLLAPSED_STORAGE_KEY_POWER } from '../lib/constants';
+import { CHART_LEGEND_PW, CHART_COLLAPSED_PW } from '../lib/constants';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
@@ -25,8 +25,8 @@ function PowerChart({ history }) {
     () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
     [colors]
   );
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_POWER, POWER_SERIES_KEYS);
-  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_POWER);
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_PW, POWER_SERIES_KEYS);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_PW);
   const { resolved } = useTheme();
   const chartColors = getChartGridAxisColors(resolved === 'dark');
 

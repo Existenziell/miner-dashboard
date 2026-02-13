@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { SETTINGS_SECTION_KEY } from '../lib/constants.js';
 import { getTabFromUrl, setTabInUrl, getSettingsSectionFromUrl, setSettingsSectionInUrl } from '../lib/tabUrl.js';
 
 const _originalWindow = globalThis.window;
@@ -11,7 +12,7 @@ function mockWindow({ search = '', href = 'http://localhost/', pathname = '/', s
     location: { search, href, pathname },
     history: { replaceState },
     localStorage: {
-      getItem: vi.fn((key) => (key === 'settingsSection' ? storedSettingsSection : null)),
+      getItem: vi.fn((key) => (key === SETTINGS_SECTION_KEY ? storedSettingsSection : null)),
       setItem: vi.fn(),
     },
   };
@@ -156,7 +157,7 @@ describe('tabUrl', () => {
       const { replaceState, win } = mockWindow({ href: 'http://localhost/?tab=settings&section=miner', pathname: '/' });
       setSettingsSectionInUrl('pools');
       expect(replaceState).toHaveBeenCalledWith({ tab: 'settings', section: 'pools' }, '', '/?tab=settings&section=pools');
-      expect(win.localStorage.setItem).toHaveBeenCalledWith('settingsSection', 'pools');
+      expect(win.localStorage.setItem).toHaveBeenCalledWith(SETTINGS_SECTION_KEY, 'pools');
     });
 
     it('does nothing for invalid section', () => {

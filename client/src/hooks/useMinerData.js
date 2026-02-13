@@ -2,10 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchMinerInfo } from '../lib/api';
 import {
   POLL_MINER_INTERVAL_MS,
-  CHART_HISTORY_HASHRATE,
-  CHART_HISTORY_TEMPERATURE,
-  CHART_HISTORY_POWER,
-  LEGACY_CHART_HISTORY_KEY,
+  CHART_HISTORY_HR,
+  CHART_HISTORY_TMP,
+  CHART_HISTORY_PW,
   MAX_CHART_HISTORY,
   CHART_PERSIST_INTERVAL_MS,
   CHART_POINTS_1M,
@@ -32,61 +31,22 @@ function loadStored(key, validate) {
   return arr.length > MAX_CHART_HISTORY ? arr.slice(-MAX_CHART_HISTORY) : arr;
 }
 
-function loadLegacy() {
-  const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(LEGACY_CHART_HISTORY_KEY) : null;
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) return null;
-    const first = parsed[0];
-    if (first == null || typeof first.time !== 'number') return null;
-    return parsed.length > MAX_CHART_HISTORY ? parsed.slice(-MAX_CHART_HISTORY) : parsed;
-  } catch {
-    return null;
-  }
-}
-
 function loadHashrateHistory() {
-  const fromKey = loadStored(CHART_HISTORY_HASHRATE, (arr) =>
+  return loadStored(CHART_HISTORY_HR, (arr) =>
     arr[0] != null && typeof arr[0].time === 'number'
   );
-  if (fromKey.length > 0) return fromKey;
-  const legacy = loadLegacy();
-  if (!legacy) return [];
-  return legacy.map((p) => ({
-    time: p.time,
-    hashRate: p.hashRate,
-    hashRate_1m: p.hashRate_1m,
-    hashRate_10m: p.hashRate_10m,
-    hashRate_1h: p.hashRate_1h,
-    hashRate_1d: p.hashRate_1d,
-  }));
 }
 
 function loadTemperatureHistory() {
-  const fromKey = loadStored(CHART_HISTORY_TEMPERATURE, (arr) =>
+  return loadStored(CHART_HISTORY_TMP, (arr) =>
     arr[0] != null && typeof arr[0].time === 'number'
   );
-  if (fromKey.length > 0) return fromKey;
-  const legacy = loadLegacy();
-  if (!legacy) return [];
-  return legacy.map((p) => ({ time: p.time, temp: p.temp, vrTemp: p.vrTemp }));
 }
 
 function loadPowerHistory() {
-  const fromKey = loadStored(CHART_HISTORY_POWER, (arr) =>
+  return loadStored(CHART_HISTORY_PW, (arr) =>
     arr[0] != null && typeof arr[0].time === 'number'
   );
-  if (fromKey.length > 0) return fromKey;
-  const legacy = loadLegacy();
-  if (!legacy) return [];
-  return legacy.map((p) => ({
-    time: p.time,
-    power: p.power,
-    fanspeed: p.fanspeed,
-    currentA: p.currentA,
-    coreVoltageActual: p.coreVoltageActual,
-  }));
 }
 
 function saveStored(key, arr) {
@@ -112,9 +72,9 @@ export function useMinerData(intervalMs = POLL_MINER_INTERVAL_MS, pausePolling =
   const lastPersistRef = useRef(0);
 
   const persistChartHistory = useCallback(() => {
-    saveStored(CHART_HISTORY_HASHRATE, historyHashrateRef.current);
-    saveStored(CHART_HISTORY_TEMPERATURE, historyTemperatureRef.current);
-    saveStored(CHART_HISTORY_POWER, historyPowerRef.current);
+    saveStored(CHART_HISTORY_HR, historyHashrateRef.current);
+    saveStored(CHART_HISTORY_TMP, historyTemperatureRef.current);
+    saveStored(CHART_HISTORY_PW, historyPowerRef.current);
     lastPersistRef.current = Date.now();
   }, []);
 

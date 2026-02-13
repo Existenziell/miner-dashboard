@@ -14,26 +14,25 @@ export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
 
 // —— Chart history & persistence ——————————————————————————————————————————————
-export const CHART_HISTORY_HASHRATE = 'chartHistory_hashrate';
-export const CHART_HISTORY_TEMPERATURE = 'chartHistory_temperature';
-export const CHART_HISTORY_POWER = 'chartHistory_power';
-export const LEGACY_CHART_HISTORY_KEY = 'chartHistory';
 export const MAX_CHART_HISTORY = 500; // cap per chart
 export const CHART_PERSIST_INTERVAL_MS = 60_000; // throttle localStorage writes to at most every 60s
 export const CHART_POINTS_1M = 6;   // 1 min at 10s interval
 export const CHART_POINTS_10M = 60;
 export const CHART_POINTS_1H = 360;
 
-// —— Chart legend / collapsed state (localStorage keys) ————————————————————————
-export const CHART_LEGEND_STORAGE_KEY_HASHRATE = 'chartLegend_hashrate';
-export const CHART_LEGEND_STORAGE_KEY_TEMPERATURE = 'chartLegend_temperature';
-export const CHART_LEGEND_STORAGE_KEY_POWER = 'chartLegend_power';
-export const CHART_COLLAPSED_STORAGE_KEY_HASHRATE = 'chartCollapsed_hashrate';
-export const CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE = 'chartCollapsed_temperature';
-export const CHART_COLLAPSED_STORAGE_KEY_POWER = 'chartCollapsed_power';
-
-// —— Theme ————————————————————————————————————————————————————————————————————
-export const THEME_STORAGE_KEY = 'theme';
+// —— LocalStorage keys ———————————————————————————————————————————————————————
+export const THEME_KEY = 'md.theme';
+export const CHART_LEGEND_HR = 'md.chart.hr.legend';
+export const CHART_LEGEND_TMP = 'md.chart.tmp.legend';
+export const CHART_LEGEND_PW = 'md.chart.pw.legend';
+export const CHART_COLLAPSED_HR = 'md.chart.hr.collapsed';
+export const CHART_COLLAPSED_TMP = 'md.chart.tmp.collapsed';
+export const CHART_COLLAPSED_PW = 'md.chart.pw.collapsed';
+export const CHART_HISTORY_HR = 'md.chart.hr.data';
+export const CHART_HISTORY_TMP = 'md.chart.tmp.data';
+export const CHART_HISTORY_PW = 'md.chart.pw.data';
+export const SETTINGS_SECTION_KEY = 'md.settings.section';
+export const SETTINGS_WIFI_COLLAPSED = 'md.settings.wifi.collapsed';
 
 // —— Settings / validation lengths —————————————————————————————————────────————
 export const MAX_STRATUM_USER_LENGTH = 128;
@@ -189,8 +188,6 @@ export const SOLO_POOLS = [
 
 /** Chart series color spec for dashboard config and Settings UI. Keys must match DASHBOARD_DEFAULTS.chartColors. */
 export const CHART_COLOR_SPEC = [
-  { id: 'power', label: 'Power', series: [{ key: 'power', label: 'Power' }, { key: 'currentA', label: 'Current' }] },
-  { id: 'temperature', label: 'Temperature', series: [{ key: 'temp', label: 'ASIC Temp' }, { key: 'vrTemp', label: 'VR Temp' }] },
   {
     id: 'hashrate',
     label: 'Hashrate',
@@ -202,6 +199,8 @@ export const CHART_COLOR_SPEC = [
       { key: 'hashRate_1d', label: '1d Avg' },
     ],
   },
+  { id: 'temperature', label: 'Temperature', series: [{ key: 'temp', label: 'ASIC Temp' }, { key: 'vrTemp', label: 'VR Temp' }] },
+  { id: 'power', label: 'Power', series: [{ key: 'power', label: 'Power' }, { key: 'currentA', label: 'Current' }] },
 ];
 
 /** Recharts grid and axis stroke colors by theme (light/dark). Not the data series colors. */

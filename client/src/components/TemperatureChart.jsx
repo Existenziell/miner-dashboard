@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTheme } from '../hooks/useTheme';
 import { useConfig } from '../context/ConfigContext';
 import { getChartGridAxisColors, formatTime, useChartLegend, useChartCollapsed } from '../lib/chartUtils';
-import { CHART_LEGEND_STORAGE_KEY_TEMPERATURE, CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE } from '../lib/constants';
+import { CHART_LEGEND_TMP, CHART_COLLAPSED_TMP } from '../lib/constants';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { ClickableLegend, ChartCard, ChartTooltip } from './TimeSeriesChart';
 
@@ -23,8 +23,8 @@ function TemperatureChart({ history }) {
     () => SERIES_DEFAULTS.map((s) => ({ ...s, color: colors[s.key] ?? s.color })),
     [colors]
   );
-  const { hidden, toggle } = useChartLegend(CHART_LEGEND_STORAGE_KEY_TEMPERATURE, TEMPERATURE_SERIES_KEYS);
-  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_STORAGE_KEY_TEMPERATURE);
+  const { hidden, toggle } = useChartLegend(CHART_LEGEND_TMP, TEMPERATURE_SERIES_KEYS);
+  const { collapsed, toggleCollapsed } = useChartCollapsed(CHART_COLLAPSED_TMP);
   const { resolved } = useTheme();
   const chartColors = getChartGridAxisColors(resolved === 'dark');
 

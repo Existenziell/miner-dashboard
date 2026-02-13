@@ -16,6 +16,7 @@ import {
   MIN_WIFI_PASSWORD_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
   CHART_COLOR_SPEC,
+  SETTINGS_WIFI_COLLAPSED,
 } from '../lib/constants';
 import { useChartCollapsed } from '../lib/chartUtils';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '../lib/tabUrl';
@@ -111,7 +112,7 @@ export default function SettingsPage({ onError }) {
   const [fallbackTLS, setFallbackTLS] = useState(toBool(miner?.fallbackStratumTLS));
   const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(toBool(miner?.stratumEnonceSubscribe, miner?.stratumExtranonceSubscribe));
   const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(toBool(miner?.fallbackStratumEnonceSubscribe, miner?.fallbackStratumExtranonceSubscribe));
-  const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed('settingsCollapsed_wifi');
+  const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed(SETTINGS_WIFI_COLLAPSED);
 
   // Settings sub-tabs: Miner | Pools | Dashboard (synced with URL ?tab=settings&section=...)
   const [settingsSubTab, setSettingsSubTab] = useState(getSettingsSectionFromUrl);
