@@ -284,6 +284,26 @@ export default function SettingsPage({ onError }) {
     if (fallbackPoolKey === 'other' && fallbackCustomURL !== baseline.fallbackCustomURL) {
       list.push({ label: 'Fallback pool URL', from: baseline.fallbackCustomURL || '—', to: fallbackCustomURL || '—' });
     }
+    const getStratumUrl = (poolKey, customURL, port, tls) => {
+      if (!poolKey) return '—';
+      const scheme = tls ? 'stratum+ssl://' : 'stratum+tcp://';
+      if (poolKey === 'other') {
+        const host = (customURL || '').trim();
+        return host ? `${scheme}${host}:${port}` : '—';
+      }
+      const opt = SOLO_POOLS.find((o) => o.identifier === poolKey);
+      return opt ? `${scheme}${opt.stratumHost}:${port}` : '—';
+    };
+    const primaryUrlBaseline = getStratumUrl(baseline.primaryPoolKey, baseline.primaryCustomURL, baseline.primaryStratumPort, baseline.primaryTLS);
+    const primaryUrlNow = getStratumUrl(primaryPoolKey, primaryCustomURL, primaryStratumPort, primaryTLS);
+    if (primaryUrlNow !== primaryUrlBaseline) {
+      list.push({ label: 'Primary stratum URL', from: primaryUrlBaseline, to: primaryUrlNow });
+    }
+    const fallbackUrlBaseline = getStratumUrl(baseline.fallbackPoolKey, baseline.fallbackCustomURL, baseline.fallbackStratumPort, baseline.fallbackTLS);
+    const fallbackUrlNow = getStratumUrl(fallbackPoolKey, fallbackCustomURL, fallbackStratumPort, fallbackTLS);
+    if (fallbackUrlNow !== fallbackUrlBaseline) {
+      list.push({ label: 'Fallback stratum URL', from: fallbackUrlBaseline, to: fallbackUrlNow });
+    }
     if (primaryStratumPort !== baseline.primaryStratumPort) {
       list.push({ label: 'Primary port', from: String(baseline.primaryStratumPort), to: String(primaryStratumPort) });
     }

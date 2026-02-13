@@ -37,13 +37,14 @@ export const MAX_STRATUM_PORT = 65535;
  * @typedef {{ identifier: string, name: string, stratumHost: string, port: number, tls: boolean, webUrl: string }} SoloPool
  */
 export const SOLO_POOLS = [
-    { identifier: 'ocean', name: 'OCEAN', stratumHost: 'stratum.ocean.xyz', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://ocean.xyz' },
+    { identifier: 'braiins', name: 'Braiins', stratumHost: 'solo.stratum.braiins.com', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://braiins.com' },
     { identifier: 'ckpool', name: 'CKPool', stratumHost: 'solo.ckpool.org', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://eusolo.ckpool.org/' },
     { identifier: 'ckpool-eu', name: 'CKPool (EU)', stratumHost: 'eusolo.ckpool.org', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://eusolo.ckpool.org/' },
-    { identifier: 'viabtc', name: 'ViaBTC', stratumHost: 'btc.viabtc.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://www.viabtc.com' },
+    { identifier: 'ckpool-oceania', name: 'CKPool (Oceania)', stratumHost: 'ausolo.ckpool.org', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://ausolo.ckpool.org/' },
+    { identifier: 'kano', name: 'Kano', stratumHost: 'stratum.kano.is', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://kano.is' },
+    { identifier: 'ocean', name: 'OCEAN', stratumHost: 'mine.ocean.xyz', port: 3334, tls: false, webUrl: 'https://ocean.xyz' },
     { identifier: 'public-pool', name: 'Public Pool', stratumHost: 'public-pool.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://web.public-pool.io' },
-    { identifier: 'd-central', name: 'D-Central Solo', stratumHost: 'solo.d-central.tech', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://d-central.tech' },
-    { identifier: 'kano', name: 'Kano', stratumHost: 'kano.is', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://kano.is' },
-    { identifier: 'braiins', name: 'Braiins', stratumHost: 'solo.stratum.braiins.com', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://braiins.com' },
-    { identifier: 'luxor', name: 'Luxor', stratumHost: 'stratum.luxor.tech', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://www.luxor.tech' },
+    { identifier: 'solo-pool-eu', name: 'Solo-Pool', stratumHost: 'btc-eu.solo-pool.org', port: 3334, tls: false, webUrl: 'https://btc.solo-pool.org/' },
+    { identifier: 'solopool-org', name: 'SoloPool.org', stratumHost: 'eu3.solopool.org', port: 8005, tls: false, webUrl: 'https://btc.solopool.org' },
+    { identifier: 'viabtc', name: 'ViaBTC', stratumHost: 'btc.viabtc.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://www.viabtc.com' },
 ];

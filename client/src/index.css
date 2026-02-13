@@ -317,6 +317,17 @@ input[type="number"] {
 .doc-page table {
   @apply text-base;
 }
+/* Smaller font for solo pools table (overrides .doc-page table above) */
+.doc-page table.doc-pools-table {
+  @apply text-xs;
+}
+.doc-page table.doc-pools-table th,
+.doc-page table.doc-pools-table td {
+  @apply p-2 whitespace-nowrap;
+}
+.doc-page table.doc-pools-table .code-inline {
+  @apply text-xs;
+}
 
 /* Status dots (connection indicator) */
 .status-dot {

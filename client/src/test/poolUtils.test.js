@@ -26,9 +26,11 @@ describe('baseDomain', () => {
     expect(baseDomain('stratum2+tcp://eu.ckpool.org')).toBe('ckpool.org');
   });
 
-  it('strips known subdomain prefixes (btc, solo, eu, us, etc.)', () => {
+  it('strips known subdomain prefixes (btc, solo, eu, us, mine, etc.)', () => {
     expect(baseDomain('btc.viabtc.io')).toBe('viabtc.io');
     expect(baseDomain('solo.ckpool.org')).toBe('ckpool.org');
+    expect(baseDomain('mine.ocean.xyz')).toBe('ocean.xyz');
+    expect(baseDomain('stratum.kano.is')).toBe('kano.is');
   });
 });
 
@@ -55,6 +57,45 @@ describe('getPoolInfo', () => {
       name: 'ViaBTC',
       webUrl: 'https://www.viabtc.com',
       identifier: 'viabtc',
+    });
+  });
+
+  it('returns known pool for OCEAN (mine.ocean.xyz)', () => {
+    expect(getPoolInfo('mine.ocean.xyz')).toEqual({
+      name: 'OCEAN',
+      webUrl: 'https://ocean.xyz',
+      identifier: 'ocean',
+    });
+    expect(getPoolInfo('stratum+tcp://mine.ocean.xyz:3334')).toEqual({
+      name: 'OCEAN',
+      webUrl: 'https://ocean.xyz',
+      identifier: 'ocean',
+    });
+  });
+
+  it('returns known pool for Kano (stratum.kano.is)', () => {
+    expect(getPoolInfo('stratum.kano.is')).toEqual({
+      name: 'Kano',
+      webUrl: 'https://kano.is',
+      identifier: 'kano',
+    });
+  });
+
+  it('returns known pool for new pools (Solo-Pool EU, CKPool Oceania, SoloPool.org)', () => {
+    expect(getPoolInfo('btc-eu.solo-pool.org')).toEqual({
+      name: 'Solo-Pool',
+      webUrl: 'https://btc.solo-pool.org/',
+      identifier: 'solo-pool-eu',
+    });
+    expect(getPoolInfo('ausolo.ckpool.org')).toEqual({
+      name: 'CKPool (Oceania)',
+      webUrl: 'https://ausolo.ckpool.org/',
+      identifier: 'ckpool-oceania',
+    });
+    expect(getPoolInfo('eu3.solopool.org')).toEqual({
+      name: 'SoloPool.org',
+      webUrl: 'https://btc.solopool.org',
+      identifier: 'solopool-org',
     });
   });
 

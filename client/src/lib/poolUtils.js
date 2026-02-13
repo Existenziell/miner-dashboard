@@ -40,7 +40,7 @@ export function baseDomain(stratumHost) {
   return stratumHost
     .replace(/^stratum\+tcp:\/\//, '')
     .replace(/^stratum2\+tcp:\/\//, '')
-    .replace(/^(btc|stratum|solo|eu|us|eusolo|na|asia|ausolo|pool)\./i, '');
+    .replace(/^(btc|stratum|solo|eu|us|eusolo|na|asia|ausolo|pool|mine)\./i, '');
 }
 
 function fallbackName(base) {

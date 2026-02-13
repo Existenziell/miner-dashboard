@@ -1,5 +1,75 @@
 import { SOLO_POOLS } from '../lib/constants';
 
+/** Solo pool fee by identifier (for documentation table only). */
+const POOL_FEE_BY_ID = {
+  ocean: '2%',
+  ckpool: '2%',
+  'ckpool-eu': '2%',
+  'ckpool-oceania': '2%',
+  viabtc: '1%',
+  'public-pool': '0%',
+  'solo-pool-eu': '1%',
+  'solopool-org': '2%',
+  kano: '0.9%',
+  braiins: '0.5%',
+};
+
+/** Registration: No signup (address-only) vs Account required. */
+const POOL_REGISTRATION_BY_ID = {
+  ocean: 'No signup',
+  ckpool: 'No signup',
+  'ckpool-eu': 'No signup',
+  'ckpool-oceania': 'No signup',
+  viabtc: 'Account required',
+  'public-pool': 'No signup',
+  'solo-pool-eu': 'No signup',
+  'solopool-org': 'No signup',
+  kano: 'No signup',
+  braiins: 'No signup',
+};
+
+/** Region / server location. */
+const POOL_REGION_BY_ID = {
+  ocean: 'Global',
+  ckpool: 'Americas',
+  'ckpool-eu': 'EU',
+  'ckpool-oceania': 'Oceania',
+  viabtc: 'Global',
+  'public-pool': 'Global',
+  'solo-pool-eu': 'EU',
+  'solopool-org': 'EU',
+  kano: 'Global',
+  braiins: 'Global',
+};
+
+/** Worker / username format. */
+const POOL_WORKER_FORMAT_BY_ID = {
+  ocean: 'Address or Address.Worker',
+  ckpool: 'Address or Address.Worker',
+  'ckpool-eu': 'Address or Address.Worker',
+  'ckpool-oceania': 'Address or Address.Worker',
+  viabtc: 'user.worker (account)',
+  'public-pool': 'Address.Worker, password x',
+  'solo-pool-eu': 'Address or Address.Worker',
+  'solopool-org': 'Address or Address.RIG_ID',
+  kano: 'username.worker (register first)',
+  braiins: 'Address or Address.Worker',
+};
+
+/** Short notes per pool. */
+const POOL_NOTES_BY_ID = {
+  ocean: 'Alternate template ports available.',
+  ckpool: '—',
+  'ckpool-eu': '—',
+  'ckpool-oceania': '—',
+  viabtc: 'Set solo mode in pool dashboard.',
+  'public-pool': 'TLS on port 4333.',
+  'solo-pool-eu': 'Instant coinbase payout.',
+  'solopool-org': 'Low-end port (250K diff); 7005, 9005 for higher hashrate.',
+  kano: '0.9% solo fee.',
+  braiins: '0.5% solo fee; stats at solo.braiins.com.',
+};
+
 export default function DocumentationPage() {
 
   return (
@@ -12,16 +82,43 @@ export default function DocumentationPage() {
         <p className="doc-body mb-2">
           The pool gives you work (block templates) and validates your shares, but it does not merge your hashrate with others. You are still competing for the next block; the pool just handles the Stratum protocol and block template distribution. Configure your miner with the pool’s Stratum URL and your payout address to start solo mining.
         </p>
-        <p className="doc-body mb-1">Known solo mining pools (can be configured in pool settings):</p>
-        <ul className="list-inside doc-body my-2 flex flex-wrap gap-2">
-          {SOLO_POOLS.map((pool) => (
-            <li key={pool.identifier} className="hover:scale-105 transition-all duration-200">
-              <a href={pool.webUrl} target="_blank" rel="noopener noreferrer" className="bg-surface-light dark:bg-surface-light-dark px-3 py-2 rounded-md no-underline!">
-                {pool.name}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <p className="doc-body mb-1">Known solo mining pools:</p>
+        <div className="overflow-x-auto my-2">
+          <table className="doc-pools-table w-full doc-body border border-gray-300 dark:border-gray-600 text-left">
+            <thead>
+              <tr className="border-b border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+                <th className="p-2 font-semibold">Pool</th>
+                <th className="p-2 font-semibold">Stratum host</th>
+                <th className="p-2 font-semibold">Port</th>
+                <th className="p-2 font-semibold">TLS</th>
+                <th className="p-2 font-semibold">Fee</th>
+                <th className="p-2 font-semibold">Registration</th>
+                <th className="p-2 font-semibold">Region</th>
+                <th className="p-2 font-semibold">Worker format</th>
+                <th className="p-2 font-semibold">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SOLO_POOLS.map((pool) => (
+                <tr key={pool.identifier} className="border-b border-gray-200 dark:border-gray-600">
+                  <td className="p-2">
+                    <a href={pool.webUrl} target="_blank" rel="noopener noreferrer" className="font-medium no-underline! hover:underline">
+                      {pool.name}
+                    </a>
+                  </td>
+                  <td className="p-2"><code className="code-inline">{pool.stratumHost}</code></td>
+                  <td className="p-2">{pool.port}</td>
+                  <td className="p-2">{pool.tls ? 'Yes' : 'No'}</td>
+                  <td className="p-2">{POOL_FEE_BY_ID[pool.identifier] ?? '—'}</td>
+                  <td className="p-2">{POOL_REGISTRATION_BY_ID[pool.identifier] ?? '—'}</td>
+                  <td className="p-2">{POOL_REGION_BY_ID[pool.identifier] ?? '—'}</td>
+                  <td className="p-2">{POOL_WORKER_FORMAT_BY_ID[pool.identifier] ?? '—'}</td>
+                  <td className="p-2">{POOL_NOTES_BY_ID[pool.identifier] ?? '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section>
