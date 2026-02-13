@@ -7,7 +7,7 @@ Thanks for your interest in contributing.
 1. Clone the repo and install dependencies:
 
    ```bash
-   git clone https://github.com/christof/miner-dashboard.git
+   git clone https://github.com/Existenziell/miner-dashboard.git
    cd miner-dashboard
    npm install
    cd client && npm install && cd ..
@@ -31,9 +31,21 @@ Thanks for your interest in contributing.
 - **`npm run lint`** – Lint client code
 - **`npm run build`** – Build frontend for production
 - **`npm start`** – Run production server (after `npm run build`)
+- **`npm run all`** – Run build, tests, and lint (good pre-PR check)
+
+## Tests and lint
+
+Before opening a pull request, run tests and lint and fix any issues:
+
+```bash
+npm test
+npm run lint
+```
+
+Or run everything in one go: `npm run all`. The client test suite and ESLint must pass for contributions to be accepted.
 
 ## Submitting changes
 
 1. Open an issue or comment on an existing one if you’re planning a larger change.
-2. Create a branch, make your changes, and ensure tests and lint pass (`npm test`, `npm run lint`).
+2. Create a branch, make your changes, and ensure tests and lint pass (see **Tests and lint** above).
 3. Open a pull request with a short description of what changed and why.

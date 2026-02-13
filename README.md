@@ -8,6 +8,24 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 - **Time-series charts**: hashrate and temperature/power history (rolling 1h buffer)
 - **Mining details**: shares accepted/rejected, best difficulty, pool info
 - **Bitcoin network**: block height, difficulty adjustment, BTC price, fee estimates (60s polling)
+- **Settings – Miner**: configure miner IP/hostname and connection
+- **Settings – Pools**: view and manage pool configuration (URL, worker, password)
+- **Settings – Dashboard**: expected hashrate, poll intervals, and metric ranges (thresholds and gauge max for hashrate, temp, power, efficiency, etc.)
+- **Settings – Colors**: customize accent color and gauge/indicator colors; settings persisted to the server
+
+## Screenshots
+
+**Dashboard**
+
+![Dashboard – miner overview](client/public/screenshots/dashboard-miner.png)
+
+**Settings**
+
+| Miner | Pools | Dashboard |
+|-------|-------|-----------|
+| ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) | ![Settings – Dashboard](client/public/screenshots/settings-dashboard.png) |
+
+![Settings – Colors](client/public/screenshots/settings-colors.png)
 
 ## Requirements
 
@@ -52,10 +70,10 @@ Then open `http://localhost:8001`.
 
 **Dashboard config (server-persisted):** Stored in `config/dashboard.json` (created when you save from **Settings → Dashboard**):
 
-- **Miner IP or hostname** — fallback if not set in `.env`
-- **Expected hashrate (GH/s)** — used for the hashrate gauge scale and the Efficiency “Expected” display
-- **Miner / Network poll intervals (ms)** — how often the dashboard fetches miner status and network stats
-- **Metric ranges** — single threshold and gauge max per metric (hashrate, temp, power, efficiency, etc.). Gauges use accent (OK) and red (out of range). Each value is editable in the Dashboard tab; the hashrate gauge uses the larger of “Expected hashrate” and “Hashrate → Gauge max”.
+- **Miner IP or hostname**: fallback if not set in `.env`
+- **Expected hashrate (GH/s)**: used for the hashrate gauge scale and the Efficiency “Expected” display
+- **Miner / Network poll intervals (ms)**: how often the dashboard fetches miner status and network stats
+- **Metric ranges**: single threshold and gauge max per metric (hashrate, temp, power, efficiency, etc.). Gauges use accent (OK) and red (out of range). Each value is editable in the Dashboard tab; the hashrate gauge uses the larger of “Expected hashrate” and “Hashrate → Gauge max”.
 
 **Settings tabs:** Settings has three sections (Miner, Pools, Dashboard). The active section is reflected in the URL (`?tab=settings&section=miner|pools|dashboard`) so you can bookmark or share a link to a specific tab.
 
