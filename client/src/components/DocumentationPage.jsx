@@ -1,6 +1,9 @@
+import { SOLO_POOLS } from '../lib/constants';
+
 export default function DocumentationPage() {
+
   return (
-    <div className="doc-page space-y-8 card mx-auto text-lg !px-8">
+    <div className="doc-page space-y-8 card mx-auto text-lg px-8!">
       <section>
         <h2 className="text-2xl font-semibold mb-2">Solo mining via a pool</h2>
         <p className="doc-body mb-2">
@@ -9,6 +12,16 @@ export default function DocumentationPage() {
         <p className="doc-body mb-2">
           The pool gives you work (block templates) and validates your shares, but it does not merge your hashrate with others. You are still competing for the next block; the pool just handles the Stratum protocol and block template distribution. Configure your miner with the pool’s Stratum URL and your payout address to start solo mining.
         </p>
+        <p className="doc-body mb-1">Known solo mining pools (can be configured in pool settings):</p>
+        <ul className="list-inside doc-body my-2 flex flex-wrap gap-2">
+          {SOLO_POOLS.map((pool) => (
+            <li key={pool.identifier} className="hover:scale-105 transition-all duration-200">
+              <a href={pool.webUrl} target="_blank" rel="noopener noreferrer" className="bg-surface-light dark:bg-surface-light-dark px-3 py-2 rounded-md no-underline!">
+                {pool.name}
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section>

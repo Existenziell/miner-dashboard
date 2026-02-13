@@ -1,18 +1,14 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { patchMinerSettings, restartMiner, shutdownMiner, fetchMinerAsic } from '../lib/api';
 import { useMiner } from '../context/MinerContext';
-import { SUCCESS_MESSAGE_DISMISS_MS } from '../lib/constants';
-import {
-  SOLO_POOL_OPTIONS,
-  getStratumPayloadFromOption,
-  findSoloPoolOption,
-} from '../lib/poolUtils';
+import { SUCCESS_MESSAGE_DISMISS_MS, DEFAULT_STRATUM_PORT, MIN_STRATUM_PORT, MAX_STRATUM_PORT, SOLO_POOLS } from '../lib/constants';
+import { useChartCollapsed } from '../lib/chartUtils';
+import { getStratumPayloadFromOption, findSoloPoolOption } from '../lib/poolUtils';
+import { ChartCard } from './TimeSeriesChart';
 
 const MAX_STRATUM_USER_LENGTH = 128;
 const MAX_STRATUM_PASSWORD_LENGTH = 128;
 const MAX_STRATUM_URL_LENGTH = 512;
-const MIN_STRATUM_PORT = 1;
-const MAX_STRATUM_PORT = 65535;
 const MAX_HOSTNAME_LENGTH = 64;
 const MAX_WIFI_SSID_LENGTH = 32;
 const MIN_WIFI_PASSWORD_LENGTH = 8;
@@ -61,8 +57,8 @@ export default function SettingsPage({ onError }) {
   const [fallbackPoolKey, setFallbackPoolKey] = useState('');
   const [primaryCustomURL, setPrimaryCustomURL] = useState('');
   const [fallbackCustomURL, setFallbackCustomURL] = useState('');
-  const [primaryStratumPort, setPrimaryStratumPort] = useState(miner?.stratumPort ?? 3333);
-  const [fallbackStratumPort, setFallbackStratumPort] = useState(miner?.fallbackStratumPort ?? 3333);
+  const [primaryStratumPort, setPrimaryStratumPort] = useState(miner?.stratumPort ?? DEFAULT_STRATUM_PORT);
+  const [fallbackStratumPort, setFallbackStratumPort] = useState(miner?.fallbackStratumPort ?? DEFAULT_STRATUM_PORT);
   const [primaryPassword, setPrimaryPassword] = useState(miner?.stratumPassword ?? '');
   const [fallbackPassword, setFallbackPassword] = useState(miner?.fallbackStratumPassword ?? '');
   const [primaryStratumUser, setPrimaryStratumUser] = useState(miner?.stratumUser ?? '');
@@ -73,6 +69,9 @@ export default function SettingsPage({ onError }) {
   const [fallbackTLS, setFallbackTLS] = useState(!!(miner?.fallbackStratumTLS === 1 || miner?.fallbackStratumTLS === true));
   const [primaryExtranonceSubscribe, setPrimaryExtranonceSubscribe] = useState(!!(miner?.stratumEnonceSubscribe === 1 || miner?.stratumEnonceSubscribe === true || miner?.stratumExtranonceSubscribe === 1 || miner?.stratumExtranonceSubscribe === true));
   const [fallbackExtranonceSubscribe, setFallbackExtranonceSubscribe] = useState(!!(miner?.fallbackStratumEnonceSubscribe === 1 || miner?.fallbackStratumEnonceSubscribe === true || miner?.fallbackStratumExtranonceSubscribe === 1 || miner?.fallbackStratumExtranonceSubscribe === true));
+
+  const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed('settingsCollapsed_wifi');
+  const { collapsed: poolCollapsed, toggleCollapsed: togglePoolCollapsed } = useChartCollapsed('settingsCollapsed_pool');
 
   // Sync form when miner data updates
   useEffect(() => {
@@ -87,15 +86,15 @@ export default function SettingsPage({ onError }) {
     setFlipScreen(!!(miner.flipscreen === 1 || miner.flipscreen === true));
     setHostname(miner.hostname ?? '');
     setWifiSsid(miner.ssid ?? '');
-    setPrimaryStratumPort(miner.stratumPort ?? 3333);
-    setFallbackStratumPort(miner.fallbackStratumPort ?? 3333);
+    setPrimaryStratumPort(miner.stratumPort ?? DEFAULT_STRATUM_PORT);
+    setFallbackStratumPort(miner.fallbackStratumPort ?? DEFAULT_STRATUM_PORT);
     setPrimaryPassword(miner.stratumPassword ?? '');
     setFallbackPassword(miner.fallbackStratumPassword ?? '');
     setPrimaryStratumUser(miner.stratumUser ?? '');
     setFallbackStratumUser(miner.fallbackStratumUser ?? '');
     const primaryOpt = findSoloPoolOption(miner.stratumURL, miner.stratumPort);
     setPrimaryPoolKey(
-      primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOL_OPTIONS[0]?.identifier ?? ''))
+      primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOLS[0]?.identifier ?? ''))
     );
     setPrimaryCustomURL(primaryOpt ? '' : (miner.stratumURL ?? ''));
     const fallbackOpt = findSoloPoolOption(miner.fallbackStratumURL, miner.fallbackStratumPort);
@@ -214,12 +213,12 @@ export default function SettingsPage({ onError }) {
       hostname: miner.hostname ?? '',
       wifiSsid: miner.ssid ?? '',
       wifiPassword: '',
-      primaryPoolKey: primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOL_OPTIONS[0]?.identifier ?? '')),
+      primaryPoolKey: primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOLS[0]?.identifier ?? '')),
       fallbackPoolKey: fallbackOpt?.identifier ?? (miner.fallbackStratumURL ? 'other' : ''),
       primaryCustomURL: primaryOpt ? '' : (miner.stratumURL ?? ''),
       fallbackCustomURL: fallbackOpt ? '' : (miner.fallbackStratumURL ?? ''),
-      primaryStratumPort: miner.stratumPort ?? 3333,
-      fallbackStratumPort: miner.fallbackStratumPort ?? 3333,
+      primaryStratumPort: miner.stratumPort ?? DEFAULT_STRATUM_PORT,
+      fallbackStratumPort: miner.fallbackStratumPort ?? DEFAULT_STRATUM_PORT,
       primaryPassword: miner.stratumPassword ?? '',
       fallbackPassword: miner.fallbackStratumPassword ?? '',
       primaryStratumUser: miner.stratumUser ?? '',
@@ -272,7 +271,7 @@ export default function SettingsPage({ onError }) {
     if (wifiPassword !== baseline.wifiPassword && wifiPassword !== '') {
       list.push({ label: 'WiFi password', from: '—', to: '•••' });
     }
-    const poolLabel = (key) => (key === 'other' ? 'Other' : key === '' ? 'None' : SOLO_POOL_OPTIONS.find((o) => o.identifier === key)?.name ?? key);
+    const poolLabel = (key) => (key === 'other' ? 'Other' : key === '' ? 'None' : SOLO_POOLS.find((o) => o.identifier === key)?.name ?? key);
     if (primaryPoolKey !== baseline.primaryPoolKey) {
       list.push({ label: 'Primary pool', from: poolLabel(baseline.primaryPoolKey), to: poolLabel(primaryPoolKey) });
     }
@@ -468,14 +467,14 @@ export default function SettingsPage({ onError }) {
     setSaving(true);
     try {
       const primaryOpt = primaryPoolKey && primaryPoolKey !== 'other'
-        ? SOLO_POOL_OPTIONS.find((o) => o.identifier === primaryPoolKey)
+        ? SOLO_POOLS.find((o) => o.identifier === primaryPoolKey)
         : null;
       const fallbackOpt = fallbackPoolKey && fallbackPoolKey !== 'other'
-        ? SOLO_POOL_OPTIONS.find((o) => o.identifier === fallbackPoolKey)
+        ? SOLO_POOLS.find((o) => o.identifier === fallbackPoolKey)
         : null;
 
-      const primaryPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(primaryStratumPort) || 3333));
-      const fallbackPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(fallbackStratumPort) || 3333));
+      const primaryPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(primaryStratumPort) || DEFAULT_STRATUM_PORT));
+      const fallbackPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(fallbackStratumPort) || DEFAULT_STRATUM_PORT));
 
       const stripStratumHost = (url) => {
         const s = (url || '').trim();
@@ -592,7 +591,11 @@ export default function SettingsPage({ onError }) {
       <form onSubmit={handleSave} className="space-y-4">
         {/* ASIC */}
         <div className="card">
-          <h3 className="card-title">ASIC</h3>
+          <div className="-mx-5 -mt-5 mb-4 min-w-0">
+            <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
+              <h3 className="text-lg font-semibold text-body m-0">ASIC</h3>
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field
               label="Frequency (MHz)"
@@ -665,7 +668,11 @@ export default function SettingsPage({ onError }) {
         {/* Temperature & Fan | Display side by side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="card">
-            <h3 className="card-title">Temperature & Fan</h3>
+            <div className="-mx-5 -mt-5 mb-4 min-w-0">
+              <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold text-body m-0">Temperature & Fan</h3>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Overheat limit (°C)" hint="Miner shuts down above this temperature.">
                 <input
@@ -743,7 +750,11 @@ export default function SettingsPage({ onError }) {
           </div>
 
           <div className="card">
-            <h3 className="card-title">Display</h3>
+            <div className="-mx-5 -mt-5 mb-4 min-w-0">
+              <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
+                <h3 className="text-lg font-semibold text-body m-0">Display</h3>
+              </div>
+            </div>
             <div className="flex flex-col gap-4">
               <Field label="Automatic screen shutdown" hint="Turn off miner display after inactivity.">
                 <div className="flex items-center gap-2">
@@ -778,8 +789,13 @@ export default function SettingsPage({ onError }) {
         </div>
 
         {/* WiFi Settings */}
-        <div className="card">
-          <h3 className="card-title">WiFi Settings</h3>
+        <ChartCard
+          title="WiFi Settings"
+          loading={false}
+          loadingMessage=""
+          collapsed={wifiCollapsed}
+          onToggleCollapsed={toggleWifiCollapsed}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
               <input
@@ -804,7 +820,7 @@ export default function SettingsPage({ onError }) {
                 type="text"
                 value={wifiSsid}
                 onChange={(e) => setWifiSsid(e.target.value)}
-                placeholder="YourWiFi"
+                placeholder="WiFi Network (SSID)"
                 maxLength={MAX_WIFI_SSID_LENGTH}
                 className={`input ${wifiSsidError ? 'border-danger' : ''}`}
                 aria-label="WiFi Network (SSID)"
@@ -822,7 +838,7 @@ export default function SettingsPage({ onError }) {
                 type="password"
                 value={wifiPassword}
                 onChange={(e) => setWifiPassword(e.target.value)}
-                placeholder="Leave blank to keep current"
+                placeholder="WiFi Password"
                 maxLength={MAX_WIFI_PASSWORD_LENGTH}
                 className={`input ${wifiPasswordError ? 'border-danger' : ''}`}
                 aria-label="WiFi Password"
@@ -839,12 +855,16 @@ export default function SettingsPage({ onError }) {
               Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
             </p>
           </div>
-        </div>
+        </ChartCard>
 
         {/* Pool (last settings section) */}
-        <div className="card">
-          <h3 className="card-title">Pool</h3>
-
+        <ChartCard
+          title="Pool"
+          loading={false}
+          loadingMessage=""
+          collapsed={poolCollapsed}
+          onToggleCollapsed={togglePoolCollapsed}
+        >
           {/* Top: Pool mode + TCP Keepalive */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-border dark:border-border-dark">
             <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
@@ -895,13 +915,13 @@ export default function SettingsPage({ onError }) {
                   onChange={(e) => {
                     const v = e.target.value;
                     setPrimaryPoolKey(v);
-                    const opt = v && v !== 'other' ? SOLO_POOL_OPTIONS.find((o) => o.identifier === v) : null;
+                    const opt = v && v !== 'other' ? SOLO_POOLS.find((o) => o.identifier === v) : null;
                     if (opt) setPrimaryStratumPort(opt.port);
                   }}
                   className="input"
                   aria-label="Primary pool"
                 >
-                  {SOLO_POOL_OPTIONS.map((opt) => (
+                  {SOLO_POOLS.map((opt) => (
                     <option key={opt.identifier} value={opt.identifier}>
                       {opt.name} ({opt.stratumHost})
                     </option>
@@ -934,7 +954,7 @@ export default function SettingsPage({ onError }) {
                   min={MIN_STRATUM_PORT}
                   max={MAX_STRATUM_PORT}
                   value={primaryStratumPort}
-                  onChange={(e) => setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || 3333)))}
+                  onChange={(e) => setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
                   className={`input ${!primaryPortValid ? 'border-danger' : ''}`}
                   aria-invalid={!primaryPortValid}
                 />
@@ -956,14 +976,14 @@ export default function SettingsPage({ onError }) {
                   </p>
                 )}
               </Field>
-              <Field label="Password" hint="Pool password. Some devices do not return it; leave blank to keep the current password.">
+              <Field label="Password" hint="Some devices do not return it. Leave blank to keep the current password.">
                 <input
                   type="text"
                   value={primaryPassword}
                   onChange={(e) => setPrimaryPassword(e.target.value)}
                   maxLength={MAX_STRATUM_PASSWORD_LENGTH}
                   className={`input ${primaryPasswordError ? 'border-danger' : ''}`}
-                  placeholder="Optional"
+                  placeholder="Pool Password"
                   aria-label="Primary pool password"
                   aria-invalid={!!primaryPasswordError}
                   aria-describedby={primaryPasswordError ? 'primary-password-error' : undefined}
@@ -974,36 +994,38 @@ export default function SettingsPage({ onError }) {
                   </p>
                 )}
               </Field>
-              <Field label="Enable Extranonce Subscribe" hint="Request extranonce updates from pool.">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={primaryExtranonceSubscribe}
-                    aria-label="Primary pool Enable Extranonce Subscribe"
-                    onClick={() => setPrimaryExtranonceSubscribe((v) => !v)}
-                    className={`switch ${primaryExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                  >
-                    <span className={`switch-thumb ${primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                  </button>
-                  <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
-                </div>
-              </Field>
-              <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool.">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={primaryTLS}
-                    aria-label="Primary pool Encrypted connection TLS"
-                    onClick={() => setPrimaryTLS((v) => !v)}
-                    className={`switch ${primaryTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                  >
-                    <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                  </button>
-                  <span className="text-sm text-body">{primaryTLS ? 'On' : 'Off'}</span>
-                </div>
-              </Field>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="Enable Extranonce Subscribe" hint="Request extranonce updates from pool.">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={primaryExtranonceSubscribe}
+                      aria-label="Primary pool Enable Extranonce Subscribe"
+                      onClick={() => setPrimaryExtranonceSubscribe((v) => !v)}
+                      className={`switch ${primaryExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    >
+                      <span className={`switch-thumb ${primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                    </button>
+                    <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
+                  </div>
+                </Field>
+                <Field label="Encrypted connection (TLS)" hint="Use TLS for primary pool.">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={primaryTLS}
+                      aria-label="Primary pool Encrypted connection TLS"
+                      onClick={() => setPrimaryTLS((v) => !v)}
+                      className={`switch ${primaryTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    >
+                      <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                    </button>
+                    <span className="text-sm text-body">{primaryTLS ? 'On' : 'Off'}</span>
+                  </div>
+                </Field>
+              </div>
             </div>
             <div className="flex flex-col gap-4 pt-4 md:pt-0 md:pl-4">
               <div className="flex items-center gap-2">
@@ -1020,14 +1042,14 @@ export default function SettingsPage({ onError }) {
                   onChange={(e) => {
                     const v = e.target.value;
                     setFallbackPoolKey(v);
-                    const opt = v && v !== 'other' ? SOLO_POOL_OPTIONS.find((o) => o.identifier === v) : null;
+                    const opt = v && v !== 'other' ? SOLO_POOLS.find((o) => o.identifier === v) : null;
                     if (opt) setFallbackStratumPort(opt.port);
                   }}
                   className="input"
                   aria-label="Fallback pool"
                 >
                   <option value="">None</option>
-                  {SOLO_POOL_OPTIONS.map((opt) => (
+                  {SOLO_POOLS.map((opt) => (
                     <option key={opt.identifier} value={opt.identifier}>
                       {opt.name} ({opt.stratumHost})
                     </option>
@@ -1060,7 +1082,7 @@ export default function SettingsPage({ onError }) {
                   min={MIN_STRATUM_PORT}
                   max={MAX_STRATUM_PORT}
                   value={fallbackStratumPort}
-                  onChange={(e) => setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || 3333)))}
+                  onChange={(e) => setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
                   className={`input ${!fallbackPortValid ? 'border-danger' : ''}`}
                   aria-invalid={!fallbackPortValid}
                 />
@@ -1082,14 +1104,14 @@ export default function SettingsPage({ onError }) {
                   </p>
                 )}
               </Field>
-              <Field label="Password" hint="Pool password. Some devices do not return it; leave blank to keep the current password.">
+              <Field label="Password" hint="Some devices do not return it. Leave blank to keep the current password.">
                 <input
                   type="text"
                   value={fallbackPassword}
                   onChange={(e) => setFallbackPassword(e.target.value)}
                   maxLength={MAX_STRATUM_PASSWORD_LENGTH}
                   className={`input ${fallbackPasswordError ? 'border-danger' : ''}`}
-                  placeholder="Optional"
+                  placeholder="Pool Password"
                   aria-label="Fallback pool password"
                   aria-invalid={!!fallbackPasswordError}
                   aria-describedby={fallbackPasswordError ? 'fallback-password-error' : undefined}
@@ -1100,39 +1122,41 @@ export default function SettingsPage({ onError }) {
                   </p>
                 )}
               </Field>
-              <Field label="Enable Extranonce Subscribe" hint="Request extranonce updates from pool.">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={fallbackExtranonceSubscribe}
-                    aria-label="Fallback pool Enable Extranonce Subscribe"
-                    onClick={() => setFallbackExtranonceSubscribe((v) => !v)}
-                    className={`switch ${fallbackExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                  >
-                    <span className={`switch-thumb ${fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                  </button>
-                  <span className="text-sm text-body">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
-                </div>
-              </Field>
-              <Field label="Encrypted connection (TLS)" hint="Use TLS for fallback pool.">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={fallbackTLS}
-                    aria-label="Fallback pool Encrypted connection TLS"
-                    onClick={() => setFallbackTLS((v) => !v)}
-                    className={`switch ${fallbackTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
-                  >
-                    <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
-                  </button>
-                  <span className="text-sm text-body">{fallbackTLS ? 'On' : 'Off'}</span>
-                </div>
-              </Field>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="Enable Extranonce Subscribe" hint="Request extranonce updates from pool.">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={fallbackExtranonceSubscribe}
+                      aria-label="Fallback pool Enable Extranonce Subscribe"
+                      onClick={() => setFallbackExtranonceSubscribe((v) => !v)}
+                      className={`switch ${fallbackExtranonceSubscribe ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    >
+                      <span className={`switch-thumb ${fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                    </button>
+                    <span className="text-sm text-body">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
+                  </div>
+                </Field>
+                <Field label="Encrypted connection (TLS)" hint="Use TLS for fallback pool.">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={fallbackTLS}
+                      aria-label="Fallback pool Encrypted connection TLS"
+                      onClick={() => setFallbackTLS((v) => !v)}
+                      className={`switch ${fallbackTLS ? 'bg-accent border-accent' : 'bg-surface-subtle border-default'}`}
+                    >
+                      <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                    </button>
+                    <span className="text-sm text-body">{fallbackTLS ? 'On' : 'Off'}</span>
+                  </div>
+                </Field>
+              </div>
             </div>
           </div>
-        </div>
+        </ChartCard>
 
         {/* Pending changes */}
         {hasChanges && (

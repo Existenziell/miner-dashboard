@@ -8,10 +8,10 @@ export const METRIC_RANGES = {
   efficiency: { greenMax: 20, orangeMax: 25, gaugeMax: 30 },
   temp:       { greenMax: 55.5, orangeMax: 65, gaugeMax: 85 },
   fanRpm:     { orangeMinPct: 65, orangeMaxPct: 75 },
-  current:    { greenMax: 9, orangeMax: 9.5, gaugeMax: 10.5 },
+  current:    { greenMax: 9.4, orangeMax: 9.75, gaugeMax: 10.5 },
   frequency:  { greenMin: 700, orangeMin: 650, gaugeMax: 850 },
   voltage:    { greenMv: 20, orangeMv: 50, gaugeMax: 1400 },
-  power:      { greenMax: 111, orangeMax: 115, gaugeMax: 125 },
+  power:      { greenMax: 115, orangeMax: 117.5, gaugeMax: 130 },
 };
 
 /** Low-is-good: value ≤ greenMax → success, ≤ orangeMax → warning, else danger */

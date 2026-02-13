@@ -43,7 +43,11 @@ export default function MinerSettings() {
 
   return (
     <div className="card">
-      <h3 className="card-title">Pool & Settings</h3>
+      <div className="-mx-5 -mt-5 mb-4 min-w-0">
+        <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
+          <h3 className="text-lg font-semibold text-body m-0">Pool & Settings</h3>
+        </div>
+      </div>
 
       {/* Primary Pool */}
       <div className="mb-4">

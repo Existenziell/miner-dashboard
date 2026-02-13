@@ -16,7 +16,11 @@ export default function SharesCard() {
 
   return (
     <div className="card">
-      <h3 className="card-title">Shares & Performance</h3>
+      <div className="-mx-5 -mt-5 mb-4 min-w-0">
+        <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
+          <h3 className="text-lg font-semibold text-body m-0">Shares & Performance</h3>
+        </div>
+      </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <div className="stat-label">Accepted</div>

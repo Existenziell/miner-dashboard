@@ -1,15 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { baseDomain, getPoolInfo, POOLS } from '../lib/poolUtils.js';
+import { SOLO_POOLS } from '../lib/constants.js';
+import { baseDomain, getPoolInfo } from '../lib/poolUtils.js';
 
-describe('POOLS', () => {
-  it('has identifier, domains, name, and webUrl for each entry', () => {
-    POOLS.forEach((pool) => {
+describe('SOLO_POOLS', () => {
+  it('has identifier, name, stratumHost, port, tls, and webUrl for each entry', () => {
+    SOLO_POOLS.forEach((pool) => {
       expect(pool).toHaveProperty('identifier');
-      expect(pool).toHaveProperty('domains');
       expect(pool).toHaveProperty('name');
+      expect(pool).toHaveProperty('stratumHost');
+      expect(pool).toHaveProperty('port');
+      expect(pool).toHaveProperty('tls');
       expect(pool).toHaveProperty('webUrl');
-      expect(Array.isArray(pool.domains)).toBe(true);
-      expect(pool.domains.length).toBeGreaterThan(0);
     });
   });
 });
@@ -28,7 +29,6 @@ describe('baseDomain', () => {
   it('strips known subdomain prefixes (btc, solo, eu, us, etc.)', () => {
     expect(baseDomain('btc.viabtc.io')).toBe('viabtc.io');
     expect(baseDomain('solo.ckpool.org')).toBe('ckpool.org');
-    expect(baseDomain('stratum+tcp://pool.bitcoin.com')).toBe('pool.bitcoin.com');
   });
 });
 
@@ -45,16 +45,16 @@ describe('getPoolInfo', () => {
     expect(info.identifier).toBe('viabtc');
   });
 
-  it('returns known pool for Bitcoin.com (pool.bitcoin.com and bitcoin.com)', () => {
-    expect(getPoolInfo('stratum+tcp://pool.bitcoin.com')).toEqual({
-      name: 'Bitcoin.com',
-      webUrl: 'https://www.bitcoin.com',
-      identifier: 'bitcoin-com',
+  it('returns known pool for ViaBTC (pool.viabtc.io and btc.viabtc.io)', () => {
+    expect(getPoolInfo('stratum+tcp://pool.viabtc.io')).toEqual({
+      name: 'ViaBTC',
+      webUrl: 'https://www.viabtc.com',
+      identifier: 'viabtc',
     });
-    expect(getPoolInfo('stratum+tcp://btc.bitcoin.com')).toEqual({
-      name: 'Bitcoin.com',
-      webUrl: 'https://www.bitcoin.com',
-      identifier: 'bitcoin-com',
+    expect(getPoolInfo('stratum+tcp://btc.viabtc.io')).toEqual({
+      name: 'ViaBTC',
+      webUrl: 'https://www.viabtc.com',
+      identifier: 'viabtc',
     });
   });
 

@@ -1,6 +1,5 @@
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '../hooks/useTheme';
-import { useMiner } from '../context/MinerContext';
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -11,7 +10,6 @@ const TABS = [
 
 export default function Header({ activeTab, onTabChange }) {
   const { mode, cycle } = useTheme();
-  const { error: minerError, loading: minerLoading } = useMiner();
 
     return (
         <header className="border-b border-default bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10">
@@ -35,19 +33,6 @@ export default function Header({ activeTab, onTabChange }) {
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                     <ThemeToggle mode={mode} onCycle={cycle} />
-                    {minerError ? (
-                        <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark">
-                            <span className="status-dot status-dot-danger" />
-                            Miner offline
-                        </span>
-                    ) : minerLoading ? (
-                        <span className="text-muted-standalone">Connecting...</span>
-                    ) : (
-                        <span className="flex items-center gap-1.5 text-success dark:text-success-dark">
-                            <span className="status-dot status-dot-success" />
-                            Connected
-                        </span>
-                    )}
                 </div>
             </div>
         </header>

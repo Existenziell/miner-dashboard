@@ -149,8 +149,12 @@ function AppContent({ activeTab, onTabChange }) {
               <MinerSettings />
             </div>
 
-            <div>
-              <h2 className="text-lg font-semibold text-muted-standalone mb-3">Bitcoin Network</h2>
+            <div className="card">
+              <div className="-mx-5 -mt-5 mb-4 min-w-0">
+                <div className="w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2">
+                  <h3 className="text-lg font-semibold text-body m-0">Bitcoin Network</h3>
+                </div>
+              </div>
               <NetworkStatus data={network} />
             </div>
           </>

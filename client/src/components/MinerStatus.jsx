@@ -34,7 +34,7 @@ function ItemGrid({ items }) {
 }
 
 export default function MinerStatus() {
-  const { data } = useMiner();
+  const { data, error: minerError, loading: minerLoading } = useMiner();
   if (!data) return null;
 
   const deviceItems = [
@@ -75,11 +75,23 @@ export default function MinerStatus() {
 
   return (
     <div className="card">
-      <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4">
+      <div className="bg-surface-light dark:bg-surface-light-dark -mx-5 -mt-5 px-5 py-3 rounded-t-xl mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-body flex items-center gap-2">
-          <span className="status-dot status-dot-success" />
-          NerdQaxe++ Miner
+          Miner Status
         </h2>
+        {minerError ? (
+          <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark">
+            <span className="status-dot status-dot-danger" />
+            Miner offline
+          </span>
+        ) : minerLoading ? (
+          <span className="text-muted-standalone">Connecting...</span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-success dark:text-success-dark">
+            <span className="status-dot status-dot-success" />
+            Connected
+          </span>
+        )}
       </div>
 
       <section className="mb-5">

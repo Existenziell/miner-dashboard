@@ -53,17 +53,17 @@ describe('getMetricColor', () => {
   });
 
   describe('power', () => {
-    it('green <= 111 W', () => {
+    it('green <= 115 W', () => {
       expect(getMetricColor({ power: 0 }, 'power')).toBe('text-success');
       expect(getMetricColor({ power: 100 }, 'power')).toBe('text-success');
-      expect(getMetricColor({ power: 111 }, 'power')).toBe('text-success');
+      expect(getMetricColor({ power: 115 }, 'power')).toBe('text-success');
     });
-    it('orange 112–115 W', () => {
-      expect(getMetricColor({ power: 112 }, 'power')).toBe('text-warning');
-      expect(getMetricColor({ power: 115 }, 'power')).toBe('text-warning');
+    it('orange > 115–117.5 W', () => {
+      expect(getMetricColor({ power: 116 }, 'power')).toBe('text-warning');
+      expect(getMetricColor({ power: 117.5 }, 'power')).toBe('text-warning');
     });
-    it('red > 115 W', () => {
-      expect(getMetricColor({ power: 116 }, 'power')).toBe('text-danger');
+    it('red > 117.5 W', () => {
+      expect(getMetricColor({ power: 118 }, 'power')).toBe('text-danger');
     });
   });
 
@@ -86,10 +86,17 @@ describe('getMetricColor', () => {
   });
 
   describe('current', () => {
-    it('green <= 9 A, orange 9.1–9.5 A, red > 9.5 A', () => {
-      expect(getMetricColor({ current: 9000 }, 'current')).toBe('text-success'); // 9 A
+    it('green <= 9.4 A', () => {
+      expect(getMetricColor({ current: 9000 }, 'current')).toBe('text-success');  // 9 A
+      expect(getMetricColor({ current: 9400 }, 'current')).toBe('text-success'); // 9.4 A
+    });
+    it('orange > 9.4–9.75 A', () => {
       expect(getMetricColor({ current: 9500 }, 'current')).toBe('text-warning'); // 9.5 A
-      expect(getMetricColor({ current: 10500 }, 'current')).toBe('text-danger');  // > 10.5 A
+      expect(getMetricColor({ current: 9750 }, 'current')).toBe('text-warning'); // 9.75 A
+    });
+    it('red > 9.75 A', () => {
+      expect(getMetricColor({ current: 9760 }, 'current')).toBe('text-danger');
+      expect(getMetricColor({ current: 10500 }, 'current')).toBe('text-danger');  // 10.5 A
     });
   });
 

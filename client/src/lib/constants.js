@@ -1,7 +1,8 @@
 /**
- * Centralized app constants.
+ * Centralized app constants and config.
  */
 
+// —— Polling & UI timing ———————————————————————————————————————————————————————
 /** Miner status poll interval (default for useMinerData). */
 export const POLL_MINER_INTERVAL_MS = 10_000;
 
@@ -22,3 +23,27 @@ export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
 
 /** Expected hashrate (GH) when not set – 6 TH/s. */
 export const DEFAULT_EXPECTED_HASHRATE_GH = 6000;
+
+// —— Stratum / pools ——————————————————————————————————————————————————————————
+/** Default Stratum port when none is set (standard is 3333). */
+export const DEFAULT_STRATUM_PORT = 3333;
+
+/** Min/max valid Stratum port for validation and inputs. */
+export const MIN_STRATUM_PORT = 1;
+export const MAX_STRATUM_PORT = 65535;
+
+/**
+ * Used by poolUtils (dropdown, getPoolInfo, findSoloPoolOption) and Documentation page.
+ * @typedef {{ identifier: string, name: string, stratumHost: string, port: number, tls: boolean, webUrl: string }} SoloPool
+ */
+export const SOLO_POOLS = [
+    { identifier: 'ocean', name: 'OCEAN', stratumHost: 'stratum.ocean.xyz', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://ocean.xyz' },
+    { identifier: 'ckpool', name: 'CKPool', stratumHost: 'solo.ckpool.org', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://eusolo.ckpool.org/' },
+    { identifier: 'ckpool-eu', name: 'CKPool (EU)', stratumHost: 'eusolo.ckpool.org', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://eusolo.ckpool.org/' },
+    { identifier: 'viabtc', name: 'ViaBTC', stratumHost: 'btc.viabtc.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://www.viabtc.com' },
+    { identifier: 'public-pool', name: 'Public Pool', stratumHost: 'public-pool.io', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://web.public-pool.io' },
+    { identifier: 'd-central', name: 'D-Central Solo', stratumHost: 'solo.d-central.tech', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://d-central.tech' },
+    { identifier: 'kano', name: 'Kano', stratumHost: 'kano.is', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://kano.is' },
+    { identifier: 'braiins', name: 'Braiins', stratumHost: 'solo.stratum.braiins.com', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://braiins.com' },
+    { identifier: 'luxor', name: 'Luxor', stratumHost: 'stratum.luxor.tech', port: DEFAULT_STRATUM_PORT, tls: false, webUrl: 'https://www.luxor.tech' },
+];
