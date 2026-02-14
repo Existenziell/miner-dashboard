@@ -167,26 +167,6 @@ input[type="number"] {
   @apply text-xs underline decoration-dotted underline-offset-2 hover:decoration-solid;
 }
 
-/* Full-width banner/alert boxes (error, warning) */
-.alert-box-danger {
-  @apply rounded-xl p-4 text-sm
-    bg-danger/10 dark:bg-danger-dark/10 border border-danger/30 dark:border-danger-dark/30
-    text-danger dark:text-danger-dark;
-}
-.alert-box-warning {
-  @apply rounded-xl p-4 text-sm
-    bg-warning/10 dark:bg-warning-dark/10 border border-warning/30 dark:border-warning-dark/30
-    text-warning dark:text-warning-dark;
-}
-
-/* Toast / inline message (success or danger) */
-.toast-success {
-  @apply text-sm text-success dark:text-success-dark
-}
-.toast-danger {
-  @apply text-sm text-danger dark:text-danger-dark
-}
-
 /* Nav tab button */
 .btn-tab {
   @apply cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium transition-colors;
@@ -219,7 +199,7 @@ input[type="number"] {
 }
 .field-hint-tooltip {
   @apply absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20
-    px-3 py-2 min-w-[15rem] max-w-sm rounded-lg text-sm text-muted dark:text-muted-dark
+    px-3 py-2 min-w-60 max-w-sm rounded-lg text-sm text-muted dark:text-muted-dark
     bg-surface-card dark:bg-surface-card-dark border border-edge dark:border-edge-dark
     shadow-lg pointer-events-none
     opacity-0 invisible transition-opacity duration-150;
@@ -247,25 +227,24 @@ input[type="number"] {
   @apply bg-surface-light dark:bg-surface-light-dark;
 }
 
-/* Alert / banner wrappers */
-.banner-danger {
-  @apply relative overflow-hidden rounded-xl border-l-4 border-l-danger dark:border-l-danger-dark
-    bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20
-    text-danger dark:text-danger-dark shadow-sm;
-}
-.banner-success {
+/* Notification banner wrappers */
+.notification-success {
   @apply relative overflow-hidden rounded-xl border-l-4 border-l-success dark:border-l-success-dark
     bg-success/10 dark:bg-success-dark/10 border border-success/20 dark:border-success-dark/20
     text-success dark:text-success-dark shadow-sm;
 }
-.banner-icon {
-  @apply shrink-0 flex h-9 w-9 items-center justify-center rounded-full text-xl font-bold text-white leading-none;
+.notification-warning {
+  @apply relative overflow-hidden rounded-xl border-l-4 border-l-danger dark:border-l-danger-dark
+    bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20
+    text-danger dark:text-danger-dark shadow-sm;
 }
-.banner-icon-danger {
-  @apply bg-danger dark:bg-danger-dark;
+
+/* Toast / inline message (success or warning) */
+.toast-success {
+  @apply text-sm text-success dark:text-success-dark
 }
-.banner-icon-success {
-  @apply bg-success dark:bg-success-dark;
+.toast-warning {
+  @apply text-sm text-danger dark:text-danger-dark
 }
 
 /* Toggle switch (track + thumb) */

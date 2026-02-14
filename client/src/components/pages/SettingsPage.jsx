@@ -6,7 +6,7 @@ import { MinerSettingsProvider } from '@/context/MinerSettingsContext';
 import { useDashboardSettingsForm } from '@/hooks/useDashboardSettingsForm';
 import { useMinerSettingsForm } from '@/hooks/useMinerSettingsForm';
 import { useChartCollapsed } from '@/lib/chartUtils';
-import { ERROR_MESSAGE_DISMISS_MS, SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
+import { TOAST_AUTO_DISMISS_MS, SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { DashboardColorsCard } from '@/components/settings/DashboardColorsCard';
@@ -37,7 +37,7 @@ export default function SettingsPage({ onError }) {
 
   useEffect(() => {
     if (minerFormMessage?.type !== 'error' || !minerFormMessage?.text) return;
-    const id = setTimeout(() => setMinerFormMessage(null), ERROR_MESSAGE_DISMISS_MS);
+    const id = setTimeout(() => setMinerFormMessage(null), TOAST_AUTO_DISMISS_MS);
     return () => clearTimeout(id);
   }, [minerFormMessage?.type, minerFormMessage?.text, setMinerFormMessage]);
 
@@ -168,7 +168,7 @@ export default function SettingsPage({ onError }) {
                     </span>
                   )}
                   {minerForm.message?.type === 'error' && (
-                    <span role="alert" className="toast-danger">
+                    <span role="alert" className="toast-warning">
                       {minerForm.message.text}
                     </span>
                   )}

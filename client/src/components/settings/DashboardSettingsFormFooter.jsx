@@ -4,7 +4,7 @@
  */
 import { useEffect } from 'react';
 import { useDashboardSettingsContext } from '@/context/DashboardSettingsContext';
-import { ERROR_MESSAGE_DISMISS_MS } from '@/lib/constants';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { ConfirmModal } from '@/components/ConfirmModal';
 
 export function DashboardSettingsFormFooter({
@@ -39,7 +39,7 @@ export function DashboardSettingsFormFooter({
 
   useEffect(() => {
     if (message?.type !== 'error' || !message?.text) return;
-    const id = setTimeout(() => setMessage(null), ERROR_MESSAGE_DISMISS_MS);
+    const id = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
     return () => clearTimeout(id);
   }, [message?.type, message?.text, setMessage]);
 
@@ -56,12 +56,12 @@ export function DashboardSettingsFormFooter({
               {saving ? 'Saving…' : saveButtonLabel}
             </button>
             {message?.type === 'success' && (
-              <span role="status" className="text-success dark:text-success-dark text-sm">
+              <span role="status" className="toast-success">
                 {message.text}
               </span>
             )}
             {message?.type === 'error' && message?.text && (
-              <span role="alert" className="toast-danger">
+              <span role="alert" className="toast-warning">
                 {message.text}
               </span>
             )}

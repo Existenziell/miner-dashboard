@@ -62,7 +62,7 @@ export default function MinerSettings() {
           )}
         </div>
         {primaryMisconfigured && (
-          <p className="text-warning dark:text-warning-dark text-xs mb-2" role="alert">
+          <p className="notification-warning text-xs mb-2" role="alert">
             Pool may be misconfigured: add Pool URL and Worker in Settings.
           </p>
         )}
@@ -84,7 +84,7 @@ export default function MinerSettings() {
           )}
         </div>
         {fallbackMisconfigured && (
-          <p className="text-warning dark:text-warning-dark text-xs mb-2" role="alert">
+          <p className="notification-warning text-xs mb-2" role="alert">
             Pool may be misconfigured: add Pool URL and Worker in Settings.
           </p>
         )}

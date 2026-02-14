@@ -12,7 +12,7 @@ import {
   MIN_STRATUM_PORT,
   MIN_WIFI_PASSWORD_LENGTH,
   SOLO_POOLS,
-  SUCCESS_MESSAGE_DISMISS_MS,
+  TOAST_AUTO_DISMISS_MS,
 } from '@/lib/constants';
 import { toBool } from '@/lib/minerApiBools';
 import { findSoloPoolOption, getStratumPayloadFromOption } from '@/lib/poolUtils';
@@ -324,7 +324,7 @@ export function useMinerSettingsForm(miner, refetch, onError) {
 
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), SUCCESS_MESSAGE_DISMISS_MS);
+    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 

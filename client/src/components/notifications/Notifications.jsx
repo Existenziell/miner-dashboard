@@ -1,52 +1,62 @@
-import { useMiner } from '@/context/MinerContext';
-import { useAlerts } from '@/hooks/useAlerts';
+import { useNotifications } from '@/hooks/useNotifications';
 import NotificationBanner from '@/components/notifications/NotificationBanner';
 
 /**
- * Dashboard-level notifications: block found, metric alerts, connection errors.
- * For inline feedback (e.g. "saved" after form submit) use a short toast in the page.
+ * Dashboard-level notifications: block found, metric notifications, connection errors.
+ * All use the shared NotificationBanner (success / warning, dismissable or not).
  */
-export default function Notifications({ activeTab, minerError, networkError }) {
-  const { data: miner } = useMiner();
+export default function Notifications({ minerError, networkError }) {
   const {
-    activeAlerts,
-    dismissAlerts,
+    activeNotifications,
+    dismissNotifications,
     blockFoundVisible,
     dismissBlockFound,
     requestNotificationPermission,
-  } = useAlerts(miner, { minerError, networkError });
-
-  // Miner error shows on all tabs; rest only on dashboard
-  if (activeTab !== 'dashboard') {
-    return minerError ? (
-      <div className="alert-box-danger">Cannot reach miner: {minerError}</div>
-    ) : null;
-  }
-
-  const showPermissionPrompt =
-    typeof Notification !== 'undefined' && Notification.permission === 'default';
+    showPermissionPrompt,
+  } = useNotifications(minerError, networkError);
 
   return (
     <>
       {minerError && (
-        <div className="alert-box-danger">Cannot reach miner: {minerError}</div>
+        <NotificationBanner
+          type="warning"
+          dismissable={false}
+          message={`Cannot reach miner: `}
+          summary={minerError}
+        />
       )}
       {networkError && (
-        <div className="alert-box-warning">Network data unavailable: {networkError}</div>
+        <NotificationBanner
+          type="warning"
+          dismissable={false}
+          message={`Network data unavailable: ${networkError}`}
+        />
       )}
       {blockFoundVisible && (
         <NotificationBanner
-          variant="success"
+          type="success"
+          dismissable
+          onDismiss={dismissBlockFound}
           title="Block found!"
           summary="Your miner found a block."
-          onDismiss={dismissBlockFound}
         />
       )}
       <NotificationBanner
-        variant="danger"
-        alerts={activeAlerts}
-        onDismiss={dismissAlerts}
-        onRequestPermission={showPermissionPrompt ? requestNotificationPermission : undefined}
+        type="warning"
+        dismissable
+        onDismiss={dismissNotifications}
+        items={activeNotifications}
+        action={
+          showPermissionPrompt ? (
+            <button
+              type="button"
+              onClick={requestNotificationPermission}
+              className="link-text font-medium opacity-90 hover:opacity-100 transition-opacity text-current"
+            >
+              Enable browser notifications
+            </button>
+          ) : null
+        }
       />
     </>
   );

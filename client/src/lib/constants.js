@@ -8,11 +8,11 @@ import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 export const DEFAULT_EXPECTED_HASHRATE_GH = DASHBOARD_DEFAULTS.defaultExpectedHashrateGh;
 export const POLL_MINER_INTERVAL_MS = DASHBOARD_DEFAULTS.pollMinerIntervalMs;
 export const POLL_NETWORK_INTERVAL_MS = DASHBOARD_DEFAULTS.pollNetworkIntervalMs;
-export const ALERT_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
-export const NOTIFICATION_AUTO_CLOSE_MS = 8_000;
-export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
-export const ERROR_MESSAGE_DISMISS_MS = 5_000;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
+/** Throttle: min time between browser (OS) notifications for the same metric. */
+export const BROWSER_NOTIFICATION_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
+/** How long the toast beside the save button is shown before auto-dismiss. */
+export const TOAST_AUTO_DISMISS_MS = 5_000;
 
 // —— Chart history & persistence ——————————————————————————————————————————————
 export const MAX_CHART_HISTORY = 500; // cap per chart

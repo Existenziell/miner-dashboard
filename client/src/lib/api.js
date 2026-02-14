@@ -35,7 +35,18 @@ export async function fetchMinerInfo(opts = {}) {
   if (ts != null) url.searchParams.set('ts', String(ts));
   if (cur != null) url.searchParams.set('cur', String(cur));
   const res = await fetch(url.pathname + url.search);
-  if (!res.ok) throw new Error(`Miner API error: ${res.status}`);
+  if (!res.ok) {
+    let msg = `Miner API error: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.error && data.detail) msg = `${data.error}. ${data.detail}`;
+      else if (data.detail) msg = data.detail;
+      else if (data.error) msg = data.error;
+    } catch {
+      // ignore non-JSON response
+    }
+    throw new Error(msg);
+  }
   return res.json();
 }
 

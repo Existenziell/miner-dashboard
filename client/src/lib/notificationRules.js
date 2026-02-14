@@ -1,9 +1,9 @@
 /**
- * Alert threshold definitions.
+ * Notification threshold definitions (metric rules).
  * Each rule: { id, label, severity, check(miner) => true if out of bounds }.
  */
 
-export const ALERT_RULES = [
+export const NOTIFICATION_RULES = [
   {
     id: 'temp_high',
     label: 'ASIC temperature high',
@@ -69,11 +69,25 @@ export const ALERT_RULES = [
 ];
 
 /**
- * Returns list of active alert objects { id, label, severity, detail } for the given miner data.
+ * Mock miner payload that triggers all notifications. Use with ?notifications=all for UI testing.
  */
-export function evaluateAlerts(miner) {
+export const MOCK_MINER_ALL_NOTIFICATIONS = {
+  temp: 76,
+  overheat_temp: 80,
+  vrTemp: 71,
+  sharesAccepted: 90,
+  sharesRejected: 10,
+  sharesRejectedReasons: [{ message: 'Stale share' }],
+  recentpingloss: 15,
+  hashRate: 0,
+};
+
+/**
+ * Returns list of active notification objects { id, label, severity, detail } for the given miner data.
+ */
+export function evaluateNotifications(miner) {
   if (!miner) return [];
-  return ALERT_RULES.filter((r) => r.check(miner)).map((r) => ({
+  return NOTIFICATION_RULES.filter((r) => r.check(miner)).map((r) => ({
     id: r.id,
     label: r.label,
     severity: r.severity,

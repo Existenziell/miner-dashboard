@@ -1,74 +1,94 @@
+import { IconWarning, IconSuccess } from '@/components/Icons';
+
+const NOTIFICATION_CLASS = {
+  success: 'notification-success',
+  warning: 'notification-warning',
+};
+
 /**
- * Banner for dashboard-level notifications (block found, metric alerts).
- * variant: 'success' | 'danger'
- * - success: e.g. block found (title, summary, onDismiss)
- * - danger: metric alerts (alerts array, onDismiss, optional onRequestPermission)
+ * Shared notification banner. Use for connection errors, block found, metric notifications.
+ *
+ * @param {object} props
+ * @param {'success'|'warning'} props.type - success (green), warning (amber)
+ * @param {boolean} props.dismissable - show Dismiss button when true
+ * @param {() => void} [props.onDismiss] - called when Dismiss is clicked (required if dismissable)
+ * @param {string} [props.message] - single-line content (e.g. "Cannot reach miner: ...")
+ * @param {string} [props.title] - heading (used with summary or items)
+ * @param {string} [props.summary] - subtitle below title
+ * @param {{ id: string, label: string, detail?: string }[]} [props.items] - list (e.g. metric notifications).
+ * @param {React.ReactNode} [props.action] - optional slot (e.g. "Enable browser notifications" button)
  */
 export default function NotificationBanner({
-  variant,
+  type,
+  dismissable,
+  onDismiss,
+  message,
   title,
   summary,
-  alerts,
-  onDismiss,
-  onRequestPermission,
+  items,
+  action,
 }) {
-  const isSuccess = variant === 'success';
-  const isDanger = variant === 'danger';
+  if (items && items.length === 0) return null;
 
-  if (isDanger && (!alerts?.length)) return null;
+  const notificationClass = NOTIFICATION_CLASS[type] ?? NOTIFICATION_CLASS.warning;
+  const isSuccess = type === 'success';
 
-  const bannerClass = isSuccess ? 'banner-success' : 'banner-danger';
-  const iconClass = isSuccess ? 'banner-icon-success' : 'banner-icon-danger';
-  const icon = isSuccess ? '✓' : '!';
-
-  const heading = isDanger
-    ? (alerts.some((a) => a.severity === 'critical') ? 'Critical' : 'Warning') +
-      (alerts.length > 1 ? ` · ${alerts.length} issues` : '')
-    : title;
+  const heading =
+    title ??
+    (type === 'warning' && items?.length
+      ? (items.some((a) => a.severity === 'critical') ? 'Critical' : 'Warning') +
+        (items.length > 1 ? ` · ${items.length} issues` : '')
+      : null);
 
   return (
-    <div role="alert" className={bannerClass}>
+    <div role="alert" className={notificationClass}>
       <div className="p-4 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0">
-          <span className={`banner-icon ${iconClass} ${isSuccess ? 'text-lg' : ''}`} aria-hidden>
-            {icon}
+          <span className="shrink-0 flex items-center text-current" aria-hidden>
+            {isSuccess ? (
+              <IconSuccess className="w-8 h-8" />
+            ) : (
+              <IconWarning className="w-6 h-6" />
+            )}
           </span>
           <div className="min-w-0">
-            <p className="font-semibold text-current">{heading}</p>
-            {isSuccess && summary && (
+            {(heading || message) && (
+              <p className="font-semibold text-current">
+                {heading ?? message}
+              </p>
+            )}
+            {summary && (
               <p className="mt-0.5 text-sm opacity-95">{summary}</p>
             )}
-            {isDanger && (
+            {items?.length > 0 && (
               <ul className="mt-1.5 list-none space-y-1 text-sm opacity-95">
-                {alerts.map((a) => (
+                {items.map((a) => (
                   <li key={a.id}>
                     {a.label}
-                    {a.detail && <span className="opacity-90"> — {a.detail}</span>}
+                    {a.detail != null && a.detail !== '' && (
+                      <span className="opacity-90"> — {a.detail}</span>
+                    )}
                   </li>
                 ))}
               </ul>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {isDanger && onRequestPermission && (
-            <button
-              type="button"
-              onClick={onRequestPermission}
-              className="link-text font-medium opacity-90 hover:opacity-100 transition-opacity text-current"
-            >
-              Enable browser alerts
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onDismiss}
-            className="btn-ghost-sm"
-            aria-label={isSuccess ? 'Dismiss notification' : 'Dismiss alert'}
-          >
-            Dismiss
-          </button>
-        </div>
+        {(dismissable || action) && (
+          <div className="flex items-center gap-2 shrink-0">
+            {action}
+            {dismissable && (
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="btn-ghost-sm"
+                aria-label="Dismiss notification"
+              >
+                Dismiss
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,41 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { evaluateAlerts } from '@/lib/alerts';
-import { ALERT_COOLDOWN_MS, NOTIFICATION_AUTO_CLOSE_MS } from '@/lib/constants';
+import { useMiner } from '@/context/MinerContext';
+import { BROWSER_NOTIFICATION_COOLDOWN_MS } from '@/lib/constants';
+import { evaluateNotifications } from '@/lib/notificationRules';
 
-function playAlertSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const now = ctx.currentTime;
-    const duration = 2.2;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sawtooth'; // raw, siren-like
-
-    // Siren: frequency sweeps up and down (wail)
-    const low = 400;
-    const high = 900;
-    osc.frequency.setValueAtTime(low, now);
-    osc.frequency.linearRampToValueAtTime(high, now + 0.45);
-    osc.frequency.linearRampToValueAtTime(low, now + 0.9);
-    osc.frequency.linearRampToValueAtTime(high, now + 1.35);
-    osc.frequency.linearRampToValueAtTime(low, now + 1.8);
-
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.25, now + 0.05);
-    gain.gain.setValueAtTime(0.25, now + duration - 0.1);
-    gain.gain.linearRampToValueAtTime(0, now + duration);
-
-    osc.start(now);
-    osc.stop(now + duration);
-  } catch {
-    // ignore if AudioContext not supported or autoplay blocked
-  }
-}
-
-function showBrowserNotification(title, body, tag = 'miner-alert') {
+function showBrowserNotification(title, body, tag = 'miner-notification') {
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
     try {
@@ -44,7 +12,6 @@ function showBrowserNotification(title, body, tag = 'miner-alert') {
         window.focus();
         n.close();
       };
-      setTimeout(() => n.close(), NOTIFICATION_AUTO_CLOSE_MS);
     } catch {
       // ignore notification errors
     }
@@ -59,7 +26,7 @@ function getNotificationPermission() {
 }
 
 // Merge evaluated (current) + sticky (ever seen); keep in list until user dismisses (no expiry)
-// If an alert is currently in evaluated (re-triggered), show it again even if previously dismissed
+// If a notification is currently in evaluated (re-triggered), show it again even if previously dismissed
 function buildDisplayed(evaluated, sticky, dismissedIds) {
   const evaluatedIds = new Set(evaluated.map((a) => a.id));
   const byId = new Map(evaluated.map((a) => [a.id, a]));
@@ -69,16 +36,30 @@ function buildDisplayed(evaluated, sticky, dismissedIds) {
   return [...byId.values()].filter((a) => !dismissedIds.has(a.id) || evaluatedIds.has(a.id));
 }
 
-export function useAlerts(minerData, { minerError, networkError } = {}) {
+/**
+ * Single hook for all notification state: miner connection errors, metric notifications,
+ * block-found banner, browser notifications (OS notifications when permitted). Uses miner data from context.
+ */
+function getShowAllNotificationsFromUrl() {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.get('notifications') === 'all' || params.get('alerts') === 'all';
+}
+
+export function useNotifications(minerError, networkError) {
+  const { data: miner } = useMiner();
+  const showAllNotifications = getShowAllNotificationsFromUrl();
+
   const lastFiredRef = useRef({});
   const prevActiveIdsRef = useRef(new Set());
   const stickyRef = useRef({});
   const displayedRef = useRef([]);
   const prevBlockCountRef = useRef(null);
 
-  const evaluated = useMemo(() => evaluateAlerts(minerData), [minerData]);
+  // When ?alerts=all we only force the success (block found) banner; metric list uses real miner data
+  const evaluated = useMemo(() => evaluateNotifications(miner), [miner]);
   const [dismissedIds, setDismissedIds] = useState(() => new Set());
-  const [activeAlerts, setActiveAlerts] = useState([]);
+  const [activeNotifications, setActiveNotifications] = useState([]);
   const [blockFoundVisible, setBlockFoundVisible] = useState(false);
 
   // Update sticky from evaluated and compute displayed list (all in one effect to avoid cascading setState)
@@ -88,11 +69,11 @@ export function useAlerts(minerData, { minerError, networkError } = {}) {
       sticky[a.id] = { id: a.id, label: a.label, severity: a.severity, detail: a.detail };
     }
     const displayed = buildDisplayed(evaluated, sticky, dismissedIds);
-    setActiveAlerts(displayed);
+    setActiveNotifications(displayed);
     displayedRef.current = displayed;
   }, [evaluated, dismissedIds]);
 
-  const dismissAlerts = useCallback(() => {
+  const dismissNotifications = useCallback(() => {
     setDismissedIds((prev) => {
       const next = new Set(prev);
       for (const a of displayedRef.current) next.add(a.id);
@@ -100,7 +81,7 @@ export function useAlerts(minerData, { minerError, networkError } = {}) {
     });
   }, []);
 
-  // Sound + notification when an alert actually triggers
+  // Browser (OS) notification when a metric notification triggers (throttled by cooldown)
   useEffect(() => {
     if (evaluated.length === 0) {
       prevActiveIdsRef.current = new Set();
@@ -111,37 +92,40 @@ export function useAlerts(minerData, { minerError, networkError } = {}) {
     const activeIds = new Set(evaluated.map((a) => a.id));
     const prevIds = prevActiveIdsRef.current;
 
-    for (const alert of evaluated) {
-      const justTriggered = !prevIds.has(alert.id);
-      const lastFired = lastFiredRef.current[alert.id] ?? 0;
-      const cooldownPassed = now - lastFired >= ALERT_COOLDOWN_MS;
+    for (const notification of evaluated) {
+      const justTriggered = !prevIds.has(notification.id);
+      const lastFired = lastFiredRef.current[notification.id] ?? 0;
+      const cooldownPassed = now - lastFired >= BROWSER_NOTIFICATION_COOLDOWN_MS;
 
       if (justTriggered || cooldownPassed) {
-        lastFiredRef.current[alert.id] = now;
-        const title = `Miner: ${alert.label}`;
-        const body = alert.detail ? `${alert.detail}` : 'Check dashboard.';
+        lastFiredRef.current[notification.id] = now;
+        const title = `Miner: ${notification.label}`;
+        const body = notification.detail ? `${notification.detail}` : 'Check dashboard.';
         getNotificationPermission().then((perm) => {
-          if (perm === 'granted') showBrowserNotification(title, body, `miner-${alert.id}`);
+          if (perm === 'granted') showBrowserNotification(title, body, `miner-${notification.id}`);
         });
-        playAlertSound();
       }
     }
 
     prevActiveIdsRef.current = activeIds;
   }, [evaluated]);
 
-  // Block found: show banner and play sound when block count increases
+  // Block found: show banner and OS notification when block count increases (works when tab in background)
   useEffect(() => {
-    if (!minerData) return;
-    const raw = minerData.totalFoundBlocks ?? minerData.foundBlocks;
-    const count = typeof raw === 'number' ? raw : (minerData.blockFound ? 1 : 0);
+    if (!miner) return;
+    const raw = miner.totalFoundBlocks ?? miner.foundBlocks;
+    const count = typeof raw === 'number' ? raw : (miner.blockFound ? 1 : 0);
     const prev = prevBlockCountRef.current;
     if (typeof count === 'number' && count > 0 && (prev == null || count > prev)) {
       queueMicrotask(() => setBlockFoundVisible(true));
-      playAlertSound();
+      getNotificationPermission().then((perm) => {
+        if (perm === 'granted') {
+          showBrowserNotification('Block found!', 'Your miner found a block.', 'block-found');
+        }
+      });
     }
     prevBlockCountRef.current = count;
-  }, [minerData]);
+  }, [miner]);
 
   const dismissBlockFound = useCallback(() => setBlockFoundVisible(false), []);
 
@@ -151,13 +135,20 @@ export function useAlerts(minerData, { minerError, networkError } = {}) {
     }
   }, []);
 
+  const showPermissionPrompt =
+    typeof Notification !== 'undefined' && Notification.permission === 'default';
+
+  // When ?notifications=all, show success banner(s) too for UI testing
+  const blockFoundVisibleForRender = blockFoundVisible || showAllNotifications;
+
   return {
-    activeAlerts,
-    dismissAlerts,
-    blockFoundVisible,
-    dismissBlockFound,
-    requestNotificationPermission,
     minerError,
     networkError,
+    activeNotifications,
+    dismissNotifications,
+    blockFoundVisible: blockFoundVisibleForRender,
+    dismissBlockFound,
+    requestNotificationPermission,
+    showPermissionPrompt,
   };
 }

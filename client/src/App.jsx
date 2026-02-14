@@ -45,7 +45,7 @@ export default function App() {
 
 function AppContent({ activeTab, onTabChange }) {
   const { config } = useConfig();
-  const { error: minerError, historyHashrate, historyTemperature, historyPower } = useMiner();
+  const { data: minerData, error: minerError, historyHashrate, historyTemperature, historyPower } = useMiner();
   const { data: network, error: networkError } = useNetworkData(config.pollNetworkIntervalMs);
 
   return (
@@ -53,11 +53,7 @@ function AppContent({ activeTab, onTabChange }) {
       <Header activeTab={activeTab} onTabChange={onTabChange} />
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        <Notifications
-          activeTab={activeTab}
-          minerError={minerError}
-          networkError={networkError}
-        />
+        <Notifications minerError={minerError} networkError={networkError} />
 
         {activeTab === 'settings' ? (
           <Suspense fallback={<PageFallback message="Loading settings…" />}>
@@ -75,17 +71,21 @@ function AppContent({ activeTab, onTabChange }) {
           <>
             <MinerStatus />
 
-            {/* Key metrics - round gauges */}
-            <Suspense fallback={<PageFallback message="Loading metrics…" />}>
-              <Metrics />
-            </Suspense>
+            {minerData && (
+              <>
+                {/* Key metrics - round gauges */}
+                <Suspense fallback={<PageFallback message="Loading metrics…" />}>
+                  <Metrics />
+                </Suspense>
 
-            {/* Time series charts */}
-            <div className="grid grid-cols-1 gap-4">
-              <HashrateChart history={historyHashrate} />
-              <TemperatureChart history={historyTemperature} />
-              <PowerChart history={historyPower} />
-            </div>
+                {/* Time series charts */}
+                <div className="grid grid-cols-1 gap-4">
+                  <HashrateChart history={historyHashrate} />
+                  <TemperatureChart history={historyTemperature} />
+                  <PowerChart history={historyPower} />
+                </div>
+              </>
+            )}
 
             {/* Settings and shares */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
