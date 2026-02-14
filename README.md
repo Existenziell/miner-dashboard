@@ -5,32 +5,29 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 ## Features
 
 - **Live miner monitoring**: hashrate, temperature, power, fan speed (10s polling)
-- **Time-series charts**: hashrate and temperature/power history (rolling 1h buffer)
+- **Charts**: hashrate and temperature/power history (rolling 1h buffer)
 - **Mining details**: shares accepted/rejected, best difficulty, pool info
 - **Bitcoin network**: block height, difficulty adjustment, BTC price, fee estimates (60s polling)
+- **Settings – Init**: first-time setup — miner IP/hostname, expected hashrate (GH/s), poll intervals; WiFi (hostname, SSID, password) stored on the miner
 - **Settings – Miner**: configure miner IP/hostname and connection
 - **Settings – Pools**: view and manage pool configuration (URL, worker, password)
+- **Settings – Firmware**: check firmware releases and install updates (via URL or file upload)
 - **Settings – Dashboard**: expected hashrate, poll intervals, and metric ranges (thresholds and gauge max for hashrate, temp, power, efficiency, etc.)
 - **Settings – Colors**: customize accent color and gauge/indicator colors; settings persisted to the server
 
-## Screenshots
+---
 
-**Dashboard**
-
-![Dashboard – miner overview](client/public/screenshots/dashboard-miner.png)
-
-**Settings**
-
-| Miner | Pools | Dashboard |
-|-------|-------|-----------|
-| ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) | ![Settings – Dashboard](client/public/screenshots/settings-dashboard.png) |
-
-![Settings – Colors](client/public/screenshots/settings-colors.png)
+![Dashboard – miner overview (dark)](client/public/screenshots/dashboard-miner-dark.png)
 
 ## Requirements
 
 - **Node.js** 18 or later
 - A NerdQaxe++ miner on your network (for live monitoring)
+
+## Tech stack
+
+- **Backend:** Express (Node.js), proxies miner API and serves config; fetches Bitcoin data from mempool.space and (optionally) GitHub for firmware releases
+- **Frontend:** React 19, Vite, Tailwind CSS, Recharts
 
 ## Quick Start
 
@@ -66,7 +63,9 @@ Then open `http://localhost:8001`.
 
 ## Configuration
 
-**Miner connection:** Set your miner's IP in **Settings → Init** (Miner IP or hostname), or in `.env` as `MINER_IP`. The server starts without it; miner routes return a clear message if the miner address is not configured. `.env` overrides the value stored in the config file.
+**Environment variables (optional):** Copy `.env.example` to `.env`. `MINER_IP` can be set here or in **Settings → Init**; `.env` overrides the value stored in the config file. For **Settings → Firmware** (fetching releases from GitHub), you can set an optional token in `.env` to avoid rate limits — see `.env.example`.
+
+**Miner connection:** Set your miner's IP in **Settings → Init** (Miner IP or hostname), or in `.env` as `MINER_IP`. The server starts without it; miner routes return a clear message if the miner address is not configured.
 
 **Dashboard config (server-persisted):** Stored in `config/dashboard.json` (created when you save from **Settings → Init** or **Settings → Dashboard**):
 
@@ -77,7 +76,12 @@ Then open `http://localhost:8001`.
 
 **Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it (JSON body with any of the allowed keys above). Used by the Settings UI.
 
-The backend listens on port 8001.
+The backend listens on port 8001 (see `server/config.js` to change).
+
+## Troubleshooting
+
+- **Miner not reachable:** Ensure `MINER_IP` (or the value in Settings → Init) is correct and the miner is on the same network. The server log prints the current miner API target on startup.
+- **Firmware releases not loading:** If you hit GitHub API rate limits, set the optional token in `.env` as described in `.env.example`.
 
 ## Commands
 
@@ -103,6 +107,37 @@ Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
 The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
 
 **Client (React):** Live miner data and dashboard config are provided via `MinerContext` and `ConfigContext`. The Settings page uses per-tab form hooks (`useInit`, `useDashboard`, `useColor`, `useMiner`) and scoped contexts (`InitContext`, `DashboardContext`, `ColorContext`, `MinerSettingsContext`) so each tab owns its state, save, revert, and reset; tab content consumes form state via the corresponding context.
+
+## More screenshots
+
+
+| Dashboard (light) | Docs |
+|-------------------|------|
+| ![Dashboard](client/public/screenshots/dashboard.png) | ![Docs](client/public/screenshots/docs.png) |
+
+**API**
+
+![API](client/public/screenshots/api.png)
+
+
+| Init | Miner | Pools |
+|------|-------|-------|
+| ![Settings – Init](client/public/screenshots/settings-init.png) | ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) |
+
+
+| Miner (dark) | Pools (dark) |
+|--------------|--------------|
+| ![Settings – Miner dark](client/public/screenshots/settings-miner-dark.png) | ![Settings – Pools dark](client/public/screenshots/settings-pools-dark.png) |
+
+
+| Dashboard | Firmware | Colors |
+|-----------|----------|--------|
+| ![Settings – Dashboard](client/public/screenshots/settings-dashboard.png) | ![Settings – Firmware](client/public/screenshots/settings-firmware.png) | ![Settings – Colors](client/public/screenshots/settings-colors.png) |
+
+
+| Dashboard (dark) | Colors (dark) |
+|------------------|---------------|
+| ![Settings – Dashboard dark](client/public/screenshots/settings-dashboard-dark.png) | ![Settings – Colors dark](client/public/screenshots/settings-colors-dark.png) |
 
 ## License
 
