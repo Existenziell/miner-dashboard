@@ -176,7 +176,7 @@ export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
                   )}
                 </Field>
               )}
-              <Field label="Fan mode">
+              <Field label="Fan mode" hint="Auto (PID) mode uses a PID controller to adjust fan speed based on temperature.">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

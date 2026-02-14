@@ -52,7 +52,7 @@ function AppContent({ activeTab, onTabChange }) {
     <div className="min-h-screen bg-surface dark:bg-surface-dark text-body">
       <Header activeTab={activeTab} onTabChange={onTabChange} />
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-4">
         <Notifications minerError={minerError} networkError={networkError} />
 
         {activeTab === 'settings' ? (

@@ -20,6 +20,8 @@ export default function NetworkStatus({ data }) {
     ? LAST_HALVING + HALVING_INTERVAL - blockHeight
     : null;
 
+  const adjustedTimeAvg = difficulty?.adjustedTimeAvg;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Block Height */}
@@ -30,7 +32,7 @@ export default function NetworkStatus({ data }) {
           <div className="mt-2">
             <div className="flex justify-between text-xs text-muted-standalone mb-1">
               <span>Halving Epoch</span>
-              <span>{halvingPct.toFixed(1)}%</span>
+              <span>{halvingPct.toFixed(1)}% ({formatNumber(blocksUntilHalving)} left)</span>
             </div>
             <div className="w-full bg-surface-subtle rounded-full h-1.5">
               <div
@@ -39,7 +41,7 @@ export default function NetworkStatus({ data }) {
               />
             </div>
             <div className="text-xs text-muted-standalone mt-1">
-              {formatNumber(blocksUntilHalving)} blocks until halving
+              Avg block time: {adjustedTimeAvg != null ? `${(adjustedTimeAvg / 60000).toFixed(1)} min` : '--'}
             </div>
           </div>
         )}

@@ -3,7 +3,7 @@ import { SOLO_POOLS } from '@/lib/constants';
 export default function DocsPage() {
 
   return (
-    <div className="doc-page space-y-8 card mx-auto text-lg px-8!">
+    <div className="doc-page space-y-8 card mx-auto text-lg">
       <section>
         <h2 className="text-2xl font-semibold mb-2">Solo mining via a pool</h2>
         <p className="doc-body mb-2">
@@ -104,12 +104,12 @@ export default function DocsPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td className="p-2"><strong>H/s</strong></td><td className="p-2">hashes per second</td><td className="p-2">10⁰</td><td className="p-2">1 H/s</td></tr>
-              <tr><td className="p-2"><strong>kH/s</strong></td><td className="p-2">kilo</td><td className="p-2">10³</td><td className="p-2">1,000 H/s</td></tr>
-              <tr><td className="p-2"><strong>MH/s</strong></td><td className="p-2">mega</td><td className="p-2">10⁶</td><td className="p-2">1,000,000 H/s</td></tr>
-              <tr><td className="p-2"><strong>GH/s</strong></td><td className="p-2">giga</td><td className="p-2">10⁹</td><td className="p-2">1,000,000,000 H/s</td></tr>
-              <tr><td className="p-2"><strong>TH/s</strong></td><td className="p-2">tera</td><td className="p-2">10¹²</td><td className="p-2">1,000,000,000,000 H/s</td></tr>
-              <tr><td className="p-2"><strong>PH/s</strong></td><td className="p-2">peta</td><td className="p-2">10¹⁵</td><td className="p-2">1,000,000,000,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>H/s</strong></td><td className="p-2">Hashes/second</td><td className="p-2">10⁰</td><td className="p-2">1 H/s</td></tr>
+              <tr><td className="p-2"><strong>kH/s</strong></td><td className="p-2">Kilo</td><td className="p-2">10³</td><td className="p-2">1,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>MH/s</strong></td><td className="p-2">Mega</td><td className="p-2">10⁶</td><td className="p-2">1,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>GH/s</strong></td><td className="p-2">Giga</td><td className="p-2">10⁹</td><td className="p-2">1,000,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>TH/s</strong></td><td className="p-2">Tera</td><td className="p-2">10¹²</td><td className="p-2">1,000,000,000,000 H/s</td></tr>
+              <tr><td className="p-2"><strong>PH/s</strong></td><td className="p-2">Peta</td><td className="p-2">10¹⁵</td><td className="p-2">1,000,000,000,000,000 H/s</td></tr>
             </tbody>
           </table>
         </div>

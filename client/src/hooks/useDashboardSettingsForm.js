@@ -5,14 +5,14 @@ import { normalizeHex } from '@/lib/colorUtils';
 import { CHART_COLOR_SPEC, TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 
 const METRIC_LABELS = {
-  hashrate: 'Hashrate',
-  efficiency: 'Efficiency',
-  temp: 'Temp',
-  fanRpm: 'Fan RPM',
-  current: 'Current',
-  frequency: 'Frequency',
-  voltage: 'Voltage',
-  power: 'Power',
+  hashrate: 'Hashrate (GH/s)',
+  efficiency: 'Efficiency (J/TH)',
+  temp: 'Temp (°C)',
+  fanRpm: 'Fan RPM (%)',
+  current: 'Current (A)',
+  frequency: 'Frequency (MHz)',
+  voltage: 'Voltage (mV)',
+  power: 'Power (W)',
 };
 
 const METRIC_KEY_LABELS = {

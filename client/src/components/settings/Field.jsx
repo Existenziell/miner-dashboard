@@ -1,6 +1,6 @@
 import { IconInfo } from '@/components/Icons';
 
-export function Field({ label, children, hint }) {
+export function Field({ label, children, hint, suffix }) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-1.5">
@@ -13,6 +13,7 @@ export function Field({ label, children, hint }) {
             </span>
           </span>
         )}
+        {suffix != null && <span className="ml-auto text-xs text-muted-standalone">{suffix}</span>}
       </div>
       {children}
     </div>

@@ -49,7 +49,7 @@ export function DashboardColorsCard() {
             {CHART_COLOR_SPEC.map((chart) => {
               const chartColors = dashboardChartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
               return (
-                <div key={chart.id} className="border border-edge dark:border-edge-dark rounded-lg p-3 space-y-1">
+                <div key={chart.id} className="border border-edge dark:border-edge-dark rounded-md px-4 py-3 space-y-1">
                   <p className="text-sm font-medium text-body">{chart.label}</p>
                   {chart.series.map(({ key, label }) => {
                     const value = chartColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];

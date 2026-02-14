@@ -59,7 +59,7 @@ a:hover {
 
 /* Card container */
 .card {
-  @apply rounded-xl p-5 border
+  @apply rounded-md px-5 py-4 border
     bg-surface-card dark:bg-surface-card-dark
     border-edge dark:border-edge-dark;
 }
@@ -85,7 +85,7 @@ a:hover {
 
 /* Gauge cards: less padding, no clip, so the ring isn’t cut off at the sides */
 .gauge-card {
-  @apply rounded-xl p-2 sm:p-3 border overflow-visible
+  @apply rounded-md px-4 py-3 border overflow-visible
     bg-surface-card dark:bg-surface-card-dark
     border-edge dark:border-edge-dark;
 }
@@ -114,10 +114,6 @@ a:hover {
 }
 
 /* Buttons */
-.btn {
-  @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
-    disabled:opacity-50 disabled:cursor-not-allowed;
-}
 .btn-primary {
   @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
     disabled:opacity-50 disabled:cursor-not-allowed
@@ -143,7 +139,7 @@ a:hover {
 
 /* Text inputs and selects */
 .input {
-  @apply w-full rounded-lg border px-3 py-2 text-sm
+  @apply w-full rounded-md border px-3 py-2 text-sm
     border-edge dark:border-edge-dark
     bg-surface-light dark:bg-surface-light-dark
     text-fg dark:text-fg-dark
@@ -169,7 +165,7 @@ input[type="number"] {
 
 /* Nav tab button */
 .btn-tab {
-  @apply cursor-pointer px-3 py-1.5 rounded-lg text-sm font-medium transition-colors;
+  @apply cursor-pointer px-3 py-1.5 rounded-md text-sm font-medium transition-colors;
 }
 .btn-tab-active {
   @apply bg-surface-hover dark:bg-surface-hover-dark text-fg dark:text-fg-dark;
@@ -180,12 +176,12 @@ input[type="number"] {
 
 /* Pending / highlight callout (e.g. pending changes) */
 .highlight-box {
-  @apply rounded-xl border border-accent/50 bg-accent/10 p-4;
+  @apply rounded-md px-5 py-4 border border-accent/50 bg-accent/10;
 }
 
 /* Chart tooltip container (card-style, compact) */
 .tooltip-card {
-  @apply rounded-lg p-3 text-sm shadow-xl
+  @apply rounded-md px-3 py-2 text-sm shadow-xl
     bg-surface-card dark:bg-surface-card-dark
     border border-edge dark:border-edge-dark;
 }
@@ -199,7 +195,7 @@ input[type="number"] {
 }
 .field-hint-tooltip {
   @apply absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20
-    px-3 py-2 min-w-60 max-w-sm rounded-lg text-sm text-muted dark:text-muted-dark
+    px-3 py-2 min-w-60 max-w-sm rounded-md text-sm text-muted dark:text-muted-dark
     bg-surface-card dark:bg-surface-card-dark border border-edge dark:border-edge-dark
     shadow-lg pointer-events-none
     opacity-0 invisible transition-opacity duration-150;
@@ -229,12 +225,12 @@ input[type="number"] {
 
 /* Notification banner wrappers */
 .notification-success {
-  @apply relative overflow-hidden rounded-xl border-l-4 border-l-success dark:border-l-success-dark
+  @apply relative overflow-hidden rounded-md border-l-4 border-l-success dark:border-l-success-dark
     bg-success/10 dark:bg-success-dark/10 border border-success/20 dark:border-success-dark/20
     text-success dark:text-success-dark shadow-sm;
 }
 .notification-warning {
-  @apply relative overflow-hidden rounded-xl border-l-4 border-l-danger dark:border-l-danger-dark
+  @apply relative overflow-hidden rounded-md border-l-4 border-l-danger dark:border-l-danger-dark
     bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20
     text-danger dark:text-danger-dark shadow-sm;
 }
@@ -270,7 +266,7 @@ input[type="number"] {
 
 /* Option list (exclusive radio list) */
 .option-list {
-  @apply flex flex-col rounded-lg border border-edge dark:border-edge-dark overflow-hidden
+  @apply flex flex-col rounded-md border border-edge dark:border-edge-dark overflow-hidden
     bg-surface-light dark:bg-surface-light-dark max-h-72 overflow-y-auto;
 }
 .option-row {
@@ -299,12 +295,9 @@ input[type="number"] {
   @apply ml-1.5 text-xs text-muted dark:text-muted-dark font-normal;
 }
 
-/* Radio and range inputs */
-.input-radio {
-  @apply rounded-full border-edge dark:border-edge-dark text-accent focus:ring-accent;
-}
+/* Range input */
 .input-range {
-  @apply w-full h-2 rounded-lg appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
+  @apply w-full h-2 rounded-md appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
 }
 
 /* Status pills / badges */
@@ -321,6 +314,9 @@ input[type="number"] {
 }
 .code-inline {
   @apply px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-light-dark text-xs;
+}
+.doc-page {
+  @apply px-10 py-6;
 }
 .doc-page .doc-body {
   @apply text-base leading-relaxed;
@@ -362,7 +358,7 @@ input[type="number"] {
 
 /* API / code block (pre) */
 .api-pre {
-  @apply text-xs text-fg dark:text-fg-dark overflow-auto max-h-96 p-4 rounded-lg
+  @apply text-xs text-fg dark:text-fg-dark overflow-auto max-h-96 p-4 rounded-md
     bg-surface-light dark:bg-surface-light-dark border border-edge dark:border-edge-dark
     whitespace-pre-wrap break-all;
 }

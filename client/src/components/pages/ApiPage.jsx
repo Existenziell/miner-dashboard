@@ -83,7 +83,7 @@ export default function ApiPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="card">
         <h2 className="card-title">Endpoints</h2>
         <div className="overflow-x-auto">
@@ -192,7 +192,7 @@ export default function ApiPage() {
       <div className="card">
         <h3 className="card-title">Query the API with cURL</h3>
         <p className="text-muted-standalone text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
-        <div className="rounded-lg overflow-hidden bg-[#1e1e1e] border border-edge dark:border-edge-dark shadow-inner">
+        <div className="rounded-md overflow-hidden bg-[#1e1e1e] border border-edge dark:border-edge-dark shadow-inner">
           <div className="flex items-center gap-2 px-3 py-2 bg-[#2d2d2d] border-b border-[#3d3d3d]">
             <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
             <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />

@@ -6,7 +6,7 @@ export default function ThemeToggle({ mode, onCycle }) {
   return (
     <button
       onClick={onCycle}
-      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium
+      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium
         bg-surface-subtle text-muted-standalone hover:text-body
         hover:bg-surface-hover dark:hover:bg-surface-hover-dark transition-colors cursor-pointer"
       title={`Theme: ${labels[mode]} (click to cycle)`}
