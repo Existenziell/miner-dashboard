@@ -63,24 +63,23 @@ Then open `http://localhost:8001`.
 
 ## Configuration
 
-**Environment variables (optional):** Copy `.env.example` to `.env`. `MINER_IP` can be set here or in **Settings → Init**; `.env` overrides the value stored in the config file. For **Settings → Firmware** (fetching releases from GitHub), you can set an optional token in `.env` to avoid rate limits — see `.env.example`.
+**Environment variables (optional):** 
+- Copy `.env.example` to `.env`. 
+- `MINER_IP` can be set here or in **Settings**; `.env` overrides the value stored in the config file. 
+- For **Settings → Firmware** (fetching releases from GitHub), you can set an optional token in `.env` to avoid rate limits — see `.env.example`.
 
-**Miner connection:** Set your miner's IP in **Settings → Init** (Miner IP or hostname), or in `.env` as `MINER_IP`. The server starts without it; miner routes return a clear message if the miner address is not configured.
+**Dashboard config:** (server-persisted, stored in `config/dashboard.json`):
 
-**Dashboard config (server-persisted):** Stored in `config/dashboard.json` (created when you save from **Settings → Init** or **Settings → Dashboard**):
+- **Init tab:** Miner IP or hostname, Expected hashrate (GH/s), Miner / Network poll intervals (ms). WiFi (hostname, SSID, password).
+- **Dashboard tab:** Metric ranges — single threshold and gauge max per metric.
 
-- **Init tab:** Miner IP or hostname (fallback if not set in `.env`), Expected hashrate (GH/s), Miner / Network poll intervals (ms). WiFi (hostname, SSID, password) is also in Init and stored on the miner device.
-- **Dashboard tab:** Metric ranges — single threshold and gauge max per metric (hashrate, temp, power, efficiency, etc.). Gauges use accent (OK) and red (out of range). The hashrate gauge uses the larger of "Expected hashrate" (set in Init) and "Hashrate → Gauge max".
-
-**Settings tabs:** Settings has six sections (Init, Miner, Pools, Firmware, Dashboard, Colors). The active section is reflected in the URL (`?tab=settings&section=init|miner|pools|firmware|dashboard|colors`) so you can bookmark or share a link to a specific tab.
-
-**Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it (JSON body with any of the allowed keys above). Used by the Settings UI.
+**Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it. Used by the Settings UI.
 
 The backend listens on port 8001 (see `server/config.js` to change).
 
 ## Troubleshooting
 
-- **Miner not reachable:** Ensure `MINER_IP` (or the value in Settings → Init) is correct and the miner is on the same network. The server log prints the current miner API target on startup.
+- **Miner not reachable:** Ensure `MINER_IP` (or the value in Settings) is correct and the miner is on the same network. The server log prints the current miner API target on startup.
 - **Firmware releases not loading:** If you hit GitHub API rate limits, set the optional token in `.env` as described in `.env.example`.
 
 ## Commands
@@ -106,10 +105,7 @@ Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
 
 The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
 
-**Client (React):** Live miner data and dashboard config are provided via `MinerContext` and `ConfigContext`. The Settings page uses per-tab form hooks (`useInit`, `useDashboard`, `useColor`, `useMiner`) and scoped contexts (`InitContext`, `DashboardContext`, `ColorContext`, `MinerSettingsContext`) so each tab owns its state, save, revert, and reset; tab content consumes form state via the corresponding context.
-
 ## More screenshots
-
 
 | Dashboard (light) | Docs |
 |-------------------|------|
