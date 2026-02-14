@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -25,7 +25,7 @@ function MetricRangeCard({
   setMetricRangeValue,
   METRIC_LABELS,
   METRIC_KEY_LABELS,
-  isDropTarget = false,
+  isDragActive,
 }) {
   const {
     attributes,
@@ -38,7 +38,7 @@ function MetricRangeCard({
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragActive ? transition : 'none',
   };
 
   const keys = Object.keys(DASHBOARD_DEFAULTS.metricRanges[metric]);
@@ -48,18 +48,11 @@ function MetricRangeCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`rounded-md px-4 py-3 space-y-2 min-h-[160px] ${
-        isDropTarget
-          ? 'border-2 border-dashed border-edge dark:border-edge-dark bg-bg/50 dark:bg-bg-dark/50'
-          : 'border border-edge dark:border-edge-dark'
-      } ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
+      className={`rounded-md px-4 py-3 space-y-2 min-h-[160px] border border-edge dark:border-edge-dark ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
     >
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-medium text-body capitalize min-w-0">
           {METRIC_LABELS[metric] ?? metric}
-          {isDropTarget && (
-            <span className="ml-1 text-muted font-normal">(drop here)</span>
-          )}
         </p>
         <div
           className="shrink-0 cursor-grab active:cursor-grabbing touch-none text-muted hover:text-body p-1 -m-1"
@@ -109,6 +102,23 @@ export function DashboardConfig() {
 
   const [activeId, setActiveId] = useState(null);
   const [overId, setOverId] = useState(null);
+  const [dropZoneRect, setDropZoneRect] = useState(null);
+  const cellRefs = useRef([]);
+
+  const order = metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
+  const overIndex = overId != null ? order.indexOf(overId) : -1;
+  const showDropZone = activeId != null && overId !== activeId && overIndex >= 0;
+
+  useLayoutEffect(() => {
+    if (!showDropZone || overIndex < 0 || !cellRefs.current[overIndex]) {
+      queueMicrotask(() => setDropZoneRect(null));
+      return;
+    }
+    const el = cellRefs.current[overIndex];
+    const rect = el.getBoundingClientRect();
+    const next = { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
+    queueMicrotask(() => setDropZoneRect(next));
+  }, [showDropZone, overIndex]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -128,6 +138,7 @@ export function DashboardConfig() {
     const { active, over } = event;
     setActiveId(null);
     setOverId(null);
+    setDropZoneRect(null);
     if (over == null || active.id === over.id) return;
     const ids = [...(metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges))];
     const oldIndex = ids.indexOf(active.id);
@@ -139,10 +150,8 @@ export function DashboardConfig() {
   const handleDragCancel = () => {
     setActiveId(null);
     setOverId(null);
+    setDropZoneRect(null);
   };
-
-  const order = metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
-  const overIndex = overId != null ? order.indexOf(overId) : -1;
 
   return (
     <div className="card">
@@ -167,19 +176,35 @@ export function DashboardConfig() {
           <SortableContext items={order} strategy={rectSortingStrategy}>
             <div className="flex flex-wrap gap-4 -mt-2">
               {order.map((metric, i) => (
-                <div key={metric} className="w-[240px] min-h-[160px] shrink-0">
+                <div
+                  key={metric}
+                  ref={(el) => { cellRefs.current[i] = el; }}
+                  className="w-[240px] min-h-[160px] shrink-0"
+                >
                   <MetricRangeCard
                     metric={metric}
                     metricRanges={metricRanges}
                     setMetricRangeValue={setMetricRangeValue}
                     METRIC_LABELS={METRIC_LABELS}
                     METRIC_KEY_LABELS={METRIC_KEY_LABELS}
-                    isDropTarget={activeId != null && overId !== activeId && i === overIndex}
+                    isDragActive={activeId != null}
                   />
                 </div>
               ))}
             </div>
           </SortableContext>
+          {dropZoneRect && (
+            <div
+              className="pointer-events-none fixed z-20 rounded-md box-border drop-zone-indicator"
+              style={{
+                top: dropZoneRect.top,
+                left: dropZoneRect.left,
+                width: dropZoneRect.width,
+                height: dropZoneRect.height,
+              }}
+              aria-hidden
+            />
+          )}
           <DragOverlay dropAnimation={null}>
             {activeId ? (
               <div className="shadow-lg rounded-md cursor-grabbing">

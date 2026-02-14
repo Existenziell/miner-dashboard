@@ -14,9 +14,11 @@ function buildAccentOverrideCSS(accent) {
   const a20 = hexWithAlpha(accent, 0.2);
   const a25 = hexWithAlpha(accent, 0.25);
   const a50 = hexWithAlpha(accent, 0.5);
+  const a60 = hexWithAlpha(accent, 0.6);
   const contrastFg = getContrastColor(accent);
   const toggleThumbFg = getContrastColor(accent, CONTRAST_THRESHOLD_TOGGLE);
   return `/* Accent override - Tailwind compiles to literal hex */
+.drop-zone-indicator{border-color:${a60} !important}
 .bg-accent{background-color:${accent} !important}
 .text-accent{color:${accent} !important}
 .btn-primary{background-color:${accent} !important;color:${contrastFg} !important}

@@ -352,6 +352,13 @@ input[type="number"] {
   @apply w-full h-2 rounded-md appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
 }
 
+/* Drop zone indicator (border color overridden by ConfigContext with user accent) */
+.drop-zone-indicator {
+  border-width: 3px;
+  border-style: dashed;
+  border-color: color-mix(in oklch, var(--color-accent) 60%, transparent);
+}
+
 /* Status pills / badges */
 .badge-success {
   @apply text-[10px] bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium;

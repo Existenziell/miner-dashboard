@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -31,7 +31,7 @@ function getOrderedMetricIds(config) {
   return order.filter((id) => known.has(id));
 }
 
-function SortableGauge({ id, isDropTarget, ...gaugeProps }) {
+function SortableGauge({ id, isDragActive, ...gaugeProps }) {
   const {
     attributes,
     listeners,
@@ -43,16 +43,14 @@ function SortableGauge({ id, isDropTarget, ...gaugeProps }) {
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragActive ? transition : 'none',
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative ${isDropTarget ? 'ring-2 ring-dashed ring-accent/60 rounded-md' : ''} ${
-        isDragging ? 'opacity-0 pointer-events-none' : ''
-      }`}
+      className={`group relative ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
     >
       <div
         className="absolute top-0 right-1 z-10 cursor-grab active:cursor-grabbing touch-none p-1 rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted hover:text-body"
@@ -74,8 +72,23 @@ export default function MinerMetrics() {
 
   const [activeId, setActiveId] = useState(null);
   const [overId, setOverId] = useState(null);
+  const [dropZoneRect, setDropZoneRect] = useState(null);
+  const cellRefs = useRef([]);
 
   const orderedIds = useMemo(() => getOrderedMetricIds(config), [config]);
+  const overIndex = overId != null ? orderedIds.indexOf(overId) : -1;
+  const showDropZone = activeId != null && overId !== activeId && overIndex >= 0;
+
+  useLayoutEffect(() => {
+    if (!showDropZone || overIndex < 0 || !cellRefs.current[overIndex]) {
+      queueMicrotask(() => setDropZoneRect(null));
+      return;
+    }
+    const el = cellRefs.current[overIndex];
+    const rect = el.getBoundingClientRect();
+    const next = { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
+    queueMicrotask(() => setDropZoneRect(next));
+  }, [showDropZone, overIndex]);
 
   const gaugeProps = useMemo(() => {
     const props = {
@@ -161,6 +174,7 @@ export default function MinerMetrics() {
     const { active, over } = event;
     setActiveId(null);
     setOverId(null);
+    setDropZoneRect(null);
     if (over == null || active.id === over.id) return;
     const order = [...orderedIds];
     const oldIndex = order.indexOf(active.id);
@@ -178,9 +192,8 @@ export default function MinerMetrics() {
   const handleDragCancel = () => {
     setActiveId(null);
     setOverId(null);
+    setDropZoneRect(null);
   };
-
-  const overIndex = overId != null ? orderedIds.indexOf(overId) : -1;
 
   return (
     <DndContext
@@ -197,16 +210,29 @@ export default function MinerMetrics() {
             const p = gaugeProps[id];
             if (!p) return null;
             return (
-              <SortableGauge
+              <div
                 key={id}
-                id={id}
-                isDropTarget={activeId != null && overId !== activeId && i === overIndex}
-                {...p}
-              />
+                ref={(el) => { cellRefs.current[i] = el; }}
+                className="min-h-0"
+              >
+                <SortableGauge id={id} isDragActive={activeId != null} {...p} />
+              </div>
             );
           })}
         </div>
       </SortableContext>
+      {dropZoneRect && (
+        <div
+          className="pointer-events-none fixed z-20 rounded-md box-border drop-zone-indicator"
+          style={{
+            top: dropZoneRect.top,
+            left: dropZoneRect.left,
+            width: dropZoneRect.width,
+            height: dropZoneRect.height,
+          }}
+          aria-hidden
+        />
+      )}
       <DragOverlay dropAnimation={null}>
         {activeId && gaugeProps[activeId] ? (
           <div className="shadow-xl rounded-md cursor-grabbing">
