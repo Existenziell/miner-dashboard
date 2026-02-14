@@ -5,7 +5,7 @@ import {
   MAX_WIFI_SSID_LENGTH,
   MIN_WIFI_PASSWORD_LENGTH,
 } from '@/lib/constants';
-import { ChartCard } from '@/components/charts/TimeSeriesChart';
+import { ChartCard } from '@/components/charts/Chart';
 import { Field } from '@/components/settings/Field';
 
 export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {

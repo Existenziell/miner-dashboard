@@ -5,7 +5,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { useTheme } from '@/hooks/useTheme';
 import { formatTime, getChartGridAxisColors, useChartCollapsed,useChartLegend } from '@/lib/chartUtils';
 import { CHART_COLLAPSED_PW,CHART_LEGEND_PW } from '@/lib/constants';
-import { ChartCard, ChartTooltip,ClickableLegend } from '@/components/charts/TimeSeriesChart';
+import { ChartCard, ChartTooltip, ClickableLegend } from '@/components/charts/Chart';
 
 const SERIES_DEFAULTS = [
   { key: 'power', name: 'Power', color: DASHBOARD_DEFAULTS.chartColors.power.power, width: 1, axis: 'power', fmt: (v) => (v != null ? `${v.toFixed(1)} W` : '--') },

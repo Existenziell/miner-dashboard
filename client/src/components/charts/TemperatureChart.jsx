@@ -5,7 +5,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { useTheme } from '@/hooks/useTheme';
 import { formatTime, getChartGridAxisColors, useChartCollapsed,useChartLegend } from '@/lib/chartUtils';
 import { CHART_COLLAPSED_TMP,CHART_LEGEND_TMP } from '@/lib/constants';
-import { ChartCard, ChartTooltip,ClickableLegend } from '@/components/charts/TimeSeriesChart';
+import { ChartCard, ChartTooltip, ClickableLegend } from '@/components/charts/Chart';
 
 const formatTempValue = (entry) =>
   entry.value != null ? `${entry.value.toFixed(1)}\u00B0C` : '--';

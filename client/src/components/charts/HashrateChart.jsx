@@ -5,7 +5,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { useTheme } from '@/hooks/useTheme';
 import { formatTime, getChartGridAxisColors, useChartCollapsed,useChartLegend } from '@/lib/chartUtils';
 import { CHART_COLLAPSED_HR,CHART_LEGEND_HR } from '@/lib/constants';
-import { ChartCard, ChartTooltip,ClickableLegend } from '@/components/charts/TimeSeriesChart';
+import { ChartCard, ChartTooltip, ClickableLegend } from '@/components/charts/Chart';
 
 const formatHashrateValue = (entry) =>
   entry.value != null ? `${entry.value.toFixed(2)} GH/s` : '--';
