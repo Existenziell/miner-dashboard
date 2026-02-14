@@ -56,12 +56,12 @@
   },
   "metricOrder": [
     "hashrate",
-    "efficiency",
     "temp",
     "fanRpm",
-    "current",
+    "efficiency",
     "frequency",
     "voltage",
+    "current",
     "power"
   ]
 }
