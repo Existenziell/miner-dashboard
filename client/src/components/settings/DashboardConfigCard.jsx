@@ -56,7 +56,7 @@ export function DashboardConfigCard() {
         </Field>
         <Field
           label="Miner poll interval (ms)"
-          hint="How often to fetch miner status."
+          hint="How often to fetch miner status for dashboard refresh."
           suffix={`(= ${(dashboardPollMiner / 1000).toFixed(1)} sec)`}
         >
           <input
@@ -71,7 +71,7 @@ export function DashboardConfigCard() {
         </Field>
         <Field
           label="Network poll interval (ms)"
-          hint="How often to fetch network stats."
+          hint="How often to fetch network stats from mempool.space."
           suffix={`(= ${(dashboardPollNetwork / 1000).toFixed(1)} sec)`}
         >
           <input
