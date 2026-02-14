@@ -47,6 +47,20 @@ export default defineConfig([
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'import/order': importOrder,
+      /* Stricter style & safety */
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-debugger': 'error',
+      'prefer-template': 'warn',
+    },
+  },
+  /* Test files: same rules + Vitest globals */
+  {
+    files: ['**/*.test.js', '**/*.spec.js'],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.vitest },
     },
   },
 ]);

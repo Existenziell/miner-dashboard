@@ -1,16 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { fetchMinerAsic, patchMinerSettings, restartMiner, shutdownMiner } from '@/lib/api';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { patchMinerSettings } from '@/lib/api';
 import {
   DEFAULT_STRATUM_PORT,
-  MAX_HOSTNAME_LENGTH,
   MAX_STRATUM_PASSWORD_LENGTH,
   MAX_STRATUM_PORT,
   MAX_STRATUM_URL_LENGTH,
   MAX_STRATUM_USER_LENGTH,
-  MAX_WIFI_PASSWORD_LENGTH,
-  MAX_WIFI_SSID_LENGTH,
   MIN_STRATUM_PORT,
-  MIN_WIFI_PASSWORD_LENGTH,
   SOLO_POOLS,
   TOAST_AUTO_DISMISS_MS,
 } from '@/lib/constants';
@@ -22,25 +18,9 @@ const POOL_MODE_OPTIONS = [
   { value: 'dual', label: 'Dual Pool' },
 ];
 
-export function useMinerSettingsForm(miner, refetch, onError) {
-  const [asic, setAsic] = useState(null);
+export function useMinerPools(miner, refetch, onError) {
   const [saving, setSaving] = useState(false);
-  const [restarting, setRestarting] = useState(false);
-  const [shuttingDown, setShuttingDown] = useState(false);
   const [message, setMessage] = useState(null);
-
-  const [frequency, setFrequency] = useState(miner?.frequency ?? 600);
-  const [coreVoltage, setCoreVoltage] = useState(miner?.coreVoltage ?? miner?.defaultCoreVoltage ?? 1150);
-  const [overheatTemp, setOverheatTemp] = useState(miner?.overheat_temp ?? 70);
-  const [fanAuto, setFanAuto] = useState(!!(miner?.autofanspeed != null && miner.autofanspeed !== 0));
-  const [pidTargetTemp, setPidTargetTemp] = useState(miner?.pidTargetTemp ?? 55);
-  const [manualFanSpeed, setManualFanSpeed] = useState(miner?.manualFanSpeed ?? 100);
-  const [autoScreenOff, setAutoScreenOff] = useState(toBool(miner?.autoscreenoff));
-  const [flipScreen, setFlipScreen] = useState(toBool(miner?.flipscreen));
-
-  const [hostname, setHostname] = useState(miner?.hostname ?? '');
-  const [wifiSsid, setWifiSsid] = useState(miner?.ssid ?? '');
-  const [wifiPassword, setWifiPassword] = useState('');
 
   const [primaryPoolKey, setPrimaryPoolKey] = useState('');
   const [fallbackPoolKey, setFallbackPoolKey] = useState('');
@@ -61,16 +41,6 @@ export function useMinerSettingsForm(miner, refetch, onError) {
 
   useEffect(() => {
     if (!miner) return;
-    setFrequency(miner.frequency ?? 600);
-    setCoreVoltage(miner.coreVoltage ?? miner.defaultCoreVoltage ?? 1150);
-    setOverheatTemp(miner.overheat_temp ?? 70);
-    setFanAuto(!!(miner.autofanspeed != null && miner.autofanspeed !== 0));
-    setPidTargetTemp(miner.pidTargetTemp ?? 55);
-    setManualFanSpeed(miner.manualFanSpeed ?? 100);
-    setAutoScreenOff(toBool(miner.autoscreenoff));
-    setFlipScreen(toBool(miner.flipscreen));
-    setHostname(miner.hostname ?? '');
-    setWifiSsid(miner.ssid ?? '');
     setPrimaryStratumPort(miner.stratumPort ?? DEFAULT_STRATUM_PORT);
     setFallbackStratumPort(miner.fallbackStratumPort ?? DEFAULT_STRATUM_PORT);
     setPrimaryPassword(miner.stratumPassword ?? '');
@@ -96,99 +66,11 @@ export function useMinerSettingsForm(miner, refetch, onError) {
     setFallbackExtranonceSubscribe(toBool(miner.fallbackStratumEnonceSubscribe, miner.fallbackStratumExtranonceSubscribe));
   }, [miner]);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchMinerAsic()
-      .then((data) => { if (!cancelled) setAsic(data); })
-      .catch(() => { if (!cancelled) setAsic(null); });
-    return () => { cancelled = true; };
-  }, []);
-
-  const officialFreq = asic?.frequencyOptions ?? (miner?.defaultFrequency != null ? [miner.defaultFrequency] : []);
-  const officialVolt = asic?.voltageOptions ?? (miner?.defaultCoreVoltage != null ? [miner.defaultCoreVoltage] : []);
-  const defaultFreq = asic?.defaultFrequency ?? miner?.defaultFrequency;
-  const defaultVolt = asic?.defaultVoltage ?? miner?.defaultCoreVoltage;
-  const absMinFreq = asic?.absMinFrequency;
-  const absMaxFreq = asic?.absMaxFrequency;
-  const absMinVolt = asic?.absMinVoltage;
-  const absMaxVolt = asic?.absMaxVoltage ?? 1200;
-
-  const extendedFreq = new Set(officialFreq);
-  const freqRangeStart = absMinFreq != null ? absMinFreq : 625;
-  if (absMaxFreq != null) {
-    for (let f = freqRangeStart; f <= absMaxFreq; f += 25) extendedFreq.add(f);
-  }
-  extendedFreq.add(frequency);
-  const frequencyOptions = [...extendedFreq].sort((a, b) => a - b);
-
-  const VOLTAGE_STEP_MV = 50;
-  const extendedVolt = new Set([...officialVolt, coreVoltage, absMaxVolt, ...(absMinVolt != null ? [absMinVolt] : [])]);
-  const voltRangeStart = absMinVolt ?? (officialVolt.length ? Math.min(...officialVolt) : 1000);
-  if (absMaxVolt != null) {
-    for (let v = voltRangeStart; v <= absMaxVolt; v += VOLTAGE_STEP_MV) extendedVolt.add(v);
-  }
-  const voltageOptions = [...extendedVolt]
-    .filter((v) => v <= absMaxVolt && (absMinVolt == null || v >= absMinVolt))
-    .sort((a, b) => a - b);
-
-  const frequencyVoltageWarning = useMemo(() => {
-    const maxF = frequencyOptions.length ? Math.max(...frequencyOptions) : null;
-    const minF = frequencyOptions.length ? Math.min(...frequencyOptions) : null;
-    const maxV = voltageOptions.length ? Math.max(...voltageOptions) : null;
-    const minV = voltageOptions.length ? Math.min(...voltageOptions) : null;
-    if (maxF == null || minF == null || maxV == null || minV == null) return null;
-    const highFreq = frequency >= maxF - 25;
-    const lowFreq = frequency <= minF + 25;
-    const highVolt = coreVoltage >= maxV - 50;
-    const lowVolt = coreVoltage <= minV + 50;
-    if (highFreq && lowVolt) {
-      return 'High frequency with low voltage can cause instability or damage. Use vendor‑recommended combinations.';
-    }
-    if (lowFreq && highVolt) {
-      return 'Low frequency with high voltage wastes power and increases heat. Prefer recommended settings.';
-    }
-    return null;
-  }, [frequency, coreVoltage, frequencyOptions, voltageOptions]);
-
-  const selectedFreqRef = useRef(null);
-
-  const currentFreq = miner?.frequency;
-  const currentVolt = miner?.coreVoltage ?? miner?.defaultCoreVoltage;
-  const getFreqTag = (f) => {
-    if (f === defaultFreq) return 'default';
-    if (f === absMaxFreq) return 'max';
-    if (absMinFreq != null && f === absMinFreq) return 'min';
-    if (currentFreq != null && f === currentFreq) return 'current';
-    return null;
-  };
-  const getVoltTag = (v) => {
-    if (v === defaultVolt) return 'default';
-    if (v === absMaxVolt) return 'max';
-    if (absMinVolt != null && v === absMinVolt) return 'min';
-    if (currentVolt != null && v === currentVolt) return 'current';
-    return null;
-  };
-
-  useEffect(() => {
-    selectedFreqRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }, [frequency]);
-
   const baseline = useMemo(() => {
     if (!miner) return null;
     const primaryOpt = findSoloPoolOption(miner.stratumURL, miner.stratumPort);
     const fallbackOpt = findSoloPoolOption(miner.fallbackStratumURL, miner.fallbackStratumPort);
     return {
-      frequency: miner.frequency ?? 600,
-      coreVoltage: miner.coreVoltage ?? miner.defaultCoreVoltage ?? 1150,
-      overheatTemp: miner.overheat_temp ?? 70,
-      fanAuto: !!(miner.autofanspeed != null && miner.autofanspeed !== 0),
-      pidTargetTemp: miner.pidTargetTemp ?? 55,
-      manualFanSpeed: miner.manualFanSpeed ?? 100,
-      autoScreenOff: toBool(miner.autoscreenoff),
-      flipScreen: toBool(miner.flipscreen),
-      hostname: miner.hostname ?? '',
-      wifiSsid: miner.ssid ?? '',
-      wifiPassword: '',
       primaryPoolKey: primaryOpt?.identifier ?? (miner.stratumURL ? 'other' : (SOLO_POOLS[0]?.identifier ?? '')),
       fallbackPoolKey: fallbackOpt?.identifier ?? (miner.fallbackStratumURL ? 'other' : ''),
       primaryCustomURL: primaryOpt ? '' : (miner.stratumURL ?? ''),
@@ -214,39 +96,6 @@ export function useMinerSettingsForm(miner, refetch, onError) {
   const changes = useMemo(() => {
     if (!baseline) return [];
     const list = [];
-    if (frequency !== baseline.frequency) {
-      list.push({ label: 'Frequency', from: `${baseline.frequency} MHz`, to: `${frequency} MHz` });
-    }
-    if (coreVoltage !== baseline.coreVoltage) {
-      list.push({ label: 'Core voltage', from: `${baseline.coreVoltage} mV`, to: `${coreVoltage} mV` });
-    }
-    if (overheatTemp !== baseline.overheatTemp) {
-      list.push({ label: 'Overheat limit', from: `${baseline.overheatTemp}°C`, to: `${overheatTemp}°C` });
-    }
-    if (fanAuto !== baseline.fanAuto) {
-      list.push({ label: 'Fan mode', from: baseline.fanAuto ? 'Auto' : 'Manual', to: fanAuto ? 'Auto' : 'Manual' });
-    }
-    if (fanAuto && pidTargetTemp !== baseline.pidTargetTemp) {
-      list.push({ label: 'PID target temp', from: `${baseline.pidTargetTemp}°C`, to: `${pidTargetTemp}°C` });
-    }
-    if (!fanAuto && manualFanSpeed !== baseline.manualFanSpeed) {
-      list.push({ label: 'Manual fan speed', from: `${baseline.manualFanSpeed}%`, to: `${manualFanSpeed}%` });
-    }
-    if (autoScreenOff !== baseline.autoScreenOff) {
-      list.push({ label: 'Auto screen off', from: baseline.autoScreenOff ? 'On' : 'Off', to: autoScreenOff ? 'On' : 'Off' });
-    }
-    if (flipScreen !== baseline.flipScreen) {
-      list.push({ label: 'Flip screen', from: baseline.flipScreen ? 'On' : 'Off', to: flipScreen ? 'On' : 'Off' });
-    }
-    if (hostname !== baseline.hostname) {
-      list.push({ label: 'Hostname', from: baseline.hostname || '—', to: hostname || '—' });
-    }
-    if (wifiSsid !== baseline.wifiSsid) {
-      list.push({ label: 'WiFi network (SSID)', from: baseline.wifiSsid || '—', to: wifiSsid || '—' });
-    }
-    if (wifiPassword !== baseline.wifiPassword && wifiPassword !== '') {
-      list.push({ label: 'WiFi password', from: '—', to: '•••' });
-    }
     const poolLabel = (key) => (key === 'other' ? 'Other' : key === '' ? 'None' : SOLO_POOLS.find((o) => o.identifier === key)?.name ?? key);
     if (primaryPoolKey !== baseline.primaryPoolKey) {
       list.push({ label: 'Primary pool', from: poolLabel(baseline.primaryPoolKey), to: poolLabel(primaryPoolKey) });
@@ -318,29 +167,12 @@ export function useMinerSettingsForm(miner, refetch, onError) {
       list.push({ label: 'Fallback Extranonce Subscribe', from: baseline.fallbackExtranonceSubscribe ? 'On' : 'Off', to: fallbackExtranonceSubscribe ? 'On' : 'Off' });
     }
     return list;
-  }, [baseline, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen, hostname, wifiSsid, wifiPassword, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryPassword, fallbackPassword, primaryStratumUser, fallbackStratumUser, poolMode, stratumTcpKeepalive, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe]);
+  }, [baseline, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryPassword, fallbackPassword, primaryStratumUser, fallbackStratumUser, poolMode, stratumTcpKeepalive, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe]);
 
   const hasChanges = changes.length > 0;
 
-  useEffect(() => {
-    if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
-    return () => clearTimeout(t);
-  }, [message?.type]);
-
-  const handleReset = useCallback(() => {
+  const revert = useCallback(() => {
     if (!baseline) return;
-    setFrequency(baseline.frequency);
-    setCoreVoltage(baseline.coreVoltage);
-    setOverheatTemp(baseline.overheatTemp);
-    setFanAuto(baseline.fanAuto);
-    setPidTargetTemp(baseline.pidTargetTemp);
-    setManualFanSpeed(baseline.manualFanSpeed);
-    setAutoScreenOff(baseline.autoScreenOff);
-    setFlipScreen(baseline.flipScreen);
-    setHostname(baseline.hostname);
-    setWifiSsid(baseline.wifiSsid);
-    setWifiPassword(baseline.wifiPassword);
     setPrimaryPoolKey(baseline.primaryPoolKey);
     setFallbackPoolKey(baseline.fallbackPoolKey);
     setPrimaryCustomURL(baseline.primaryCustomURL);
@@ -359,20 +191,14 @@ export function useMinerSettingsForm(miner, refetch, onError) {
     setFallbackExtranonceSubscribe(baseline.fallbackExtranonceSubscribe);
   }, [baseline]);
 
+  useEffect(() => {
+    if (message?.type !== 'success') return;
+    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    return () => clearTimeout(t);
+  }, [message?.type]);
+
   const { validationErrors, isFormValid } = useMemo(() => {
     const errors = [];
-    const overheatNum = Number(overheatTemp);
-    if (!Number.isFinite(overheatNum) || overheatNum < 50 || overheatNum > 80) {
-      errors.push({ id: 'overheatTemp', message: `Overheat limit must be between 50 and 80°C` });
-    }
-    const pidNum = Number(pidTargetTemp);
-    if (!Number.isFinite(pidNum) || pidNum < 40 || pidNum > 75) {
-      errors.push({ id: 'pidTargetTemp', message: `PID target temperature must be between 40 and 75°C` });
-    }
-    const fanNum = Number(manualFanSpeed);
-    if (!Number.isFinite(fanNum) || fanNum < 0 || fanNum > 100) {
-      errors.push({ id: 'manualFanSpeed', message: `Manual fan speed must be between 0 and 100%` });
-    }
     if (primaryPoolKey === 'other') {
       const url = primaryCustomURL.trim();
       if (!url) {
@@ -409,65 +235,35 @@ export function useMinerSettingsForm(miner, refetch, onError) {
     if (fallbackPassword.length > MAX_STRATUM_PASSWORD_LENGTH) {
       errors.push({ id: 'fallbackPassword', message: `Fallback password: max ${MAX_STRATUM_PASSWORD_LENGTH} characters` });
     }
-    if (hostname.trim().length > 0) {
-      if (hostname.length > MAX_HOSTNAME_LENGTH) {
-        errors.push({ id: 'hostname', message: `Hostname: max ${MAX_HOSTNAME_LENGTH} characters` });
-      } else if (!/^[a-zA-Z0-9-]+$/.test(hostname.trim())) {
-        errors.push({ id: 'hostname', message: 'Hostname: alphanumeric and hyphens only' });
-      }
-    }
-    if (wifiSsid.length > MAX_WIFI_SSID_LENGTH) {
-      errors.push({ id: 'wifiSsid', message: `WiFi network: max ${MAX_WIFI_SSID_LENGTH} characters` });
-    }
-    if (wifiPassword.length > 0 && (wifiPassword.length < MIN_WIFI_PASSWORD_LENGTH || wifiPassword.length > MAX_WIFI_PASSWORD_LENGTH)) {
-      errors.push({ id: 'wifiPassword', message: `WiFi password: ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters when set` });
-    }
     return {
       validationErrors: errors,
       isFormValid: errors.length === 0,
     };
-  }, [overheatTemp, pidTargetTemp, manualFanSpeed, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword, hostname, wifiSsid, wifiPassword]);
+  }, [primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword]);
 
-  const handleSave = useCallback(async (e) => {
-    e.preventDefault();
-    setMessage(null);
+  const save = useCallback(async () => {
     if (!isFormValid) {
-      setMessage({ type: 'error', text: validationErrors[0].message });
+      setMessage({ type: 'error', text: validationErrors[0]?.message ?? 'Fix form errors.' });
       return;
     }
+    setMessage(null);
     setSaving(true);
     try {
-      const primaryOpt = primaryPoolKey && primaryPoolKey !== 'other'
-        ? SOLO_POOLS.find((o) => o.identifier === primaryPoolKey)
-        : null;
-      const fallbackOpt = fallbackPoolKey && fallbackPoolKey !== 'other'
-        ? SOLO_POOLS.find((o) => o.identifier === fallbackPoolKey)
-        : null;
-
+      const primaryOpt = primaryPoolKey && primaryPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === primaryPoolKey) : null;
+      const fallbackOpt = fallbackPoolKey && fallbackPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === fallbackPoolKey) : null;
       const primaryPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(primaryStratumPort) || DEFAULT_STRATUM_PORT));
       const fallbackPort = Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(fallbackStratumPort) || DEFAULT_STRATUM_PORT));
-
       const stripStratumHost = (url) => {
         const s = (url || '').trim();
         if (!s) return '';
-        return s
-          .replace(/^stratum\+tcp:\/\//i, '')
-          .replace(/^stratum2\+tcp:\/\//i, '')
-          .split(':')[0]
-          .split('/')[0]
-          .trim();
+        return s.replace(/^stratum\+tcp:\/\//i, '').replace(/^stratum2\+tcp:\/\//i, '').split(':')[0].split('/')[0].trim();
       };
-
       let poolPayload = {};
       if (primaryOpt) {
         const p = getStratumPayloadFromOption(primaryOpt);
         poolPayload = { stratumURL: p.stratumURL, stratumPort: primaryPort, stratumTLS: primaryTLS };
       } else if (primaryPoolKey === 'other') {
-        poolPayload = {
-          stratumURL: stripStratumHost(primaryCustomURL),
-          stratumPort: primaryPort,
-          stratumTLS: primaryTLS,
-        };
+        poolPayload = { stratumURL: stripStratumHost(primaryCustomURL), stratumPort: primaryPort, stratumTLS: primaryTLS };
       }
       if (fallbackPoolKey === '') {
         poolPayload.fallbackStratumURL = '';
@@ -491,61 +287,16 @@ export function useMinerSettingsForm(miner, refetch, onError) {
       poolPayload.fallbackStratumPassword = fallbackPassword.trim();
       poolPayload.poolMode = poolMode;
       poolPayload.stratum_keep = stratumTcpKeepalive;
-
-      const wifiPayload = {
-        hostname: hostname.trim(),
-        ssid: wifiSsid.trim(),
-        ...(wifiPassword.length > 0 ? { wifiPass: wifiPassword } : {}),
-      };
-
-      await patchMinerSettings({
-        frequency: Number(frequency),
-        coreVoltage: Number(coreVoltage),
-        overheat_temp: Number(overheatTemp),
-        autofanspeed: fanAuto ? 2 : 0,
-        ...(fanAuto ? { pidTargetTemp: Number(pidTargetTemp) } : { manualFanSpeed: Number(manualFanSpeed) }),
-        autoscreenoff: autoScreenOff,
-        flipscreen: flipScreen,
-        ...wifiPayload,
-        ...poolPayload,
-      });
-      setMessage({ type: 'success', text: 'Settings saved.' });
-      refetch();
+      await patchMinerSettings(poolPayload);
+      await refetch();
+      setMessage({ type: 'success', text: 'Pools saved.' });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);
     } finally {
       setSaving(false);
     }
-  }, [isFormValid, validationErrors, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword, poolMode, stratumTcpKeepalive, hostname, wifiSsid, wifiPassword, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen, refetch, onError]);
-
-  const handleRestart = useCallback(async () => {
-    setMessage(null);
-    setRestarting(true);
-    try {
-      await restartMiner();
-      setMessage({ type: 'success', text: 'Miner restarting…' });
-      refetch();
-    } catch (err) {
-      setMessage({ type: 'error', text: err.message });
-    } finally {
-      setRestarting(false);
-    }
-  }, [refetch]);
-
-  const handleShutdown = useCallback(async () => {
-    setMessage(null);
-    setShuttingDown(true);
-    try {
-      await shutdownMiner();
-      setMessage({ type: 'success', text: 'Miner shutting down…' });
-      refetch();
-    } catch (err) {
-      setMessage({ type: 'error', text: err.message });
-    } finally {
-      setShuttingDown(false);
-    }
-  }, [refetch]);
+  }, [isFormValid, validationErrors, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword, poolMode, stratumTcpKeepalive, refetch, onError]);
 
   const validation = {
     primaryStratumUserError: validationErrors.find((e) => e.id === 'primaryStratumUser')?.message ?? null,
@@ -556,44 +307,13 @@ export function useMinerSettingsForm(miner, refetch, onError) {
     fallbackCustomURLError: validationErrors.find((e) => e.id === 'fallbackCustomURL')?.message ?? null,
     primaryPasswordError: validationErrors.find((e) => e.id === 'primaryPassword')?.message ?? null,
     fallbackPasswordError: validationErrors.find((e) => e.id === 'fallbackPassword')?.message ?? null,
-    overheatTempError: validationErrors.find((e) => e.id === 'overheatTemp')?.message ?? null,
-    pidTargetTempError: validationErrors.find((e) => e.id === 'pidTargetTemp')?.message ?? null,
-    manualFanSpeedError: validationErrors.find((e) => e.id === 'manualFanSpeed')?.message ?? null,
-    hostnameError: validationErrors.find((e) => e.id === 'hostname')?.message ?? null,
-    wifiSsidError: validationErrors.find((e) => e.id === 'wifiSsid')?.message ?? null,
-    wifiPasswordError: validationErrors.find((e) => e.id === 'wifiPassword')?.message ?? null,
   };
 
   return {
     POOL_MODE_OPTIONS,
-    asic,
     saving,
-    restarting,
-    shuttingDown,
     message,
     setMessage,
-    frequency,
-    setFrequency,
-    coreVoltage,
-    setCoreVoltage,
-    overheatTemp,
-    setOverheatTemp,
-    fanAuto,
-    setFanAuto,
-    pidTargetTemp,
-    setPidTargetTemp,
-    manualFanSpeed,
-    setManualFanSpeed,
-    autoScreenOff,
-    setAutoScreenOff,
-    flipScreen,
-    setFlipScreen,
-    hostname,
-    setHostname,
-    wifiSsid,
-    setWifiSsid,
-    wifiPassword,
-    setWifiPassword,
     primaryPoolKey,
     setPrimaryPoolKey,
     fallbackPoolKey,
@@ -626,23 +346,12 @@ export function useMinerSettingsForm(miner, refetch, onError) {
     setPrimaryExtranonceSubscribe,
     fallbackExtranonceSubscribe,
     setFallbackExtranonceSubscribe,
-    baseline,
     changes,
     hasChanges,
-    handleReset,
+    revert,
+    save,
     validationErrors,
     isFormValid,
     validation,
-    handleSave,
-    handleRestart,
-    handleShutdown,
-    frequencyOptions,
-    voltageOptions,
-    getFreqTag,
-    getVoltTag,
-    frequencyVoltageWarning,
-    selectedFreqRef,
-    absMaxFreq,
-    absMaxVolt,
   };
 }

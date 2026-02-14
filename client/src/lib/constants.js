@@ -45,7 +45,7 @@ export const MIN_WIFI_PASSWORD_LENGTH = 8;
 export const MAX_WIFI_PASSWORD_LENGTH = 63;
 
 // —— UI (gauges) & metric ranges ——————————————————————————————————————————————
-export const GAUGE_RADIUS = 48; // MetricGauge arc radius (viewBox units)
+export const GAUGE_RADIUS = 48; // Gauge arc radius (viewBox units)
 export const METRIC_RANGES = DASHBOARD_DEFAULTS.metricRanges;
 
 // —— Stratum / pools ——————————————————————————————————————————————————————————

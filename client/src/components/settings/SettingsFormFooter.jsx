@@ -1,41 +1,19 @@
 /**
- * Footer for dashboard settings forms (config and colors): Save button, message, Reset to defaults + confirm dialog.
- * Reads form state from DashboardSettingsContext; use mode to pick config vs colors slice.
+ * Footer for Dashboard and Colors tabs: Save button, message, Reset to defaults + confirm dialog.
+ * Receives form state as props (from useDashboard or useColor).
  */
 import { useEffect } from 'react';
-import { useDashboardSettingsContext } from '@/context/DashboardSettingsContext';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { ConfirmModal } from '@/components/ConfirmModal';
 
-export function DashboardSettingsFormFooter({
-  mode,
-  resetDialogDescription = 'Reset all settings to their default values and save immediately.',
+export function SettingsFormFooter({
+  form,
+  resetDialogDescription = 'Reset all settings to their default values and save.',
   saveButtonLabel = 'Save settings',
   resetDialogTitle = 'Reset to defaults',
 }) {
-  const form = useDashboardSettingsContext();
-  const slice = mode === 'colors'
-    ? {
-        saving: form.savingColors,
-        hasChanges: form.hasColorsChanges,
-        message: form.colorsMessage,
-        setMessage: form.setColorsMessage,
-        hasDefaultsDiff: form.hasColorsDefaultsDiff,
-        showResetConfirm: form.showResetColorsConfirm,
-        setShowResetConfirm: form.setShowResetColorsConfirm,
-        onResetToDefaults: form.handleResetColorsToDefaults,
-      }
-    : {
-        saving: form.savingConfig,
-        hasChanges: form.hasConfigChanges,
-        message: form.configMessage,
-        setMessage: form.setConfigMessage,
-        hasDefaultsDiff: form.hasConfigDefaultsDiff,
-        showResetConfirm: form.showResetConfigConfirm,
-        setShowResetConfirm: form.setShowResetConfigConfirm,
-        onResetToDefaults: form.handleResetConfigToDefaults,
-      };
-  const { saving, hasChanges, message, setMessage, hasDefaultsDiff, showResetConfirm, setShowResetConfirm, onResetToDefaults } = slice;
+  if (!form) throw new Error('SettingsFormFooter requires a form prop.');
+  const { saving, hasChanges, message, setMessage, hasDefaultsDiff, showResetConfirm, setShowResetConfirm, resetToDefaults } = form;
 
   useEffect(() => {
     if (message?.type !== 'error' || !message?.text) return;
@@ -84,7 +62,7 @@ export function DashboardSettingsFormFooter({
         title={resetDialogTitle}
         description={resetDialogDescription}
         confirmLabel="Reset"
-        onConfirm={onResetToDefaults}
+        onConfirm={resetToDefaults}
         confirmDisabled={saving}
       />
     </>

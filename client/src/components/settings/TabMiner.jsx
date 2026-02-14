@@ -1,15 +1,8 @@
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
-import {
-  MAX_HOSTNAME_LENGTH,
-  MAX_WIFI_PASSWORD_LENGTH,
-  MAX_WIFI_SSID_LENGTH,
-  MIN_WIFI_PASSWORD_LENGTH,
-} from '@/lib/constants';
-import { ChartCard } from '@/components/charts/Chart';
 import { Field } from '@/components/settings/Field';
 
-export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
-  const form = useMinerSettingsContext();
+export function TabMiner() {
+  const { device: form } = useMinerSettingsContext();
   const {
     frequency,
     setFrequency,
@@ -27,12 +20,6 @@ export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
     setAutoScreenOff,
     flipScreen,
     setFlipScreen,
-    hostname,
-    setHostname,
-    wifiSsid,
-    setWifiSsid,
-    wifiPassword,
-    setWifiPassword,
     frequencyOptions,
     voltageOptions,
     getFreqTag,
@@ -47,9 +34,6 @@ export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
     overheatTempError,
     pidTargetTempError,
     manualFanSpeedError,
-    hostnameError,
-    wifiSsidError,
-    wifiPasswordError,
   } = validation;
 
   return (
@@ -250,74 +234,6 @@ export function MinerTabContent({ wifiCollapsed, toggleWifiCollapsed }) {
           </div>
         </div>
       </div>
-
-      <ChartCard
-        title="WiFi Settings"
-        loading={false}
-        loadingMessage=""
-        collapsed={wifiCollapsed}
-        onToggleCollapsed={toggleWifiCollapsed}
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
-            <input
-              type="text"
-              value={hostname}
-              onChange={(e) => setHostname(e.target.value)}
-              placeholder="bitaxe"
-              maxLength={MAX_HOSTNAME_LENGTH}
-              className={`input ${hostnameError ? 'input-danger' : ''}`}
-              aria-label="Hostname"
-              aria-invalid={!!hostnameError}
-              aria-describedby={hostnameError ? 'hostname-error' : undefined}
-            />
-            {hostnameError && (
-              <p id="hostname-error" className="text-danger text-xs mt-1" role="alert">
-                {hostnameError}
-              </p>
-            )}
-          </Field>
-          <Field label="WiFi Network (SSID)" hint="Network name to connect to.">
-            <input
-              type="text"
-              value={wifiSsid}
-              onChange={(e) => setWifiSsid(e.target.value)}
-              placeholder="WiFi Network (SSID)"
-              maxLength={MAX_WIFI_SSID_LENGTH}
-              className={`input ${wifiSsidError ? 'input-danger' : ''}`}
-              aria-label="WiFi Network (SSID)"
-              aria-invalid={!!wifiSsidError}
-              aria-describedby={wifiSsidError ? 'wifi-ssid-error' : undefined}
-            />
-            {wifiSsidError && (
-              <p id="wifi-ssid-error" className="text-danger text-xs mt-1" role="alert">
-                {wifiSsidError}
-              </p>
-            )}
-          </Field>
-          <Field label="WiFi Password" hint={`Leave blank to keep current password. When set, ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters.`}>
-            <input
-              type="password"
-              value={wifiPassword}
-              onChange={(e) => setWifiPassword(e.target.value)}
-              placeholder="WiFi Password"
-              maxLength={MAX_WIFI_PASSWORD_LENGTH}
-              className={`input ${wifiPasswordError ? 'input-danger' : ''}`}
-              aria-label="WiFi Password"
-              aria-invalid={!!wifiPasswordError}
-              aria-describedby={wifiPasswordError ? 'wifi-password-error' : undefined}
-            />
-            {wifiPasswordError && (
-              <p id="wifi-password-error" className="text-danger text-xs mt-1" role="alert">
-                {wifiPasswordError}
-              </p>
-            )}
-          </Field>
-          <p className="text-muted-standalone text-xs mt-5">
-            Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
-          </p>
-        </div>
-      </ChartCard>
     </>
   );
 }

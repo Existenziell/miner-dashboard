@@ -1,22 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ColorProvider } from '@/context/ColorContext';
 import { useConfig } from '@/context/ConfigContext';
-import { DashboardSettingsProvider } from '@/context/DashboardSettingsContext';
+import { DashboardProvider } from '@/context/DashboardContext';
+import { InitProvider } from '@/context/InitContext';
 import { useMiner } from '@/context/MinerContext';
 import { MinerSettingsProvider } from '@/context/MinerSettingsContext';
-import { useDashboardSettingsForm } from '@/hooks/useDashboardSettingsForm';
-import { useMinerSettingsForm } from '@/hooks/useMinerSettingsForm';
-import { useChartCollapsed } from '@/lib/chartUtils';
-import { TOAST_AUTO_DISMISS_MS, SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
+import { useColor } from '@/hooks/useColor';
+import { useDashboard } from '@/hooks/useDashboard';
+import { useInit } from '@/hooks/useInit';
+import { useMinerDevice } from '@/hooks/useMinerDevice';
+import { useMinerPools } from '@/hooks/useMinerPools';
+import { useMinerWifi } from '@/hooks/useMinerWifi';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import { DashboardColorsCard } from '@/components/settings/DashboardColorsCard';
-import { DashboardConfigCard } from '@/components/settings/DashboardConfigCard';
-import { DashboardSettingsFormFooter } from '@/components/settings/DashboardSettingsFormFooter';
-import { FirmwareTabContent } from '@/components/settings/FirmwareTabContent';
-import { MinerTabContent } from '@/components/settings/MinerTabContent';
-import { PendingChangesBox } from '@/components/settings/PendingChangesBox';
-import { PoolsTabContent } from '@/components/settings/PoolsTabContent';
+import { DashboardColors } from '@/components/settings/DashboardColors';
+import { DashboardConfig } from '@/components/settings/DashboardConfig';
+import { PendingChanges } from '@/components/settings/PendingChanges';
+import { SettingsFormFooter } from '@/components/settings/SettingsFormFooter';
 import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
+import { TabFirmware } from '@/components/settings/TabFirmware';
+import { TabInit } from '@/components/settings/TabInit';
+import { TabMiner } from '@/components/settings/TabMiner';
+import { TabPools } from '@/components/settings/TabPools';
 
 export default function SettingsPage({ onError }) {
   const { data: miner, refetch } = useMiner();
@@ -31,60 +37,90 @@ export default function SettingsPage({ onError }) {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  const minerForm = useMinerSettingsForm(miner, refetch, onError);
-  const { message: minerFormMessage, setMessage: setMinerFormMessage } = minerForm;
-  const dashboardForm = useDashboardSettingsForm(config, refetchConfig, onError);
-  const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed(SETTINGS_WIFI_COLLAPSED);
+  const initForm = useInit(config, refetchConfig, onError);
+  const dashboardForm = useDashboard(config, refetchConfig, onError);
+  const colorForm = useColor(config, refetchConfig, onError);
+  const deviceForm = useMinerDevice(miner, refetch, onError);
+  const wifiForm = useMinerWifi(miner, refetch, onError);
+  const poolsForm = useMinerPools(miner, refetch, onError);
+  const minerSettingsValue = { device: deviceForm, wifi: wifiForm, pools: poolsForm };
+
+  const activeErrorMessage =
+    settingsSubTab === 'miner' ? deviceForm.message : settingsSubTab === 'pools' ? poolsForm.message : null;
+  const clearActiveMessage = useMemo(
+    () =>
+      settingsSubTab === 'miner'
+        ? deviceForm.setMessage
+        : settingsSubTab === 'pools'
+          ? poolsForm.setMessage
+          : () => {},
+    [settingsSubTab, deviceForm.setMessage, poolsForm.setMessage]
+  );
 
   useEffect(() => {
-    if (minerFormMessage?.type !== 'error' || !minerFormMessage?.text) return;
-    const id = setTimeout(() => setMinerFormMessage(null), TOAST_AUTO_DISMISS_MS);
+    if (activeErrorMessage?.type !== 'error' || !activeErrorMessage?.text) return;
+    const id = setTimeout(() => clearActiveMessage(null), TOAST_AUTO_DISMISS_MS);
     return () => clearTimeout(id);
-  }, [minerFormMessage?.type, minerFormMessage?.text, setMinerFormMessage]);
+  }, [settingsSubTab, activeErrorMessage?.type, activeErrorMessage?.text, clearActiveMessage]);
 
   const handleTabChange = (id) => {
     setSettingsSubTab(id);
     setSettingsSectionInUrl(id);
   };
 
-  const goToDashboardTab = () => {
-    setSettingsSubTab('dashboard');
-    setSettingsSectionInUrl('dashboard');
+  const goToInitTab = () => {
+    setSettingsSubTab('init');
+    setSettingsSectionInUrl('init');
   };
 
   if (!miner) {
     return (
       <div className="space-y-4">
         <SettingsTabBar currentTab={settingsSubTab} onTabChange={handleTabChange} />
+        {settingsSubTab === 'init' && (
+          <InitProvider value={initForm}>
+            <MinerSettingsProvider value={minerSettingsValue}>
+              <TabInit minerReachable={false} />
+            </MinerSettingsProvider>
+          </InitProvider>
+        )}
         {settingsSubTab === 'dashboard' && (
-          <form onSubmit={dashboardForm.handleSaveConfig} className="space-y-4">
-            <DashboardSettingsProvider value={dashboardForm}>
-              <DashboardConfigCard />
-              <PendingChangesBox changes={dashboardForm.configChanges} onReset={dashboardForm.handleRevertConfig} />
-              <DashboardSettingsFormFooter
-                mode="config"
-                resetDialogDescription="Reset all dashboard config to default values and save immediately. Miner IP is kept."
+          <form onSubmit={dashboardForm.save} className="space-y-4">
+            <DashboardProvider value={dashboardForm}>
+              <DashboardConfig />
+              <PendingChanges
+                changes={dashboardForm.changes}
+                onReset={dashboardForm.revert}
+                title="Pending changes"
               />
-            </DashboardSettingsProvider>
+              <SettingsFormFooter
+                form={dashboardForm}
+                resetDialogDescription="Reset metric ranges to default values and save."
+              />
+            </DashboardProvider>
           </form>
         )}
         {settingsSubTab === 'colors' && (
-          <form onSubmit={dashboardForm.handleSaveColors} className="space-y-4">
-            <DashboardSettingsProvider value={dashboardForm}>
-              <DashboardColorsCard />
-              <PendingChangesBox changes={dashboardForm.colorsChanges} onReset={dashboardForm.handleRevertColors} />
-              <DashboardSettingsFormFooter
-                mode="colors"
-                resetDialogDescription="Reset accent and chart colors to defaults and save immediately."
+          <form onSubmit={colorForm.save} className="space-y-4">
+            <ColorProvider value={colorForm}>
+              <DashboardColors />
+              <PendingChanges
+                changes={colorForm.changes}
+                onReset={colorForm.revert}
+                title="Pending changes"
               />
-            </DashboardSettingsProvider>
+              <SettingsFormFooter
+                form={colorForm}
+                resetDialogDescription="Reset accent and chart colors to defaults and save."
+              />
+            </ColorProvider>
           </form>
         )}
         {settingsSubTab === 'miner' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to change device settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToDashboardTab} className="link-text text-body cursor-pointer underline">
-              Dashboard
+            <button type="button" onClick={goToInitTab} className="link-text text-body cursor-pointer underline">
+              Init
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
@@ -92,8 +128,8 @@ export default function SettingsPage({ onError }) {
         {settingsSubTab === 'pools' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to change pool settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToDashboardTab} className="link-text text-body cursor-pointer underline">
-              Dashboard
+            <button type="button" onClick={goToInitTab} className="link-text text-body cursor-pointer underline">
+              Init
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
@@ -101,8 +137,8 @@ export default function SettingsPage({ onError }) {
         {settingsSubTab === 'firmware' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to update firmware. Set Miner IP in the{' '}
-            <button type="button" onClick={goToDashboardTab} className="link-text text-body cursor-pointer underline">
-              Dashboard
+            <button type="button" onClick={goToInitTab} className="link-text text-body cursor-pointer underline">
+              Init
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
@@ -115,75 +151,113 @@ export default function SettingsPage({ onError }) {
     <div className="space-y-4">
       <SettingsTabBar currentTab={settingsSubTab} onTabChange={handleTabChange} />
 
+      {settingsSubTab === 'init' && (
+        <InitProvider value={initForm}>
+          <MinerSettingsProvider value={minerSettingsValue}>
+            <TabInit minerReachable={true} />
+          </MinerSettingsProvider>
+        </InitProvider>
+      )}
+
       {settingsSubTab === 'dashboard' && (
-        <form onSubmit={dashboardForm.handleSaveConfig} className="space-y-4">
-          <DashboardSettingsProvider value={dashboardForm}>
-            <DashboardConfigCard />
-            <PendingChangesBox changes={dashboardForm.configChanges} onReset={dashboardForm.handleRevertConfig} />
-            <DashboardSettingsFormFooter
-              mode="config"
-              resetDialogDescription="Reset all dashboard config to default values and save immediately. Miner IP is kept."
+        <form onSubmit={dashboardForm.save} className="space-y-4">
+          <DashboardProvider value={dashboardForm}>
+            <DashboardConfig />
+            <PendingChanges
+              changes={dashboardForm.changes}
+              onReset={dashboardForm.revert}
+              title="Pending changes"
             />
-          </DashboardSettingsProvider>
+            <SettingsFormFooter
+              form={dashboardForm}
+              resetDialogDescription="Reset Dashboard metric ranges to default values and save."
+            />
+          </DashboardProvider>
         </form>
       )}
 
       {settingsSubTab === 'colors' && (
-        <form onSubmit={dashboardForm.handleSaveColors} className="space-y-4">
-          <DashboardSettingsProvider value={dashboardForm}>
-            <DashboardColorsCard />
-            <PendingChangesBox changes={dashboardForm.colorsChanges} onReset={dashboardForm.handleRevertColors} />
-            <DashboardSettingsFormFooter
-              mode="colors"
-              resetDialogDescription="Reset accent and chart colors to defaults and save immediately."
+        <form onSubmit={colorForm.save} className="space-y-4">
+          <ColorProvider value={colorForm}>
+            <DashboardColors />
+            <PendingChanges
+              changes={colorForm.changes}
+              onReset={colorForm.revert}
+              title="Pending changes"
             />
-          </DashboardSettingsProvider>
+            <SettingsFormFooter
+              form={colorForm}
+              resetDialogDescription="Reset accent and chart colors to defaults and save."
+            />
+          </ColorProvider>
         </form>
       )}
 
       {settingsSubTab === 'firmware' && (
-        <FirmwareTabContent />
+        <TabFirmware />
       )}
 
-      {(settingsSubTab === 'miner' || settingsSubTab === 'pools') && (
-        <form onSubmit={minerForm.handleSave} className="space-y-4">
-          <MinerSettingsProvider value={minerForm}>
+      {(settingsSubTab === 'miner' || settingsSubTab === 'pools') && (() => {
+        const minerTabShowError = deviceForm.hasChanges && !deviceForm.isFormValid;
+        const poolsTabShowError = poolsForm.hasChanges && !poolsForm.isFormValid;
+        const minerTabSaveDisabled =
+          deviceForm.saving || !deviceForm.hasChanges || !deviceForm.isFormValid;
+        const poolsTabSaveDisabled =
+          poolsForm.saving || !poolsForm.hasChanges || !poolsForm.isFormValid;
+        const activeForm = settingsSubTab === 'miner' ? deviceForm : poolsForm;
+        return (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            settingsSubTab === 'miner' ? deviceForm.save() : poolsForm.save();
+          }}
+          className="space-y-4"
+        >
+          <MinerSettingsProvider value={minerSettingsValue}>
             {settingsSubTab === 'miner' && (
-              <MinerTabContent
-                wifiCollapsed={wifiCollapsed}
-                toggleWifiCollapsed={toggleWifiCollapsed}
-              />
+              <TabMiner />
             )}
             {settingsSubTab === 'pools' && (
-              <PoolsTabContent miner={miner} />
+              <TabPools miner={miner} />
             )}
 
-            <PendingChangesBox changes={minerForm.changes} onReset={minerForm.handleReset} />
+            <PendingChanges
+              changes={settingsSubTab === 'miner' ? deviceForm.changes : poolsForm.changes}
+              onReset={settingsSubTab === 'miner' ? deviceForm.revert : poolsForm.revert}
+              title="Pending changes"
+            />
 
             <div className="card">
               {settingsSubTab === 'miner' && <h3 className="card-title">Restart & Shutdown</h3>}
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap items-center gap-4">
-                  {minerForm.hasChanges && !minerForm.isFormValid && (
+                  {settingsSubTab === 'miner' && minerTabShowError && (
+                    <span className="text-danger text-sm" role="alert">
+                      Fix the errors above to save.
+                    </span>
+                  )}
+                  {settingsSubTab === 'pools' && poolsTabShowError && (
                     <span className="text-danger text-sm" role="alert">
                       Fix the errors above to save.
                     </span>
                   )}
                   <button
                     type="submit"
-                    disabled={minerForm.saving || !minerForm.hasChanges || !minerForm.isFormValid}
+                    disabled={
+                      settingsSubTab === 'miner' ? minerTabSaveDisabled : poolsTabSaveDisabled
+                    }
                     className="btn-primary"
                   >
-                    {minerForm.saving ? 'Saving…' : 'Save settings'}
+                    {activeForm.saving ? 'Saving…' : 'Save settings'}
                   </button>
-                  {minerForm.message?.type === 'success' && (
+                  {activeForm.message?.type === 'success' && (
                     <span role="status" className="toast-success">
                       <span>Saved successfully</span>
                     </span>
                   )}
-                  {minerForm.message?.type === 'error' && (
+                  {activeForm.message?.type === 'error' && (
                     <span role="alert" className="toast-warning">
-                      {minerForm.message.text}
+                      {activeForm.message.text}
                     </span>
                   )}
                 </div>
@@ -192,18 +266,18 @@ export default function SettingsPage({ onError }) {
                     <button
                       type="button"
                       onClick={() => setShowRestartConfirm(true)}
-                      disabled={minerForm.restarting || minerForm.shuttingDown}
+                      disabled={deviceForm.restarting || deviceForm.shuttingDown}
                       className="btn-ghost-accent"
                     >
-                      {minerForm.restarting ? 'Restarting…' : 'Restart miner'}
+                      {deviceForm.restarting ? 'Restarting…' : 'Restart miner'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowShutdownConfirm(true)}
-                      disabled={minerForm.restarting || minerForm.shuttingDown}
+                      disabled={deviceForm.restarting || deviceForm.shuttingDown}
                       className="btn-ghost-accent"
                     >
-                      {minerForm.shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
+                      {deviceForm.shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
                     </button>
                   </div>
                 )}
@@ -218,10 +292,10 @@ export default function SettingsPage({ onError }) {
                 description="Really restart the miner? It will disconnect briefly."
                 confirmLabel="Restart"
                 onConfirm={async () => {
-                  await minerForm.handleRestart();
+                  await deviceForm.handleRestart();
                   setShowRestartConfirm(false);
                 }}
-                confirmDisabled={minerForm.restarting}
+                confirmDisabled={deviceForm.restarting}
               />
               <ConfirmModal
                 open={showShutdownConfirm}
@@ -230,14 +304,15 @@ export default function SettingsPage({ onError }) {
                 description="Shutdown the miner? It will stop hashing and disconnect. You will need to power it back on manually."
                 confirmLabel="Shutdown"
                 onConfirm={async () => {
-                  await minerForm.handleShutdown();
+                  await deviceForm.handleShutdown();
                   setShowShutdownConfirm(false);
                 }}
-                confirmDisabled={minerForm.shuttingDown}
+                confirmDisabled={deviceForm.shuttingDown}
               />
           </>
         </form>
-      )}
+        );
+      })()}
     </div>
   );
 }

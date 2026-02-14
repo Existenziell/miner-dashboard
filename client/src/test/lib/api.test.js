@@ -189,7 +189,7 @@ describe('api', () => {
     });
 
     it('fetches checksum URL and parses SHA256', async () => {
-      const hash = 'a'.repeat(64) + '\n';
+      const hash = `${'a'.repeat(64)  }\n`;
       fetchStub.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(hash) });
       const result = await fetchFirmwareChecksum('https://example.com/file.sha256');
       expect(result).toBe('a'.repeat(64));

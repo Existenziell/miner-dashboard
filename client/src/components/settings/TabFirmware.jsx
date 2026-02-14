@@ -29,7 +29,7 @@ function pickFirmwareAsset(assets) {
   return bin || assets[0];
 }
 
-export function FirmwareTabContent() {
+export function TabFirmware() {
   const { data: miner, error: minerError } = useMiner();
   const [releases, setReleases] = useState([]);
   const [loadingReleases, setLoadingReleases] = useState(true);
@@ -329,7 +329,7 @@ export function FirmwareTabContent() {
             <h4 className="card-title">Manual Firmware Upload</h4>
             <div className="flex flex-wrap items-center gap-2">
               <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm">
-                <span>BROWSE</span>
+                <span>Browse</span>
                 <input
                   type="file"
                   accept=".bin"
@@ -344,7 +344,7 @@ export function FirmwareTabContent() {
                 disabled={disabled || flashingFirmware || !firmwareFile}
                 className="btn-ghost-accent"
               >
-                {flashingFirmware ? 'Flashing…' : 'FLASH'}
+                {flashingFirmware ? 'Flashing…' : 'Flash'}
               </button>
             </div>
             <p className="text-xs text-muted dark:text-muted-dark mt-1">(esp-miner-NerdQAxe++.bin)</p>
@@ -353,7 +353,7 @@ export function FirmwareTabContent() {
             <h4 className="card-title">Manual WWW Upload</h4>
             <div className="flex flex-wrap items-center gap-2">
               <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm">
-                <span>BROWSE</span>
+                <span>Browse</span>
                 <input
                   type="file"
                   accept=".bin"
@@ -368,7 +368,7 @@ export function FirmwareTabContent() {
                 disabled={disabled || flashingWww || !wwwFile}
                 className="btn-ghost-accent"
               >
-                {flashingWww ? 'Flashing…' : 'FLASH'}
+                {flashingWww ? 'Flashing…' : 'Flash'}
               </button>
             </div>
             <p className="text-xs text-muted dark:text-muted-dark mt-1">(www.bin)</p>

@@ -66,16 +66,14 @@ Then open `http://localhost:8001`.
 
 ## Configuration
 
-**Miner connection:** Set your miner's IP in **Settings → Dashboard** (Miner IP), or in `.env` as `MINER_IP`. The server starts without it; miner routes return a clear message if the miner address is not configured. `.env` overrides the value stored in the config file.
+**Miner connection:** Set your miner's IP in **Settings → Init** (Miner IP or hostname), or in `.env` as `MINER_IP`. The server starts without it; miner routes return a clear message if the miner address is not configured. `.env` overrides the value stored in the config file.
 
-**Dashboard config (server-persisted):** Stored in `config/dashboard.json` (created when you save from **Settings → Dashboard**):
+**Dashboard config (server-persisted):** Stored in `config/dashboard.json` (created when you save from **Settings → Init** or **Settings → Dashboard**):
 
-- **Miner IP or hostname**: fallback if not set in `.env`
-- **Expected hashrate (GH/s)**: used for the hashrate gauge scale and the Efficiency “Expected” display
-- **Miner / Network poll intervals (ms)**: how often the dashboard fetches miner status and network stats
-- **Metric ranges**: single threshold and gauge max per metric (hashrate, temp, power, efficiency, etc.). Gauges use accent (OK) and red (out of range). Each value is editable in the Dashboard tab; the hashrate gauge uses the larger of “Expected hashrate” and “Hashrate → Gauge max”.
+- **Init tab:** Miner IP or hostname (fallback if not set in `.env`), Expected hashrate (GH/s), Miner / Network poll intervals (ms). WiFi (hostname, SSID, password) is also in Init and stored on the miner device.
+- **Dashboard tab:** Metric ranges — single threshold and gauge max per metric (hashrate, temp, power, efficiency, etc.). Gauges use accent (OK) and red (out of range). The hashrate gauge uses the larger of "Expected hashrate" (set in Init) and "Hashrate → Gauge max".
 
-**Settings tabs:** Settings has three sections (Miner, Pools, Dashboard). The active section is reflected in the URL (`?tab=settings&section=miner|pools|dashboard`) so you can bookmark or share a link to a specific tab.
+**Settings tabs:** Settings has six sections (Init, Miner, Pools, Firmware, Dashboard, Colors). The active section is reflected in the URL (`?tab=settings&section=init|miner|pools|firmware|dashboard|colors`) so you can bookmark or share a link to a specific tab.
 
 **Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it (JSON body with any of the allowed keys above). Used by the Settings UI.
 
@@ -104,7 +102,7 @@ Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
 
 The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
 
-**Client (React):** Live miner data and dashboard config are provided via `MinerContext` and `ConfigContext`. The Settings page uses scoped settings contexts (`MinerSettingsContext`, `DashboardSettingsContext`) so the miner/pool and dashboard/colors forms avoid prop drilling; tab content components consume form state via the corresponding hooks.
+**Client (React):** Live miner data and dashboard config are provided via `MinerContext` and `ConfigContext`. The Settings page uses per-tab form hooks (`useInit`, `useDashboard`, `useColor`, `useMiner`) and scoped contexts (`InitContext`, `DashboardContext`, `ColorContext`, `MinerSettingsContext`) so each tab owns its state, save, revert, and reset; tab content consumes form state via the corresponding context.
 
 ## License
 

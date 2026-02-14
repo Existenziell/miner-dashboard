@@ -32,7 +32,7 @@ function clamp01(v) {
   return Math.max(0, Math.min(100, v));
 }
 
-export function getMetricGaugePercent(miner, metric, efficiency = null) {
+export function getGaugePercent(miner, metric, efficiency = null) {
   if (!miner) return null;
   const r = getRanges();
   switch (metric) {
@@ -69,7 +69,7 @@ export function getMetricGaugePercent(miner, metric, efficiency = null) {
  * @param {string} metric - One of: temp, hashrate, power, efficiency, current, frequency, voltage, fanRpm
  * @param {number} [efficiency] - Precomputed efficiency (J/TH) when metric === 'efficiency'
  */
-export function getMetricColor(miner, metric, efficiency = null) {
+export function getGaugeColor(miner, metric, efficiency = null) {
   if (!miner) return DEFAULT_ACCENT_COLOR;
 
   const r = getRanges();

@@ -1,8 +1,7 @@
 /**
  * Reusable "Pending changes" block: list of from → to changes and a Reset button.
- * Used for both miner form and dashboard (config/colors) forms.
  */
-export function PendingChangesBox({ changes, onReset, title = 'Pending changes' }) {
+export function PendingChanges({ changes, onReset, title = 'Pending changes' }) {
   if (!changes || changes.length === 0) return null;
   return (
     <div className="highlight-box">

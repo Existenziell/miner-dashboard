@@ -7,9 +7,9 @@ import HashrateChart from '@/components/charts/HashrateChart';
 import PowerChart from '@/components/charts/PowerChart';
 import TemperatureChart from '@/components/charts/TemperatureChart';
 import MinerSettings from '@/components/dashboard/MinerSettings';
+import MinerShares from '@/components/dashboard/MinerShares';
 import MinerStatus from '@/components/dashboard/MinerStatus';
 import NetworkStatus from '@/components/dashboard/NetworkStatus';
-import SharesCard from '@/components/dashboard/SharesCard';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import Notifications from '@/components/notifications/Notifications';
@@ -17,7 +17,7 @@ import Notifications from '@/components/notifications/Notifications';
 const SettingsPage = lazy(() => import('@/components/pages/SettingsPage'));
 const DocsPage = lazy(() => import('@/components/pages/DocsPage'));
 const ApiPage = lazy(() => import('@/components/pages/ApiPage'));
-const Metrics = lazy(() => import('@/components/dashboard/Metrics'));
+const MinerMetrics = lazy(() => import('@/components/dashboard/MinerMetrics'));
 
 function PageFallback({ message }) {
   return <div className="text-muted-standalone py-8 text-center">{message}</div>;
@@ -75,7 +75,7 @@ function AppContent({ activeTab, onTabChange }) {
               <>
                 {/* Key metrics - round gauges */}
                 <Suspense fallback={<PageFallback message="Loading metrics…" />}>
-                  <Metrics />
+                  <MinerMetrics />
                 </Suspense>
 
                 {/* Time series charts */}
@@ -89,7 +89,7 @@ function AppContent({ activeTab, onTabChange }) {
 
             {/* Settings and shares */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <SharesCard />
+              <MinerShares />
               <MinerSettings />
             </div>
 

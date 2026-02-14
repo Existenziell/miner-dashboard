@@ -13,7 +13,7 @@ function getArcPath(radius) {
   return `M ${startX} ${startY} A ${radius} ${radius} 0 1 1 ${endX} ${endY}`;
 }
 
-export default function MetricGauge({ label, value, sub, color = 'text-accent', percent = null }) {
+export default function Gauge({ label, value, sub, color = 'text-accent', percent = null }) {
   const arcPath = useMemo(() => getArcPath(GAUGE_RADIUS), []);
   const fillPercent = percent != null ? Math.max(0, Math.min(100, percent)) : 0;
 

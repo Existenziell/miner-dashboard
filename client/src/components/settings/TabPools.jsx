@@ -9,8 +9,8 @@ import {
 } from '@/lib/constants';
 import { Field } from '@/components/settings/Field';
 
-export function PoolsTabContent({ miner }) {
-  const form = useMinerSettingsContext();
+export function TabPools({ miner }) {
+  const { pools: form } = useMinerSettingsContext();
   const {
     POOL_MODE_OPTIONS,
     poolMode,

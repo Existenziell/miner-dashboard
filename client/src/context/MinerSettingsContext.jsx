@@ -3,6 +3,10 @@ import { createContext, useContext } from 'react';
 
 const MinerSettingsContext = createContext(null);
 
+/**
+ * Provider for miner settings. Value must be { device, wifi, pools }, each from
+ * useMinerDevice, useMinerWifi, useMinerPools respectively.
+ */
 export function MinerSettingsProvider({ value, children }) {
   return (
     <MinerSettingsContext.Provider value={value}>

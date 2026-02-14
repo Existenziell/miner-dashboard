@@ -71,10 +71,10 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'dashboard' }, '', '/');
     });
 
-    it('sets tab=settings and section=miner in URL when no stored section', () => {
+    it('sets tab=settings and section=init in URL when no stored section', () => {
       const { replaceState } = mockWindow({ href: 'http://localhost/', pathname: '/', storedSettingsSection: null });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=miner');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=init');
     });
 
     it('sets tab=settings and section from localStorage when URL has no section', () => {
@@ -89,14 +89,14 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'docs' }, '', '/?tab=docs');
     });
 
-    it('replaces existing tab param when switching to settings and uses stored section or miner', () => {
+    it('replaces existing tab param when switching to settings and uses stored section or init', () => {
       const { replaceState } = mockWindow({
         href: 'http://localhost/?tab=docs',
         pathname: '/',
         storedSettingsSection: null,
       });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=miner');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=init');
     });
 
     it('removes tab and section when switching to dashboard', () => {
@@ -119,22 +119,24 @@ describe('tabUrl', () => {
   });
 
   describe('getSettingsSectionFromUrl', () => {
-    it('returns miner when window is undefined', () => {
+    it('returns init when window is undefined', () => {
       vi.stubGlobal('window', undefined);
-      expect(getSettingsSectionFromUrl()).toBe('miner');
+      expect(getSettingsSectionFromUrl()).toBe('init');
     });
 
-    it('returns miner when section param is missing', () => {
+    it('returns init when section param is missing', () => {
       mockWindow({ search: '', href: 'http://localhost/' });
-      expect(getSettingsSectionFromUrl()).toBe('miner');
+      expect(getSettingsSectionFromUrl()).toBe('init');
     });
 
-    it('returns miner when section param is invalid', () => {
+    it('returns init when section param is invalid', () => {
       mockWindow({ search: '?tab=settings&section=invalid', href: 'http://localhost/?tab=settings&section=invalid' });
-      expect(getSettingsSectionFromUrl()).toBe('miner');
+      expect(getSettingsSectionFromUrl()).toBe('init');
     });
 
-    it('returns section when valid (miner, pools, firmware, dashboard, colors)', () => {
+    it('returns section when valid (init, miner, pools, firmware, dashboard, colors)', () => {
+      mockWindow({ search: '?tab=settings&section=init', href: 'http://localhost/?tab=settings&section=init' });
+      expect(getSettingsSectionFromUrl()).toBe('init');
       mockWindow({ search: '?tab=settings&section=miner', href: 'http://localhost/?tab=settings&section=miner' });
       expect(getSettingsSectionFromUrl()).toBe('miner');
       mockWindow({ search: '?tab=settings&section=pools', href: 'http://localhost/?tab=settings&section=pools' });
