@@ -181,14 +181,10 @@ input[type="number"] {
 
 /* Toast / inline message (success or danger) */
 .toast-success {
-  @apply rounded-lg px-4 py-3 text-sm
-    bg-success/15 dark:bg-success-dark/15 text-success dark:text-success-dark
-    border border-success/30 dark:border-success-dark/30;
+  @apply text-sm text-success dark:text-success-dark
 }
 .toast-danger {
-  @apply rounded-lg px-4 py-3 text-sm
-    bg-danger/15 dark:bg-danger-dark/15 text-danger dark:text-danger-dark
-    border border-danger/30 dark:border-danger-dark/30;
+  @apply text-sm text-danger dark:text-danger-dark
 }
 
 /* Nav tab button */

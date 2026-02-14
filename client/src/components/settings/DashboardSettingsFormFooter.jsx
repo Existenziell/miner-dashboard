@@ -2,7 +2,10 @@
  * Footer for dashboard settings forms (config and colors): Save button, message, Reset to defaults + confirm dialog.
  * Reads form state from DashboardSettingsContext; use mode to pick config vs colors slice.
  */
+import { useEffect } from 'react';
 import { useDashboardSettingsContext } from '@/context/DashboardSettingsContext';
+import { ERROR_MESSAGE_DISMISS_MS } from '@/lib/constants';
+import { ConfirmModal } from '@/components/ConfirmModal';
 
 export function DashboardSettingsFormFooter({
   mode,
@@ -34,6 +37,12 @@ export function DashboardSettingsFormFooter({
       };
   const { saving, hasChanges, message, setMessage, hasDefaultsDiff, showResetConfirm, setShowResetConfirm, onResetToDefaults } = slice;
 
+  useEffect(() => {
+    if (message?.type !== 'error' || !message?.text) return;
+    const id = setTimeout(() => setMessage(null), ERROR_MESSAGE_DISMISS_MS);
+    return () => clearTimeout(id);
+  }, [message?.type, message?.text, setMessage]);
+
   return (
     <>
       <div className="card">
@@ -51,10 +60,9 @@ export function DashboardSettingsFormFooter({
                 {message.text}
               </span>
             )}
-            {message?.type === 'error' && (
-              <span role="alert" className="toast-danger inline-flex items-center gap-2 px-3 py-2">
-                <span>{message.text}</span>
-                <button type="button" onClick={() => setMessage(null)} className="link-text font-medium opacity-90 hover:opacity-100">Dismiss</button>
+            {message?.type === 'error' && message?.text && (
+              <span role="alert" className="toast-danger">
+                {message.text}
               </span>
             )}
           </div>
@@ -70,22 +78,15 @@ export function DashboardSettingsFormFooter({
         </div>
       </div>
 
-      {showResetConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="reset-dashboard-dialog-title">
-          <div className="card max-w-md w-full shadow-xl">
-            <h2 id="reset-dashboard-dialog-title" className="text-lg font-semibold text-body mb-2">{resetDialogTitle}</h2>
-            <p className="text-muted-standalone text-sm mb-6">{resetDialogDescription}</p>
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowResetConfirm(false)} disabled={saving} className="btn-ghost">
-                Cancel
-              </button>
-              <button type="button" onClick={onResetToDefaults} disabled={saving} className="btn-primary">
-                {saving ? 'Resetting…' : 'Reset'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        title={resetDialogTitle}
+        description={resetDialogDescription}
+        confirmLabel="Reset"
+        onConfirm={onResetToDefaults}
+        confirmDisabled={saving}
+      />
     </>
   );
 }

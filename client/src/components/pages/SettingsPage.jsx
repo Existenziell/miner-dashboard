@@ -6,8 +6,9 @@ import { MinerSettingsProvider } from '@/context/MinerSettingsContext';
 import { useDashboardSettingsForm } from '@/hooks/useDashboardSettingsForm';
 import { useMinerSettingsForm } from '@/hooks/useMinerSettingsForm';
 import { useChartCollapsed } from '@/lib/chartUtils';
-import { SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
+import { ERROR_MESSAGE_DISMISS_MS, SETTINGS_WIFI_COLLAPSED } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import { DashboardColorsCard } from '@/components/settings/DashboardColorsCard';
 import { DashboardConfigCard } from '@/components/settings/DashboardConfigCard';
 import { DashboardSettingsFormFooter } from '@/components/settings/DashboardSettingsFormFooter';
@@ -20,6 +21,8 @@ export default function SettingsPage({ onError }) {
   const { data: miner, refetch } = useMiner();
   const { config, refetch: refetchConfig } = useConfig();
   const [settingsSubTab, setSettingsSubTab] = useState(getSettingsSectionFromUrl);
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+  const [showShutdownConfirm, setShowShutdownConfirm] = useState(false);
 
   useEffect(() => {
     const onPopState = () => setSettingsSubTab(getSettingsSectionFromUrl());
@@ -28,8 +31,15 @@ export default function SettingsPage({ onError }) {
   }, []);
 
   const minerForm = useMinerSettingsForm(miner, refetch, onError);
+  const { message: minerFormMessage, setMessage: setMinerFormMessage } = minerForm;
   const dashboardForm = useDashboardSettingsForm(config, refetchConfig, onError);
   const { collapsed: wifiCollapsed, toggleCollapsed: toggleWifiCollapsed } = useChartCollapsed(SETTINGS_WIFI_COLLAPSED);
+
+  useEffect(() => {
+    if (minerFormMessage?.type !== 'error' || !minerFormMessage?.text) return;
+    const id = setTimeout(() => setMinerFormMessage(null), ERROR_MESSAGE_DISMISS_MS);
+    return () => clearTimeout(id);
+  }, [minerFormMessage?.type, minerFormMessage?.text, setMinerFormMessage]);
 
   const handleTabChange = (id) => {
     setSettingsSubTab(id);
@@ -153,20 +163,13 @@ export default function SettingsPage({ onError }) {
                     {minerForm.saving ? 'Saving…' : 'Save settings'}
                   </button>
                   {minerForm.message?.type === 'success' && (
-                    <span role="status" className="toast-success inline-flex items-center gap-1.5 px-3 py-2">
+                    <span role="status" className="toast-success">
                       <span>Saved successfully</span>
                     </span>
                   )}
                   {minerForm.message?.type === 'error' && (
-                    <span role="alert" className="toast-danger inline-flex items-center gap-2 px-3 py-2">
-                      <span>{minerForm.message.text}</span>
-                      <button
-                        type="button"
-                        onClick={() => minerForm.setMessage(null)}
-                        className="link-text font-medium opacity-90 hover:opacity-100"
-                      >
-                        Dismiss
-                      </button>
+                    <span role="alert" className="toast-danger">
+                      {minerForm.message.text}
                     </span>
                   )}
                 </div>
@@ -174,7 +177,7 @@ export default function SettingsPage({ onError }) {
                   <div className="flex flex-wrap gap-3">
                     <button
                       type="button"
-                      onClick={minerForm.handleRestart}
+                      onClick={() => setShowRestartConfirm(true)}
                       disabled={minerForm.restarting || minerForm.shuttingDown}
                       className="btn-ghost-accent"
                     >
@@ -182,7 +185,7 @@ export default function SettingsPage({ onError }) {
                     </button>
                     <button
                       type="button"
-                      onClick={minerForm.handleShutdown}
+                      onClick={() => setShowShutdownConfirm(true)}
                       disabled={minerForm.restarting || minerForm.shuttingDown}
                       className="btn-ghost-accent"
                     >
@@ -193,6 +196,32 @@ export default function SettingsPage({ onError }) {
               </div>
             </div>
           </MinerSettingsProvider>
+          <>
+            <ConfirmModal
+                open={showRestartConfirm}
+                onClose={() => setShowRestartConfirm(false)}
+                title="Restart miner?"
+                description="Really restart the miner? It will disconnect briefly."
+                confirmLabel="Restart"
+                onConfirm={async () => {
+                  await minerForm.handleRestart();
+                  setShowRestartConfirm(false);
+                }}
+                confirmDisabled={minerForm.restarting}
+              />
+              <ConfirmModal
+                open={showShutdownConfirm}
+                onClose={() => setShowShutdownConfirm(false)}
+                title="Shutdown miner?"
+                description="Shutdown the miner? It will stop hashing and disconnect. You will need to power it back on manually."
+                confirmLabel="Shutdown"
+                onConfirm={async () => {
+                  await minerForm.handleShutdown();
+                  setShowShutdownConfirm(false);
+                }}
+                confirmDisabled={minerForm.shuttingDown}
+              />
+          </>
         </form>
       )}
     </div>

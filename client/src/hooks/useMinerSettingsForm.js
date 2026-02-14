@@ -520,7 +520,6 @@ export function useMinerSettingsForm(miner, refetch, onError) {
   }, [isFormValid, validationErrors, primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe, primaryStratumUser, fallbackStratumUser, primaryPassword, fallbackPassword, poolMode, stratumTcpKeepalive, hostname, wifiSsid, wifiPassword, frequency, coreVoltage, overheatTemp, fanAuto, pidTargetTemp, manualFanSpeed, autoScreenOff, flipScreen, refetch, onError]);
 
   const handleRestart = useCallback(async () => {
-    if (!confirm('Really restart the miner? It will disconnect briefly.')) return;
     setMessage(null);
     setRestarting(true);
     try {
@@ -535,7 +534,6 @@ export function useMinerSettingsForm(miner, refetch, onError) {
   }, [refetch]);
 
   const handleShutdown = useCallback(async () => {
-    if (!confirm('Shutdown the miner? It will stop hashing and disconnect. You will need to power it back on manually.')) return;
     setMessage(null);
     setShuttingDown(true);
     try {

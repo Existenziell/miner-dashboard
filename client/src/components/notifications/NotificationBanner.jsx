@@ -3,7 +3,6 @@
  * variant: 'success' | 'danger'
  * - success: e.g. block found (title, summary, onDismiss)
  * - danger: metric alerts (alerts array, onDismiss, optional onRequestPermission)
- * For inline feedback like "saved" use a short toast near the action instead.
  */
 export default function NotificationBanner({
   variant,

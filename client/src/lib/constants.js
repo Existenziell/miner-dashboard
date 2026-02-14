@@ -11,6 +11,7 @@ export const POLL_NETWORK_INTERVAL_MS = DASHBOARD_DEFAULTS.pollNetworkIntervalMs
 export const ALERT_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
 export const NOTIFICATION_AUTO_CLOSE_MS = 8_000;
 export const SUCCESS_MESSAGE_DISMISS_MS = 3_000;
+export const ERROR_MESSAGE_DISMISS_MS = 5_000;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
 
 // —— Chart history & persistence ——————————————————————————————————————————————
