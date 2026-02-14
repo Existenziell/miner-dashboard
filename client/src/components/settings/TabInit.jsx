@@ -1,12 +1,12 @@
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
-import { useInitContext } from '@/context/InitContext';
-import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import {
   MAX_HOSTNAME_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
   MAX_WIFI_SSID_LENGTH,
   MIN_WIFI_PASSWORD_LENGTH,
-} from '@/lib/constants';
+} from 'shared/schemas/minerApi';
+import { useInitContext } from '@/context/InitContext';
+import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import { Field } from '@/components/settings/Field';
 import { PendingChanges } from '@/components/settings/PendingChanges';
 

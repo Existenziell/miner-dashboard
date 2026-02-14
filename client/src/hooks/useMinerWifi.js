@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { patchMinerSettings } from '@/lib/api';
 import {
   MAX_HOSTNAME_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
   MAX_WIFI_SSID_LENGTH,
   MIN_WIFI_PASSWORD_LENGTH,
-  TOAST_AUTO_DISMISS_MS,
-} from '@/lib/constants';
+} from 'shared/schemas/minerApi';
+import { patchMinerSettings } from '@/lib/api';
+import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 
 export function useMinerWifi(miner, refetch, onError) {
   const [saving, setSaving] = useState(false);

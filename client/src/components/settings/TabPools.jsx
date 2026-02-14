@@ -1,10 +1,12 @@
-import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import {
-  DEFAULT_STRATUM_PORT,
   MAX_STRATUM_PASSWORD_LENGTH,
   MAX_STRATUM_PORT,
   MAX_STRATUM_USER_LENGTH,
   MIN_STRATUM_PORT,
+} from 'shared/schemas/minerApi';
+import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
+import {
+  DEFAULT_STRATUM_PORT,
   SOLO_POOLS,
 } from '@/lib/constants';
 import { Field } from '@/components/settings/Field';

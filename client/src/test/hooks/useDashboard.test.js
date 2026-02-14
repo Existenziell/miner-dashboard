@@ -63,7 +63,7 @@ describe('useDashboard', () => {
     expect(result.current.hasChanges).toBe(false);
   });
 
-  it('save() calls patchDashboardConfig with metricRanges and refetchConfig', async () => {
+  it('save() calls patchDashboardConfig with metricRanges, metricOrder and refetchConfig', async () => {
     const metricRanges = { hashrate: { min: 5500, gaugeMax: 7000 } };
     const config = { metricRanges };
     mockPatchDashboardConfig.mockResolvedValue({});
@@ -77,10 +77,29 @@ describe('useDashboard', () => {
       await result.current.save();
     });
 
-    expect(mockPatchDashboardConfig).toHaveBeenCalledWith({
-      metricRanges: expect.objectContaining({ hashrate: expect.objectContaining({ gaugeMax: 7500 }) }),
-    });
+    expect(mockPatchDashboardConfig).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metricRanges: expect.objectContaining({ hashrate: expect.objectContaining({ gaugeMax: 7500 }) }),
+        metricOrder: expect.any(Array),
+      })
+    );
     expect(refetchConfig).toHaveBeenCalled();
     expect(result.current.message).toEqual({ type: 'success', text: 'Metric ranges saved.' });
+  });
+
+  it('returns metricOrder from config and setMetricOrder updates order', () => {
+    const metricOrder = ['power', 'hashrate', 'efficiency', 'temp', 'fanRpm', 'current', 'frequency', 'voltage'];
+    const config = { metricRanges: {}, metricOrder };
+    const { result } = renderHook(() => useDashboard(config, refetchConfig, onError));
+
+    expect(result.current.metricOrder).toEqual(metricOrder);
+
+    act(() => {
+      result.current.setMetricOrder(['hashrate', 'power', 'efficiency', 'temp', 'fanRpm', 'current', 'frequency', 'voltage']);
+    });
+
+    expect(result.current.metricOrder[0]).toBe('hashrate');
+    expect(result.current.metricOrder[1]).toBe('power');
+    expect(result.current.hasChanges).toBe(true);
   });
 });

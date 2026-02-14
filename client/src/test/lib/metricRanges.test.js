@@ -15,12 +15,13 @@ describe('getGaugeColor', () => {
   });
 
   describe('temp', () => {
-    it('accent when <= 65 °C', () => {
+    it('accent when <= 60 °C (default max)', () => {
       expect(getGaugeColor({ temp: 0 }, 'temp')).toBe('text-accent');
       expect(getGaugeColor({ temp: 55 }, 'temp')).toBe('text-accent');
-      expect(getGaugeColor({ temp: 65 }, 'temp')).toBe('text-accent');
+      expect(getGaugeColor({ temp: 60 }, 'temp')).toBe('text-accent');
     });
-    it('red when > 65 °C', () => {
+    it('red when > 60 °C', () => {
+      expect(getGaugeColor({ temp: 61 }, 'temp')).toBe('text-danger');
       expect(getGaugeColor({ temp: 66 }, 'temp')).toBe('text-danger');
     });
     it('accent when temp is null', () => {
@@ -33,25 +34,26 @@ describe('getGaugeColor', () => {
       expect(getGaugeColor({ hashRate: null }, 'hashrate')).toBe('text-danger');
       expect(getGaugeColor({ hashRate: 0 }, 'hashrate')).toBe('text-danger');
     });
-    it('red when below min (5500 GH/s)', () => {
+    it('red when below min (5900 GH/s default)', () => {
       expect(getGaugeColor({ hashRate: 4800 }, 'hashrate')).toBe('text-danger');
       expect(getGaugeColor({ hashRate: 5499 }, 'hashrate')).toBe('text-danger');
+      expect(getGaugeColor({ hashRate: 5899 }, 'hashrate')).toBe('text-danger');
     });
-    it('accent at or above 5500 GH/s', () => {
-      expect(getGaugeColor({ hashRate: 5500 }, 'hashrate')).toBe('text-accent');
+    it('accent at or above 5900 GH/s', () => {
+      expect(getGaugeColor({ hashRate: 5900 }, 'hashrate')).toBe('text-accent');
       expect(getGaugeColor({ hashRate: 6000 }, 'hashrate')).toBe('text-accent');
       expect(getGaugeColor({ hashRate: 7000 }, 'hashrate')).toBe('text-accent');
     });
   });
 
   describe('power', () => {
-    it('accent when <= 117.5 W', () => {
+    it('accent when <= 115 W (default max)', () => {
       expect(getGaugeColor({ power: 0 }, 'power')).toBe('text-accent');
       expect(getGaugeColor({ power: 100 }, 'power')).toBe('text-accent');
       expect(getGaugeColor({ power: 115 }, 'power')).toBe('text-accent');
-      expect(getGaugeColor({ power: 117.5 }, 'power')).toBe('text-accent');
     });
-    it('red when > 117.5 W', () => {
+    it('red when > 115 W', () => {
+      expect(getGaugeColor({ power: 116 }, 'power')).toBe('text-danger');
       expect(getGaugeColor({ power: 118 }, 'power')).toBe('text-danger');
     });
   });
@@ -73,13 +75,13 @@ describe('getGaugeColor', () => {
   });
 
   describe('current', () => {
-    it('accent when <= 9.75 A', () => {
+    it('accent when <= 9.5 A (default max)', () => {
       expect(getGaugeColor({ current: 9000 }, 'current')).toBe('text-accent');  // 9 A
       expect(getGaugeColor({ current: 9400 }, 'current')).toBe('text-accent'); // 9.4 A
-      expect(getGaugeColor({ current: 9750 }, 'current')).toBe('text-accent'); // 9.75 A
+      expect(getGaugeColor({ current: 9500 }, 'current')).toBe('text-accent'); // 9.5 A
     });
-    it('red when > 9.75 A', () => {
-      expect(getGaugeColor({ current: 9760 }, 'current')).toBe('text-danger');
+    it('red when > 9.5 A', () => {
+      expect(getGaugeColor({ current: 9510 }, 'current')).toBe('text-danger');
       expect(getGaugeColor({ current: 10500 }, 'current')).toBe('text-danger');  // 10.5 A
     });
   });

@@ -53,5 +53,15 @@
       "max": 115,
       "gaugeMax": 130
     }
-  }
+  },
+  "metricOrder": [
+    "hashrate",
+    "efficiency",
+    "temp",
+    "fanRpm",
+    "current",
+    "frequency",
+    "voltage",
+    "power"
+  ]
 }

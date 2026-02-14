@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { deepCopy } from '@/lib/utils';
 
 export const METRIC_LABELS = {
   hashrate: 'Hashrate (GH/s)',
@@ -22,12 +23,13 @@ export const METRIC_KEY_LABELS = {
   maxMv: 'Max (mV)',
 };
 
-function deepCopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
+const defaultMetricOrder = () => DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
 
 export function useDashboard(config, refetchConfig, onError) {
   const [metricRanges, setMetricRanges] = useState(() => deepCopy(config.metricRanges));
+  const [metricOrder, setMetricOrder] = useState(
+    () => config.metricOrder ?? defaultMetricOrder()
+  );
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -36,11 +38,17 @@ export function useDashboard(config, refetchConfig, onError) {
     setMetricRanges(deepCopy(config.metricRanges));
   }, [config.metricRanges]);
 
-  const hasChanges =
-    JSON.stringify(metricRanges) !== JSON.stringify(config.metricRanges);
+  useEffect(() => {
+    setMetricOrder(config.metricOrder ?? defaultMetricOrder());
+  }, [config.metricOrder]);
+
+  const rangesChanged = JSON.stringify(metricRanges) !== JSON.stringify(config.metricRanges);
+  const orderChanged = JSON.stringify(metricOrder) !== JSON.stringify(config.metricOrder ?? defaultMetricOrder());
+  const hasChanges = rangesChanged || orderChanged;
 
   const hasDefaultsDiff =
-    JSON.stringify(metricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges);
+    JSON.stringify(metricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges) ||
+    JSON.stringify(metricOrder) !== JSON.stringify(defaultMetricOrder());
 
   const changes = useMemo(() => {
     const list = [];
@@ -66,7 +74,8 @@ export function useDashboard(config, refetchConfig, onError) {
 
   const revert = useCallback(() => {
     setMetricRanges(deepCopy(config.metricRanges));
-  }, [config.metricRanges]);
+    setMetricOrder(config.metricOrder ?? defaultMetricOrder());
+  }, [config.metricRanges, config.metricOrder]);
 
   const save = useCallback(
     async (e) => {
@@ -74,7 +83,10 @@ export function useDashboard(config, refetchConfig, onError) {
       setMessage(null);
       setSaving(true);
       try {
-        await patchDashboardConfig({ metricRanges: deepCopy(metricRanges) });
+        await patchDashboardConfig({
+          metricRanges: deepCopy(metricRanges),
+          metricOrder: [...metricOrder],
+        });
         await refetchConfig();
         setMessage({ type: 'success', text: 'Metric ranges saved.' });
       } catch (err) {
@@ -84,18 +96,22 @@ export function useDashboard(config, refetchConfig, onError) {
         setSaving(false);
       }
     },
-    [metricRanges, refetchConfig, onError]
+    [metricRanges, metricOrder, refetchConfig, onError]
   );
 
   const resetToDefaults = useCallback(async () => {
     setMessage(null);
     setSaving(true);
     try {
-      await patchDashboardConfig({ metricRanges: deepCopy(DASHBOARD_DEFAULTS.metricRanges) });
+      await patchDashboardConfig({
+        metricRanges: deepCopy(DASHBOARD_DEFAULTS.metricRanges),
+        metricOrder: [...defaultMetricOrder()],
+      });
       await refetchConfig();
       setMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
+      setMetricOrder(defaultMetricOrder());
       setShowResetConfirm(false);
-      setMessage({ type: 'success', text: 'Metric ranges reset to defaults and saved.' });
+      setMessage({ type: 'success', text: 'Metric ranges reset to default values.' });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);
@@ -114,6 +130,10 @@ export function useDashboard(config, refetchConfig, onError) {
     }));
   }, []);
 
+  const setMetricOrderList = useCallback((newOrder) => {
+    setMetricOrder(Array.isArray(newOrder) ? [...newOrder] : newOrder);
+  }, []);
+
   useEffect(() => {
     if (message?.type !== 'success') return;
     const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
@@ -124,6 +144,8 @@ export function useDashboard(config, refetchConfig, onError) {
     METRIC_LABELS,
     METRIC_KEY_LABELS,
     metricRanges,
+    metricOrder,
+    setMetricOrder: setMetricOrderList,
     setMetricRangeValue,
     changes,
     hasChanges,

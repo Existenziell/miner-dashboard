@@ -1,4 +1,4 @@
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/context/ThemeContext';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 
 const TABS = [

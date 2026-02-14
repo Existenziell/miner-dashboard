@@ -33,16 +33,6 @@ export const CHART_HISTORY_HR = 'md.chart.hr.data';
 export const CHART_HISTORY_TMP = 'md.chart.tmp.data';
 export const CHART_HISTORY_PW = 'md.chart.pw.data';
 export const SETTINGS_SECTION_KEY = 'md.settings.section';
-export const SETTINGS_WIFI_COLLAPSED = 'md.settings.wifi.collapsed';
-
-// —— Settings / validation lengths —————————————————————————————————────────————
-export const MAX_STRATUM_USER_LENGTH = 128;
-export const MAX_STRATUM_PASSWORD_LENGTH = 128;
-export const MAX_STRATUM_URL_LENGTH = 512;
-export const MAX_HOSTNAME_LENGTH = 64;
-export const MAX_WIFI_SSID_LENGTH = 32;
-export const MIN_WIFI_PASSWORD_LENGTH = 8;
-export const MAX_WIFI_PASSWORD_LENGTH = 63;
 
 // —— UI (gauges) & metric ranges ——————————————————————————————————————————————
 export const GAUGE_RADIUS = 48; // Gauge arc radius (viewBox units)
@@ -50,8 +40,6 @@ export const METRIC_RANGES = DASHBOARD_DEFAULTS.metricRanges;
 
 // —— Stratum / pools ——————————————————————————————————————————————————————————
 export const DEFAULT_STRATUM_PORT = 3333;
-export const MIN_STRATUM_PORT = 1;
-export const MAX_STRATUM_PORT = 65535;
 
 export const SOLO_POOLS = [
   {

@@ -29,4 +29,14 @@ export const DASHBOARD_DEFAULTS = {
     voltage: { maxMv: 50, gaugeMax: 1500 },
     power: { max: 115, gaugeMax: 130 },
   },
+  metricOrder: [
+    'hashrate',
+    'efficiency',
+    'temp',
+    'fanRpm',
+    'current',
+    'frequency',
+    'voltage',
+    'power',
+  ],
 };

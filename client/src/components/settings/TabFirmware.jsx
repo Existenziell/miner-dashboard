@@ -328,7 +328,7 @@ export function TabFirmware() {
           <div>
             <h4 className="card-title">Manual Firmware Upload</h4>
             <div className="flex flex-wrap items-center gap-2">
-              <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm">
+              <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm">
                 <span>Browse</span>
                 <input
                   type="file"
@@ -352,7 +352,7 @@ export function TabFirmware() {
           <div>
             <h4 className="card-title">Manual WWW Upload</h4>
             <div className="flex flex-wrap items-center gap-2">
-              <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm">
+              <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm">
                 <span>Browse</span>
                 <input
                   type="file"

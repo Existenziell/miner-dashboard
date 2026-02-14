@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { patchMinerSettings } from '@/lib/api';
 import {
-  DEFAULT_STRATUM_PORT,
   MAX_STRATUM_PASSWORD_LENGTH,
   MAX_STRATUM_PORT,
   MAX_STRATUM_URL_LENGTH,
   MAX_STRATUM_USER_LENGTH,
   MIN_STRATUM_PORT,
+} from 'shared/schemas/minerApi';
+import { patchMinerSettings } from '@/lib/api';
+import {
+  DEFAULT_STRATUM_PORT,
   SOLO_POOLS,
   TOAST_AUTO_DISMISS_MS,
 } from '@/lib/constants';

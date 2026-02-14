@@ -105,7 +105,7 @@ export function useInit(config, refetchConfig, onError) {
       setPollMinerMs(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
       setPollNetworkMs(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
       setShowResetConfirm(false);
-      setMessage({ type: 'success', text: 'Settings reset to defaults and saved.' });
+      setMessage({ type: 'success', text: 'Settings reset to default values.' });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);

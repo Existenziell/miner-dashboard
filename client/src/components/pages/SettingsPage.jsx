@@ -111,7 +111,7 @@ export default function SettingsPage({ onError }) {
               />
               <SettingsFormFooter
                 form={colorForm}
-                resetDialogDescription="Reset accent and chart colors to defaults and save."
+                resetDialogDescription="Reset accent and chart colors to default values."
               />
             </ColorProvider>
           </form>
@@ -187,7 +187,7 @@ export default function SettingsPage({ onError }) {
             />
             <SettingsFormFooter
               form={colorForm}
-              resetDialogDescription="Reset accent and chart colors to defaults and save."
+              resetDialogDescription="Reset accent and chart colors to default values."
             />
           </ColorProvider>
         </form>

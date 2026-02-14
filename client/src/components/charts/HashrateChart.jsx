@@ -2,7 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer,Tooltip, XAxis, YAxis } from 'recharts';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { useConfig } from '@/context/ConfigContext';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/context/ThemeContext';
 import { formatTime, getChartGridAxisColors, useChartCollapsed,useChartLegend } from '@/lib/chartUtils';
 import { CHART_COLLAPSED_HR,CHART_LEGEND_HR } from '@/lib/constants';
 import { ChartCard, ChartTooltip, ClickableLegend } from '@/components/charts/Chart';

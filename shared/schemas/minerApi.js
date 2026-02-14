@@ -9,16 +9,19 @@
 
 import { z } from 'zod';
 
-// --- Constants (match server validation) ---
-const MAX_HOSTNAME_LENGTH = 64;
-const MAX_WIFI_SSID_LENGTH = 32;
-const MIN_WIFI_PASSWORD_LENGTH = 8;
-const MAX_WIFI_PASSWORD_LENGTH = 63;
-const MAX_STRATUM_URL_LENGTH = 512;
-const MAX_STRATUM_USER_LENGTH = 128;
-const MAX_STRATUM_PASSWORD_LENGTH = 128;
-const MIN_PORT = 1;
-const MAX_PORT = 65535;
+// --- Constants (match server validation); exported for client validation/UI ---
+export const MAX_HOSTNAME_LENGTH = 64;
+export const MAX_WIFI_SSID_LENGTH = 32;
+export const MIN_WIFI_PASSWORD_LENGTH = 8;
+export const MAX_WIFI_PASSWORD_LENGTH = 63;
+export const MAX_STRATUM_URL_LENGTH = 512;
+export const MAX_STRATUM_USER_LENGTH = 128;
+export const MAX_STRATUM_PASSWORD_LENGTH = 128;
+export const MIN_PORT = 1;
+export const MAX_PORT = 65535;
+/** Stratum port range aliases for client (same as MIN_PORT / MAX_PORT). */
+export const MIN_STRATUM_PORT = MIN_PORT;
+export const MAX_STRATUM_PORT = MAX_PORT;
 const POOL_MODE_VALUES = ['failover', 'dual', '0', '1'];
 const HOSTNAME_REGEX = /^[a-zA-Z0-9-]*$/;
 

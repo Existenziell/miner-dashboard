@@ -42,6 +42,23 @@ function deepMergeChartColors(defaults, fromFile) {
   return out;
 }
 
+const DEFAULT_METRIC_ORDER = DASHBOARD_DEFAULTS.metricOrder;
+const KNOWN_METRICS = new Set(Object.keys(DASHBOARD_DEFAULTS.metricRanges));
+
+function mergeMetricOrder(fromFile) {
+  if (!Array.isArray(fromFile) || fromFile.length !== KNOWN_METRICS.size) {
+    return [...DEFAULT_METRIC_ORDER];
+  }
+  const seen = new Set();
+  for (const id of fromFile) {
+    if (typeof id !== 'string' || !KNOWN_METRICS.has(id) || seen.has(id)) {
+      return [...DEFAULT_METRIC_ORDER];
+    }
+    seen.add(id);
+  }
+  return [...fromFile];
+}
+
 function mergeWithDefaults(fileObj) {
   if (!fileObj || typeof fileObj !== 'object') return { ...DASHBOARD_DEFAULTS };
   const metricRanges = deepMergeMetricRanges(
@@ -52,11 +69,13 @@ function mergeWithDefaults(fileObj) {
     DASHBOARD_DEFAULTS.chartColors,
     fileObj.chartColors
   );
+  const metricOrder = mergeMetricOrder(fileObj.metricOrder);
   return {
     ...DASHBOARD_DEFAULTS,
     ...fileObj,
     metricRanges,
     chartColors,
+    metricOrder,
   };
 }
 

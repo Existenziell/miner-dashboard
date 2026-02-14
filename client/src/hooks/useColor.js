@@ -3,10 +3,7 @@ import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
 import { normalizeHex } from '@/lib/colorUtils';
 import { CHART_COLOR_SPEC, TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
-
-function deepCopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
+import { deepCopy } from '@/lib/utils';
 
 export function useColor(config, refetchConfig, onError) {
   const [accentColor, setAccentColor] = useState(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
@@ -111,7 +108,7 @@ export function useColor(config, refetchConfig, onError) {
       setAccentColor(DASHBOARD_DEFAULTS.accentColor);
       setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
       setShowResetConfirm(false);
-      setMessage({ type: 'success', text: 'Colors reset to defaults and saved.' });
+      setMessage({ type: 'success', text: 'Colors reset to default values.' });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);

@@ -12,14 +12,32 @@ function validateNumber(value, min, max, label) {
   return null;
 }
 
+const KNOWN_METRICS = new Set(Object.keys(DASHBOARD_DEFAULTS.metricRanges));
+
 function validateMetricRanges(ranges) {
   if (ranges == null) return null;
   if (typeof ranges !== 'object') return 'metricRanges must be an object';
-  const known = Object.keys(DASHBOARD_DEFAULTS.metricRanges);
   for (const key of Object.keys(ranges)) {
-    if (!known.includes(key)) return `Unknown metric: ${key}`;
+    if (!KNOWN_METRICS.has(key)) return `Unknown metric: ${key}`;
     const m = ranges[key];
     if (typeof m !== 'object' || m === null) return `metricRanges.${key} must be an object`;
+  }
+  return null;
+}
+
+function validateMetricOrder(order) {
+  if (order === undefined) return null;
+  if (!Array.isArray(order)) return 'metricOrder must be an array';
+  if (order.length !== KNOWN_METRICS.size) {
+    return `metricOrder must contain exactly ${KNOWN_METRICS.size} metric ids`;
+  }
+  const seen = new Set();
+  for (let i = 0; i < order.length; i++) {
+    const id = order[i];
+    if (typeof id !== 'string') return `metricOrder[${i}] must be a string`;
+    if (!KNOWN_METRICS.has(id)) return `metricOrder: unknown metric "${id}"`;
+    if (seen.has(id)) return `metricOrder: duplicate metric "${id}"`;
+    seen.add(id);
   }
   return null;
 }
@@ -83,6 +101,8 @@ router.patch('/', (req, res) => {
   }
   const mrErr = validateMetricRanges(body.metricRanges);
   if (mrErr) errors.push(mrErr);
+  const orderErr = validateMetricOrder(body.metricOrder);
+  if (orderErr) errors.push(orderErr);
   const accentErr = validateAccentColor(body.accentColor);
   if (accentErr) errors.push(accentErr);
   const chartErr = validateChartColors(body.chartColors);
