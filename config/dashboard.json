@@ -3,7 +3,7 @@
   "defaultExpectedHashrateGh": 6000,
   "pollMinerIntervalMs": 10000,
   "pollNetworkIntervalMs": 60000,
-  "accentColor": "#d946ef",
+  "accentColor": "#8b41e7",
   "chartColors": {
     "power": {
       "power": "#d946ef",
@@ -23,7 +23,7 @@
   },
   "metricRanges": {
     "hashrate": {
-      "min": 5500,
+      "min": 5900,
       "gaugeMax": 7000
     },
     "efficiency": {
@@ -31,26 +31,26 @@
       "gaugeMax": 30
     },
     "temp": {
-      "max": 65,
-      "gaugeMax": 85
+      "max": 60,
+      "gaugeMax": 100
     },
     "fanRpm": {
       "maxPct": 75
     },
     "current": {
-      "max": 9.75,
-      "gaugeMax": 10.5
+      "max": 9.5,
+      "gaugeMax": 11
     },
     "frequency": {
       "min": 650,
-      "gaugeMax": 850
+      "gaugeMax": 900
     },
     "voltage": {
       "maxMv": 50,
-      "gaugeMax": 1400
+      "gaugeMax": 1500
     },
     "power": {
-      "max": 117.5,
+      "max": 115,
       "gaugeMax": 130
     }
   }
