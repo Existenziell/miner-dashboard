@@ -63,12 +63,7 @@ export function getGaugePercent(miner, metric, efficiency = null) {
   }
 }
 
-/**
- * Returns the Tailwind color class for a metric given miner data.
- * @param {object} miner - Miner info object
- * @param {string} metric - One of: temp, hashrate, power, efficiency, current, frequency, voltage, fanRpm
- * @param {number} [efficiency] - Precomputed efficiency (J/TH) when metric === 'efficiency'
- */
+/** Returns the Tailwind color class for a metric given miner data. */
 export function getGaugeColor(miner, metric, efficiency = null) {
   if (!miner) return DEFAULT_ACCENT_COLOR;
 

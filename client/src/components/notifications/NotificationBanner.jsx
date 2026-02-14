@@ -5,19 +5,7 @@ const NOTIFICATION_CLASS = {
   warning: 'notification-warning',
 };
 
-/**
- * Shared notification banner. Use for connection errors, block found, metric notifications.
- *
- * @param {object} props
- * @param {'success'|'warning'} props.type - success (green), warning (amber)
- * @param {boolean} props.dismissable - show Dismiss button when true
- * @param {() => void} [props.onDismiss] - called when Dismiss is clicked (required if dismissable)
- * @param {string} [props.message] - single-line content (e.g. "Cannot reach miner: ...")
- * @param {string} [props.title] - heading (used with summary or items)
- * @param {string} [props.summary] - subtitle below title
- * @param {{ id: string, label: string, detail?: string }[]} [props.items] - list (e.g. metric notifications).
- * @param {React.ReactNode} [props.action] - optional slot (e.g. "Enable browser notifications" button)
- */
+/** Shared notification banner for connection errors, block found, metric notifications. */
 export default function NotificationBanner({
   type,
   dismissable,

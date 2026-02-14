@@ -1,10 +1,6 @@
 import { formatTime } from '@/lib/chartUtils';
 
-/**
- * Recharts tooltip wrapper: time label + list of series values.
- * @param {Object} props - Recharts tooltip props (active, payload, label)
- * @param {(entry: { dataKey: string, name: string, color: string, value?: number }) => string} props.formatValue - Format one payload entry for display
- */
+/** Recharts tooltip wrapper: time label + list of series values. */
 export function ChartTooltip({ active, payload, label, formatValue }) {
   if (!active || !payload?.length) return null;
   return (
@@ -47,15 +43,7 @@ export function ClickableLegend({ series, hidden, onToggle }) {
   );
 }
 
-/**
- * Card shell for time-series charts: title, collapse, loading state.
- * @param {string} title - Chart title
- * @param {boolean} loading - Show loading placeholder
- * @param {string} loadingMessage - Message when loading
- * @param {boolean} collapsed - Whether chart is collapsed
- * @param {() => void} onToggleCollapsed - Toggle collapse
- * @param {React.ReactNode} children - Content when not loading and expanded (legend + chart)
- */
+/** Card shell for time-series charts: title, collapse, loading state. */
 export function ChartCard({ title, loading, loadingMessage, collapsed, onToggleCollapsed, children }) {
   if (loading) {
     return (

@@ -7,12 +7,7 @@ export function formatTime(ts) {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-/**
- * Persist which legend series are hidden in localStorage.
- * @param {string} storageKey - localStorage key
- * @param {Set<string>} seriesKeys - valid series keys
- * @returns {{ hidden: Set<string>, toggle: (key: string) => void }}
- */
+/** Persist which legend series are hidden in localStorage. */
 export function useChartLegend(storageKey, seriesKeys) {
   const loadStored = useCallback(() => {
     try {
@@ -46,11 +41,7 @@ export function useChartLegend(storageKey, seriesKeys) {
   return { hidden, toggle };
 }
 
-/**
- * Persist chart collapsed/expanded state in localStorage.
- * @param {string} storageKey - localStorage key
- * @returns {{ collapsed: boolean, toggleCollapsed: () => void }}
- */
+/** Persist chart collapsed/expanded state in localStorage. */
 export function useChartCollapsed(storageKey) {
   const [collapsed, setCollapsed] = useState(() => {
     try {

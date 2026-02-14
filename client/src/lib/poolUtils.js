@@ -1,10 +1,6 @@
 import { DEFAULT_STRATUM_PORT,SOLO_POOLS } from '@/lib/constants.js';
 
-/**
- * Build stratum payload for miner PATCH from a solo pool option.
- * @param {SoloPool} option
- * @returns {{ stratumURL: string, stratumPort: number, stratumTLS: boolean }}
- */
+/** Build stratum payload for miner PATCH from a solo pool option. */
 export function getStratumPayloadFromOption(option) {
   return {
     stratumURL: option.stratumHost,
@@ -13,12 +9,7 @@ export function getStratumPayloadFromOption(option) {
   };
 }
 
-/**
- * Find a SOLO_POOLS entry that matches the current miner stratum host.
- * Match by host only (pool identity); port/TLS are read from miner state for the form.
- * @param {string | null | undefined} stratumURL
- * @returns {SoloPool | null}
- */
+/** Find a SOLO_POOLS entry that matches the current miner stratum host (match by host only). */
 export function findSoloPoolOption(stratumURL) {
   if (!stratumURL) return null;
   const normalized = String(stratumURL)
@@ -50,11 +41,7 @@ function fallbackName(base) {
   return segment ? segment.charAt(0).toUpperCase() + segment.slice(1) : base;
 }
 
-/**
- * Resolve pool info from a stratum host URL.
- * @param {string | null | undefined} stratumHost
- * @returns {{ name: string, webUrl: string | null, identifier: string | null }}
- */
+/** Resolve pool info from a stratum host URL. */
 export function getPoolInfo(stratumHost) {
   if (!stratumHost) return { name: '--', webUrl: null, identifier: null };
   const rawHost = String(stratumHost)
