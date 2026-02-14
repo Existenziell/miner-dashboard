@@ -7,7 +7,7 @@ export const DASHBOARD_DEFAULTS = {
   defaultExpectedHashrateGh: 6000,
   pollMinerIntervalMs: 10_000,
   pollNetworkIntervalMs: 60_000,
-  accentColor: '#d946ef',
+  accentColor: '#06b6d4',
   chartColors: {
     power: { power: '#d946ef', currentA: '#06b6d4' },
     temperature: { temp: '#d946ef', vrTemp: '#06b6d4' },
@@ -31,12 +31,12 @@ export const DASHBOARD_DEFAULTS = {
   },
   metricOrder: [
     'hashrate',
-    'efficiency',
     'temp',
     'fanRpm',
-    'current',
+    'efficiency',
     'frequency',
     'voltage',
+    'current',
     'power',
   ],
 };

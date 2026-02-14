@@ -2,7 +2,7 @@
 import { createContext, useCallback,useContext, useEffect, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { fetchDashboardConfig } from '@/lib/api';
-import { getContrastColor,hexWithAlpha, normalizeHex } from '@/lib/colorUtils';
+import { getContrastColor, CONTRAST_THRESHOLD_TOGGLE, hexWithAlpha, normalizeHex } from '@/lib/colorUtils';
 import { setMetricRanges } from '@/lib/metricRanges';
 
 const ConfigContext = createContext(null);
@@ -15,6 +15,7 @@ function buildAccentOverrideCSS(accent) {
   const a25 = hexWithAlpha(accent, 0.25);
   const a50 = hexWithAlpha(accent, 0.5);
   const contrastFg = getContrastColor(accent);
+  const toggleThumbFg = getContrastColor(accent, CONTRAST_THRESHOLD_TOGGLE);
   return `/* Accent override - Tailwind compiles to literal hex */
 .bg-accent{background-color:${accent} !important}
 .text-accent{color:${accent} !important}
@@ -25,7 +26,7 @@ function buildAccentOverrideCSS(accent) {
 .input:focus{--tw-ring-color:${accent} !important}
 .switch:focus{--tw-ring-color:${accent} !important}
 .switch-on{background-color:${accent} !important;border-color:${accent} !important}
-.switch-on .switch-thumb{background-color:${contrastFg} !important}
+.switch-on .switch-thumb{background-color:${toggleThumbFg} !important}
 @media (hover: hover){.hover\\:border-accent\\/20:hover{border-color:${a20} !important}}
 .highlight-box{background-color:${a10} !important;border-color:${a50} !important}
 .option-row-selected{background-color:${a15} !important;border-left-color:${accent} !important}

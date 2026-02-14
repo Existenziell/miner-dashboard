@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
-import { normalizeHex } from '@/lib/colorUtils';
+import { isValidHex, normalizeHex } from '@/lib/colorUtils';
 import { CHART_COLOR_SPEC, TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { deepCopy } from '@/lib/utils';
 
@@ -38,22 +38,26 @@ export function useColor(config, refetchConfig, onError) {
     if (effectiveAccent !== configAccent) {
       list.push({ label: 'Accent color', from: configAccent, to: effectiveAccent });
     }
-    if (hasChartColorsChange) {
-      const saved = config.chartColors ?? DASHBOARD_DEFAULTS.chartColors;
-      CHART_COLOR_SPEC.forEach((chart) => {
-        chart.series.forEach(({ key, label: seriesLabel }) => {
-          const fromVal = saved[chart.id]?.[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key];
-          const toVal = chartColors[chart.id]?.[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key];
-          const fromHex = normalizeHex(fromVal, DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key]);
-          const toHex = normalizeHex(toVal, DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key]);
-          if (fromHex !== toHex) {
-            list.push({ label: `${chart.label} → ${seriesLabel}`, from: fromHex, to: toHex });
-          }
-        });
+    const saved = config.chartColors ?? DASHBOARD_DEFAULTS.chartColors;
+    CHART_COLOR_SPEC.forEach((chart) => {
+      chart.series.forEach(({ key, label: seriesLabel }) => {
+        const defaultHex = DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key];
+        const fromVal = saved[chart.id]?.[key] ?? defaultHex;
+        const toVal = chartColors[chart.id]?.[key] ?? defaultHex;
+        const fromHex = normalizeHex(fromVal, defaultHex);
+        const toHex = normalizeHex(toVal, defaultHex);
+        const toDisplay = isValidHex(toVal) ? toHex : (String(toVal ?? '').trim() || fromHex);
+        if (fromHex !== toHex || fromHex !== toDisplay) {
+          list.push({
+            label: `${chart.label} → ${seriesLabel}`,
+            from: fromHex,
+            to: toDisplay,
+          });
+        }
       });
-    }
+    });
     return list;
-  }, [config.chartColors, configAccent, chartColors, effectiveAccent, hasChartColorsChange]);
+  }, [config.chartColors, configAccent, chartColors, effectiveAccent]);
 
   const revert = useCallback(() => {
     setAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
