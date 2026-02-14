@@ -12,6 +12,7 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import { DashboardColorsCard } from '@/components/settings/DashboardColorsCard';
 import { DashboardConfigCard } from '@/components/settings/DashboardConfigCard';
 import { DashboardSettingsFormFooter } from '@/components/settings/DashboardSettingsFormFooter';
+import { FirmwareTabContent } from '@/components/settings/FirmwareTabContent';
 import { MinerTabContent } from '@/components/settings/MinerTabContent';
 import { PendingChangesBox } from '@/components/settings/PendingChangesBox';
 import { PoolsTabContent } from '@/components/settings/PoolsTabContent';
@@ -97,6 +98,15 @@ export default function SettingsPage({ onError }) {
             tab if the dashboard cannot reach the miner.
           </div>
         )}
+        {settingsSubTab === 'firmware' && (
+          <div className="card p-8 text-center text-muted-standalone">
+            Connect to the miner to update firmware. Set Miner IP in the{' '}
+            <button type="button" onClick={goToDashboardTab} className="link-text text-body cursor-pointer underline">
+              Dashboard
+            </button>{' '}
+            tab if the dashboard cannot reach the miner.
+          </div>
+        )}
       </div>
     );
   }
@@ -129,6 +139,10 @@ export default function SettingsPage({ onError }) {
             />
           </DashboardSettingsProvider>
         </form>
+      )}
+
+      {settingsSubTab === 'firmware' && (
+        <FirmwareTabContent />
       )}
 
       {(settingsSubTab === 'miner' || settingsSubTab === 'pools') && (

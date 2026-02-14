@@ -1,11 +1,11 @@
 /**
  * Tab state synced with URL query (?tab=settings|docs|api).
  * Valid tab ids: 'dashboard' | 'settings' | 'docs' | 'api'
- * Settings sub-tabs use ?tab=settings&section=miner|pools|dashboard|colors
+ * Settings sub-tabs use ?tab=settings&section=miner|pools|firmware|dashboard|colors
  */
 import { SETTINGS_SECTION_KEY } from '@/lib/constants.js';
 
-const VALID_SETTINGS_SECTIONS = new Set(['miner', 'pools', 'dashboard', 'colors']);
+const VALID_SETTINGS_SECTIONS = new Set(['miner', 'pools', 'firmware', 'dashboard', 'colors']);
 
 function getStoredSettingsSection() {
   if (typeof window === 'undefined') return 'miner';

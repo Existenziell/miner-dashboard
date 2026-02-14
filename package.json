@@ -5,7 +5,9 @@
   "repository": "github:Existenziell/miner-dashboard",
   "homepage": "https://github.com/Existenziell/miner-dashboard#readme",
   "bugs": "https://github.com/Existenziell/miner-dashboard/issues",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "scripts": {
     "dev": "concurrently --kill-others \"npm run dev:server\" \"npm run dev:client\"",
@@ -22,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "multer": "^2.0.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -98,3 +98,82 @@ export async function shutdownMiner() {
   if (!res.ok) throw new Error(`Miner shutdown error: ${res.status}`);
   return res.json();
 }
+
+export async function fetchFirmwareReleases(opts = {}) {
+  const { includePrereleases = false } = opts;
+  const url = new URL(`${BASE}/api/firmware/releases`, window.location.origin);
+  url.searchParams.set('includePrereleases', String(includePrereleases));
+  const res = await fetch(url.pathname + url.search);
+  if (!res.ok) {
+    let msg = `Releases error: ${res.status}`;
+    try {
+      const data = await res.json();
+      if (data.detail) msg += ` — ${data.detail}`;
+      else if (data.error) msg += ` — ${data.error}`;
+    } catch {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+/** Fetch checksum for an asset (e.g. from release asset checksumUrl). Returns SHA256 hex string or null. */
+export async function fetchFirmwareChecksum(checksumUrl) {
+  if (!checksumUrl) return null;
+  const res = await fetch(checksumUrl);
+  if (!res.ok) return null;
+  const text = await res.text();
+  const match = text.trim().match(/^([a-fA-F0-9]{64})\s/) || text.trim().match(/^([a-fA-F0-9]{64})$/);
+  return match ? match[1].toLowerCase() : null;
+}
+
+export async function installFirmwareFromUrl(payload) {
+  const { url, keepSettings = false, expectedSha256 } = payload;
+  const res = await fetch(`${BASE}/api/miner/firmware/install`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, keepSettings, expectedSha256 }),
+  });
+  if (!res.ok) {
+    let msg = 'Firmware install failed';
+    let body = null;
+    try {
+      body = await res.json();
+      if (body.detail) msg = body.detail;
+      else if (body.error) msg = body.error;
+    } catch {
+      // ignore
+    }
+    const err = new Error(msg);
+    if (body && (body.checksumVerified !== undefined || body.computedSha256 != null)) {
+      err.installErrorBody = body;
+    }
+    throw err;
+  }
+  return res.json();
+}
+
+/** type: 'firmware' | 'www' */
+export async function flashFirmwareFile(file, type = 'firmware') {
+  const form = new FormData();
+  form.append('file', file);
+  const url = new URL(`${BASE}/api/miner/firmware/flash`, window.location.origin);
+  url.searchParams.set('type', type);
+  const res = await fetch(url.pathname + url.search, {
+    method: 'POST',
+    body: form,
+  });
+  if (!res.ok) {
+    let msg = 'Flash failed';
+    try {
+      const data = await res.json();
+      if (data.detail) msg = data.detail;
+      else if (data.error) msg = data.error;
+    } catch {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}

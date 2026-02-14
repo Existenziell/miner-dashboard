@@ -295,6 +295,25 @@ input[type="number"] {
   @apply ml-1.5 text-xs text-muted dark:text-muted-dark font-normal;
 }
 
+/* Custom checkbox (accent color, like option-radio) */
+.checkbox-input {
+  @apply sr-only;
+}
+.checkbox-box {
+  @apply shrink-0 w-4 h-4 rounded border-2 border-edge dark:border-edge-dark
+    flex items-center justify-center transition-colors duration-150
+    focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 focus-within:ring-offset-surface dark:focus-within:ring-offset-surface-dark;
+}
+.checkbox-check {
+  @apply w-3 h-3 opacity-0 transition-opacity duration-150 pointer-events-none;
+}
+.checkbox-input:checked ~ .checkbox-box {
+  @apply border-accent bg-accent ring-4 ring-accent/25;
+}
+.checkbox-input:checked ~ .checkbox-box .checkbox-check {
+  @apply opacity-100;
+}
+
 /* Range input */
 .input-range {
   @apply w-full h-2 rounded-md appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;

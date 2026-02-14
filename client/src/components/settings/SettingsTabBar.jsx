@@ -1,6 +1,7 @@
 const SETTINGS_TABS = [
   { id: 'miner', label: 'Miner' },
   { id: 'pools', label: 'Pools' },
+  { id: 'firmware', label: 'Firmware' },
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'colors', label: 'Colors' },
 ];

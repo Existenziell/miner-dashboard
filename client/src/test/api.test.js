@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   fetchDashboardConfig,
+  fetchFirmwareChecksum,
+  fetchFirmwareReleases,
+  flashFirmwareFile,
+  installFirmwareFromUrl,
   fetchMinerAsic,
   fetchMinerInfo,
   fetchNetworkStatus,
@@ -148,6 +152,104 @@ describe('api', () => {
     it('throws when not ok', async () => {
       fetchStub.mockResolvedValueOnce({ ok: false, status: 502 });
       await expect(shutdownMiner()).rejects.toThrow('Miner shutdown error: 502');
+    });
+  });
+
+  describe('fetchFirmwareReleases', () => {
+    it('GETs /api/firmware/releases and returns JSON', async () => {
+      const data = [{ tag_name: 'v1.0.36', assets: [] }];
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(data) });
+      const result = await fetchFirmwareReleases();
+      expect(result).toEqual(data);
+      expect(fetchStub).toHaveBeenCalledWith(expect.stringContaining('/api/firmware/releases'));
+      expect(fetchStub).toHaveBeenCalledWith(expect.stringContaining('includePrereleases=false'));
+    });
+
+    it('passes includePrereleases=true when requested', async () => {
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([]) });
+      await fetchFirmwareReleases({ includePrereleases: true });
+      expect(fetchStub).toHaveBeenCalledWith(expect.stringContaining('includePrereleases=true'));
+    });
+
+    it('throws with message when not ok', async () => {
+      fetchStub.mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        json: () => Promise.resolve({ error: 'Failed to fetch releases', detail: 'Rate limited.' }),
+      });
+      await expect(fetchFirmwareReleases()).rejects.toThrow(/Releases error: 429/);
+    });
+  });
+
+  describe('fetchFirmwareChecksum', () => {
+    it('returns null when checksumUrl is empty', async () => {
+      expect(await fetchFirmwareChecksum(null)).toBeNull();
+      expect(await fetchFirmwareChecksum('')).toBeNull();
+      expect(fetchStub).not.toHaveBeenCalled();
+    });
+
+    it('fetches checksum URL and parses SHA256', async () => {
+      const hash = 'a'.repeat(64) + '\n';
+      fetchStub.mockResolvedValueOnce({ ok: true, text: () => Promise.resolve(hash) });
+      const result = await fetchFirmwareChecksum('https://example.com/file.sha256');
+      expect(result).toBe('a'.repeat(64));
+      expect(fetchStub).toHaveBeenCalledWith('https://example.com/file.sha256');
+    });
+
+    it('returns null when response not ok', async () => {
+      fetchStub.mockResolvedValueOnce({ ok: false });
+      expect(await fetchFirmwareChecksum('https://example.com/file.sha256')).toBeNull();
+    });
+  });
+
+  describe('installFirmwareFromUrl', () => {
+    it('POSTs /api/miner/firmware/install with url and optional expectedSha256', async () => {
+      const response = { success: true, message: 'Firmware install started.', checksumVerified: true };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(response) });
+      const result = await installFirmwareFromUrl({ url: 'https://example.com/fw.bin', expectedSha256: 'abc123' });
+      expect(result).toEqual(response);
+      expect(fetchStub).toHaveBeenCalledWith('/api/miner/firmware/install', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: 'https://example.com/fw.bin', keepSettings: false, expectedSha256: 'abc123' }),
+      });
+    });
+
+    it('throws and attaches installErrorBody when response has checksum fields', async () => {
+      const body = { error: 'Checksum mismatch', checksumVerified: false, computedSha256: 'aaa', expectedSha256: 'bbb' };
+      fetchStub.mockResolvedValueOnce({ ok: false, json: () => Promise.resolve(body) });
+      const err = await installFirmwareFromUrl({ url: 'https://x/fw.bin' }).catch((e) => e);
+      expect(err).toBeInstanceOf(Error);
+      expect(err.message).toContain('Checksum mismatch');
+      expect(err.installErrorBody).toEqual(body);
+    });
+  });
+
+  describe('flashFirmwareFile', () => {
+    it('POSTs /api/miner/firmware/flash with FormData and type param', async () => {
+      const file = new Blob(['binary'], { type: 'application/octet-stream' });
+      const response = { success: true, message: 'Firmware flash started.' };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(response) });
+      const result = await flashFirmwareFile(file, 'firmware');
+      expect(result).toEqual(response);
+      expect(fetchStub).toHaveBeenCalledWith(
+        expect.stringMatching(/\/api\/miner\/firmware\/flash\?type=firmware/),
+        expect.objectContaining({ method: 'POST' })
+      );
+    });
+
+    it('uses type=www when specified', async () => {
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ success: true }) });
+      await flashFirmwareFile(new Blob(), 'www');
+      expect(fetchStub).toHaveBeenCalledWith(expect.stringContaining('type=www'), expect.any(Object));
+    });
+
+    it('throws when not ok', async () => {
+      fetchStub.mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ detail: 'Miner unreachable' }),
+      });
+      await expect(flashFirmwareFile(new Blob(), 'firmware')).rejects.toThrow('Miner unreachable');
     });
   });
 

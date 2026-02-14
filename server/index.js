@@ -5,9 +5,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { PORT } from './config.js';
 import { getMinerIp } from './config/dashboardConfig.js';
+import configRoutes from './routes/config.js';
+import firmwareRoutes from './routes/firmware.js';
 import minerRoutes from './routes/miner.js';
 import networkRoutes from './routes/network.js';
-import configRoutes from './routes/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // API routes
 app.use('/api/config', configRoutes);
+app.use('/api/firmware', firmwareRoutes);
 app.use('/api/miner', minerRoutes);
 app.use('/api/network', networkRoutes);
 

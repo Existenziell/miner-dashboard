@@ -134,11 +134,13 @@ describe('tabUrl', () => {
       expect(getSettingsSectionFromUrl()).toBe('miner');
     });
 
-    it('returns section when valid (miner, pools, dashboard, colors)', () => {
+    it('returns section when valid (miner, pools, firmware, dashboard, colors)', () => {
       mockWindow({ search: '?tab=settings&section=miner', href: 'http://localhost/?tab=settings&section=miner' });
       expect(getSettingsSectionFromUrl()).toBe('miner');
       mockWindow({ search: '?tab=settings&section=pools', href: 'http://localhost/?tab=settings&section=pools' });
       expect(getSettingsSectionFromUrl()).toBe('pools');
+      mockWindow({ search: '?tab=settings&section=firmware', href: 'http://localhost/?tab=settings&section=firmware' });
+      expect(getSettingsSectionFromUrl()).toBe('firmware');
       mockWindow({ search: '?tab=settings&section=dashboard', href: 'http://localhost/?tab=settings&section=dashboard' });
       expect(getSettingsSectionFromUrl()).toBe('dashboard');
       mockWindow({ search: '?tab=settings&section=colors', href: 'http://localhost/?tab=settings&section=colors' });
