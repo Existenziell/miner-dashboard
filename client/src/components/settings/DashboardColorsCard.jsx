@@ -23,9 +23,9 @@ export function DashboardColorsCard() {
       <p className="text-muted-standalone text-sm mb-4">
         Custom accent and chart line colors.
       </p>
-      <div className="space-y-4">
+      <div className="space-y-4 mt-8">
         <Field label="Accent color" hint="Buttons, links, and highlights. Darker shade is derived automatically.">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-w-96">
             <input
               type="color"
               value={effectiveAccent}
@@ -43,14 +43,13 @@ export function DashboardColorsCard() {
             />
           </div>
         </Field>
-        <div>
-          <p className="text-sm font-medium text-body mb-1">Chart colors</p>
-          <p className="text-muted-standalone text-xs mb-3">Line colors for Power, Temperature, and Hashrate charts.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-8">
+          <Field label="Chart colors" hint="Line colors for Power, Temperature, and Hashrate charts." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
             {CHART_COLOR_SPEC.map((chart) => {
               const chartColors = dashboardChartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
               return (
-                <div key={chart.id} className="border border-edge dark:border-edge-dark rounded-lg p-3 space-y-3">
+                <div key={chart.id} className="border border-edge dark:border-edge-dark rounded-lg p-3 space-y-1">
                   <p className="text-sm font-medium text-body">{chart.label}</p>
                   {chart.series.map(({ key, label }) => {
                     const value = chartColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];
