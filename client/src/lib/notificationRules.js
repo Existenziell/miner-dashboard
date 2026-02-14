@@ -69,20 +69,6 @@ export const NOTIFICATION_RULES = [
 ];
 
 /**
- * Mock miner payload that triggers all notifications. Use with ?notifications=all for UI testing.
- */
-export const MOCK_MINER_ALL_NOTIFICATIONS = {
-  temp: 76,
-  overheat_temp: 80,
-  vrTemp: 71,
-  sharesAccepted: 90,
-  sharesRejected: 10,
-  sharesRejectedReasons: [{ message: 'Stale share' }],
-  recentpingloss: 15,
-  hashRate: 0,
-};
-
-/**
  * Returns list of active notification objects { id, label, severity, detail } for the given miner data.
  */
 export function evaluateNotifications(miner) {

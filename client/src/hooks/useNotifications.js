@@ -40,15 +40,8 @@ function buildDisplayed(evaluated, sticky, dismissedIds) {
  * Single hook for all notification state: miner connection errors, metric notifications,
  * block-found banner, browser notifications (OS notifications when permitted). Uses miner data from context.
  */
-function getShowAllNotificationsFromUrl() {
-  if (typeof window === 'undefined') return false;
-  const params = new URLSearchParams(window.location.search);
-  return params.get('notifications') === 'all' || params.get('alerts') === 'all';
-}
-
 export function useNotifications(minerError, networkError) {
   const { data: miner } = useMiner();
-  const showAllNotifications = getShowAllNotificationsFromUrl();
 
   const lastFiredRef = useRef({});
   const prevActiveIdsRef = useRef(new Set());
@@ -56,7 +49,6 @@ export function useNotifications(minerError, networkError) {
   const displayedRef = useRef([]);
   const prevBlockCountRef = useRef(null);
 
-  // When ?alerts=all we only force the success (block found) banner; metric list uses real miner data
   const evaluated = useMemo(() => evaluateNotifications(miner), [miner]);
   const [dismissedIds, setDismissedIds] = useState(() => new Set());
   const [activeNotifications, setActiveNotifications] = useState([]);
@@ -138,15 +130,12 @@ export function useNotifications(minerError, networkError) {
   const showPermissionPrompt =
     typeof Notification !== 'undefined' && Notification.permission === 'default';
 
-  // When ?notifications=all, show success banner(s) too for UI testing
-  const blockFoundVisibleForRender = blockFoundVisible || showAllNotifications;
-
   return {
     minerError,
     networkError,
     activeNotifications,
     dismissNotifications,
-    blockFoundVisible: blockFoundVisibleForRender,
+    blockFoundVisible,
     dismissBlockFound,
     requestNotificationPermission,
     showPermissionPrompt,
