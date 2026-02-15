@@ -12,11 +12,11 @@ import { CHART_GRID_AXIS_COLORS, THEME_KEY } from '@/lib/constants.js';
 
 describe('CHART_GRID_AXIS_COLORS', () => {
   it('defines light theme with grid, axis hex colors, and axis font size', () => {
-    expect(CHART_GRID_AXIS_COLORS.light).toEqual({ grid: '#d1d5db', axis: '#9ca3af', axisFontSize: 10 });
+    expect(CHART_GRID_AXIS_COLORS.light).toEqual({ grid: '#d1d5db', axis: '#9ca3af', axisFontSize: 11 });
   });
 
   it('defines dark theme with grid, axis hex colors, and axis font size', () => {
-    expect(CHART_GRID_AXIS_COLORS.dark).toEqual({ grid: '#333366', axis: '#666688', axisFontSize: 10 });
+    expect(CHART_GRID_AXIS_COLORS.dark).toEqual({ grid: '#333366', axis: '#666688', axisFontSize: 11 });
   });
 });
 

@@ -48,7 +48,7 @@ export function SettingsFormFooter({
             type="button"
             onClick={() => setShowResetConfirm(true)}
             disabled={!hasDefaultsDiff}
-            className="link-text text-body cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+            className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             aria-disabled={!hasDefaultsDiff}
           >
             Reset to defaults

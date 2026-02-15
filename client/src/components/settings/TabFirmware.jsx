@@ -236,7 +236,7 @@ export function TabFirmware() {
         </div>
         <div className="space-y-4">
           <Field label="Current version">
-            <span className="text-body text-sm font-medium">{currentVersion}</span>
+            <span className="text-normal text-sm font-medium">{currentVersion}</span>
           </Field>
           <Field label="Select release" hint="Choose a release to install. Checksum is verified before flashing.">
             <div className="flex flex-wrap items-center gap-2">
@@ -259,7 +259,7 @@ export function TabFirmware() {
                   </option>
                 ))}
               </select>
-              <label className="flex items-center gap-2 text-sm text-body whitespace-nowrap cursor-pointer">
+              <label className="flex items-center gap-2 text-sm text-normal whitespace-nowrap cursor-pointer">
                 <input
                   type="checkbox"
                   checked={showPrereleases}
@@ -286,10 +286,10 @@ export function TabFirmware() {
             </div>
           </Field>
           <Field label="Published">
-            <span className="text-body text-sm">{published}</span>
+            <span className="text-normal text-sm">{published}</span>
           </Field>
           <Field label="Filename">
-            <span className="text-body text-sm font-mono break-all">{filename}</span>
+            <span className="text-normal text-sm font-mono break-all">{filename}</span>
           </Field>
           {selectedRelease?.html_url && (
             <p>
@@ -318,33 +318,33 @@ export function TabFirmware() {
             </button>
           </div>
           {expectedSha256 && !lastChecksumResult && (
-            <p className="text-xs text-muted dark:text-muted-dark">
+            <p className="text-xs text-muted">
               Checksum will be verified (SHA256) after download.
             </p>
           )}
-          <p className="text-xs text-muted dark:text-muted-dark">
+          <p className="text-xs text-muted">
             Download the firmware first; verification is shown below. Then click Flash to install. Errors (e.g. checksum mismatch or miner unreachable) are shown below. The dashboard does not control how the miner handles a failed OTA; many devices keep the previous firmware and reboot back to it on failure.
           </p>
           {lastChecksumResult && (
             <div className="rounded-md border border-default bg-surface-subtle px-3 py-2 text-xs font-mono space-y-1">
-              <div className="font-semibold text-body">Checksum verification</div>
+              <div className="font-semibold text-normal">Checksum verification</div>
               {lastChecksumResult.mismatch ? (
                 <p className="text-danger dark:text-danger-dark">Mismatch: file does not match expected SHA256.</p>
               ) : lastChecksumResult.checksumVerified ? (
                 <p className="text-success dark:text-success-dark">Verified (SHA256).</p>
               ) : (
-                <p className="text-muted dark:text-muted-dark">No checksum file in release; download proceeded without verification.</p>
+                <p className="text-muted">No checksum file in release; download proceeded without verification.</p>
               )}
               {lastChecksumResult.computedSha256 != null && (
                 <div>
-                  <span className="text-muted dark:text-muted-dark">Computed: </span>
-                  <span className="text-body break-all">{lastChecksumResult.computedSha256}</span>
+                  <span className="text-muted">Computed: </span>
+                  <span className="text-normal break-all">{lastChecksumResult.computedSha256}</span>
                 </div>
               )}
               {lastChecksumResult.expectedSha256 != null && (
                 <div>
-                  <span className="text-muted dark:text-muted-dark">Expected: </span>
-                  <span className="text-body break-all">{lastChecksumResult.expectedSha256}</span>
+                  <span className="text-muted">Expected: </span>
+                  <span className="text-normal break-all">{lastChecksumResult.expectedSha256}</span>
                 </div>
               )}
             </div>
@@ -398,7 +398,7 @@ export function TabFirmware() {
         <div className="space-y-6">
           <div>
             <h4 className="card-title">Manual Firmware Upload</h4>
-            <p className="text-xs text-muted dark:text-muted-dark mb-2">
+            <p className="text-xs text-muted mb-2">
               Upload a firmware .bin file (e.g. esp-miner-NerdQAxe++.bin) from your computer. Use this when you have a local build or a file from a source other than GitHub. No checksum verification is performed, ensure the file is from a trusted source. The device may reboot after flashing.
             </p>
             <div className="flex flex-wrap items-center gap-2">
@@ -421,11 +421,11 @@ export function TabFirmware() {
                 {flashingFirmware ? 'Flashing…' : 'Flash'}
               </button>
             </div>
-            <p className="text-xs text-muted dark:text-muted-dark mt-1">Accepted: .bin (e.g. esp-miner-NerdQAxe++.bin)</p>
+            <p className="text-xs text-muted mt-1">Accepted: .bin (e.g. esp-miner-NerdQAxe++.bin)</p>
           </div>
           <div>
             <h4 className="card-title">Manual WWW Upload</h4>
-            <p className="text-xs text-muted dark:text-muted-dark mb-2">
+            <p className="text-xs text-muted mb-2">
               Upload a packed web UI .bin file (e.g. www.bin) to update only the dashboard/UI on the device without changing the miner firmware. Useful for updating the web interface from a custom or pre-built www bundle. No checksum verification is performed.
             </p>
             <div className="flex flex-wrap items-center gap-2">
@@ -448,7 +448,7 @@ export function TabFirmware() {
                 {flashingWww ? 'Flashing…' : 'Flash'}
               </button>
             </div>
-            <p className="text-xs text-muted dark:text-muted-dark mt-1">Accepted: .bin (e.g. www.bin)</p>
+            <p className="text-xs text-muted mt-1">Accepted: .bin (e.g. www.bin)</p>
           </div>
           {flashMessage && (
             <p

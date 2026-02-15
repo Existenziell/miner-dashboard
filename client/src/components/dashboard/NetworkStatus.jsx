@@ -27,10 +27,10 @@ export default function NetworkStatus({ data }) {
       {/* Block Height */}
       <div className="card">
         <div className="stat-label mb-1">Block Height</div>
-        <div className="text-2xl font-bold text-body">{formatNumber(blockHeight)}</div>
+        <div className="text-2xl font-bold text-normal">{formatNumber(blockHeight)}</div>
         {halvingPct != null && (
           <div className="mt-2">
-            <div className="flex justify-between text-xs text-muted dark:text-muted-dark mb-1">
+            <div className="flex justify-between text-xs text-muted mb-1">
               <span>Halving Epoch</span>
               <span>{halvingPct.toFixed(1)}% ({formatNumber(blocksUntilHalving)} left)</span>
             </div>
@@ -40,7 +40,7 @@ export default function NetworkStatus({ data }) {
                 style={{ width: `${Math.min(halvingPct, 100)}%` }}
               />
             </div>
-            <div className="text-xs text-muted dark:text-muted-dark mt-1">
+            <div className="text-xs text-muted mt-1">
               Avg block time: {adjustedTimeAvg != null ? `${(adjustedTimeAvg / 60000).toFixed(1)} min` : '--'}
             </div>
           </div>
@@ -50,12 +50,12 @@ export default function NetworkStatus({ data }) {
       {/* Network Difficulty */}
       <div className="card">
         <div className="stat-label mb-1">Network Difficulty</div>
-        <div className="text-2xl font-bold text-body">
+        <div className="text-2xl font-bold text-normal">
           {formatDifficulty(networkDifficulty)}
         </div>
         {diffProgressPct != null && (
           <div className="mt-1.5">
-            <div className="flex justify-between text-xs text-muted dark:text-muted-dark mb-1">
+            <div className="flex justify-between text-xs text-muted mb-1">
               <span>Retarget</span>
               <span>{diffProgressPct.toFixed(1)}% ({formatNumber(difficulty?.remainingBlocks)} left)</span>
             </div>
@@ -68,7 +68,7 @@ export default function NetworkStatus({ data }) {
           </div>
         )}
         <div className="text-xs mt-1">
-          <span className="text-muted dark:text-muted-dark">Next adjustment: </span>
+          <span className="text-muted">Next adjustment: </span>
           <span>{diffChangeStr}</span>
         </div>
       </div>
@@ -76,9 +76,9 @@ export default function NetworkStatus({ data }) {
       {/* BTC Price */}
       <div className="card">
         <div className="stat-label mb-1">BTC Price</div>
-        <div className="text-2xl font-bold text-body">{formatPrice(prices?.USD)}</div>
+        <div className="text-2xl font-bold text-normal">{formatPrice(prices?.USD)}</div>
         {prices?.EUR && (
-          <div className="text-sm text-muted dark:text-muted-dark mt-1">
+          <div className="text-sm text-muted mt-1">
             EUR {formatNumber(prices.EUR)}
           </div>
         )}
@@ -89,15 +89,15 @@ export default function NetworkStatus({ data }) {
         <div className="stat-label mb-2">Fee Estimates</div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-muted dark:text-muted-dark text-sm">High Priority</span>
+            <span className="text-muted text-sm">High Priority</span>
             <span className="text-sm font-medium">{fees?.fastestFee ?? '--'} sat/vB</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted dark:text-muted-dark text-sm">Medium</span>
+            <span className="text-muted text-sm">Medium</span>
             <span className="text-sm font-medium">{fees?.halfHourFee ?? '--'} sat/vB</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted dark:text-muted-dark text-sm">Low Priority</span>
+            <span className="text-muted text-sm">Low Priority</span>
             <span className="text-sm font-medium">{fees?.hourFee ?? '--'} sat/vB</span>
           </div>
         </div>

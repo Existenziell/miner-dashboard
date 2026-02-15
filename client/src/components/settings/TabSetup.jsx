@@ -148,7 +148,7 @@ export function TabSetup({ minerReachable }) {
           </div>
         </div>
         {!minerReachable ? (
-          <p className="text-muted dark:text-muted-dark text-sm">
+          <p className="text-muted text-sm">
             Connect to the miner to configure WiFi. Set Miner IP above and save, then this section will be available.
           </p>
         ) : (
@@ -210,7 +210,7 @@ export function TabSetup({ minerReachable }) {
               )}
             </Field>
           </div>
-          <p className="text-muted dark:text-muted-dark text-xs mt-5">
+          <p className="text-muted text-xs mt-5">
             Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
           </p>
           <PendingChanges

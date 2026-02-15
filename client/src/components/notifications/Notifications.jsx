@@ -11,8 +11,6 @@ export default function Notifications({ minerError, networkError }) {
     dismissNotifications,
     blockFoundVisible,
     dismissBlockFound,
-    requestNotificationPermission,
-    showPermissionPrompt,
   } = useNotifications(minerError, networkError);
 
   return (
@@ -46,17 +44,6 @@ export default function Notifications({ minerError, networkError }) {
         dismissable
         onDismiss={dismissNotifications}
         items={activeNotifications}
-        action={
-          showPermissionPrompt ? (
-            <button
-              type="button"
-              onClick={requestNotificationPermission}
-              className="link-text font-medium opacity-90 hover:opacity-100 transition-opacity text-current"
-            >
-              Enable browser notifications
-            </button>
-          ) : null
-        }
       />
     </>
   );

@@ -11,15 +11,15 @@ function ResponseCard({ title, path, data, error, loading }) {
           <h3 className="card-header-title">{title}</h3>
         </div>
       </div>
-      <p className="text-muted dark:text-muted-dark text-sm mb-2 font-mono">{path}</p>
-      {loading && <p className="text-muted dark:text-muted-dark text-sm">Loading…</p>}
+      <p className="text-muted text-sm mb-2 font-mono">{path}</p>
+      {loading && <p className="text-muted text-sm">Loading…</p>}
       {error && <p className="text-danger dark:text-danger-dark text-sm">{error.message}</p>}
       {!loading && !error && data != null && (
         <pre className="api-pre flex-1 min-h-0">
           {JSON.stringify(data, null, 2)}
         </pre>
       )}
-      {!loading && !error && data == null && <p className="text-muted dark:text-muted-dark text-sm">No data.</p>}
+      {!loading && !error && data == null && <p className="text-muted text-sm">No data.</p>}
     </div>
   );
 }
@@ -102,12 +102,12 @@ export default function ApiPage() {
           <table className="w-full text-sm text-left">
             <thead>
               <tr className="border-b border-default">
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Method</th>
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Path</th>
-                <th className="py-2 font-medium text-muted dark:text-muted-dark">Description</th>
+                <th className="py-2 pr-4 font-medium text-muted">Method</th>
+                <th className="py-2 pr-4 font-medium text-muted">Path</th>
+                <th className="py-2 font-medium text-muted">Description</th>
               </tr>
             </thead>
-            <tbody className="text-body">
+            <tbody className="text-normal">
               {API_ENDPOINTS.map((ep) => (
                 <tr key={ep.method + ep.path} className="border-b border-edge/60 dark:border-edge-dark/60">
                   <td className="py-2 pr-4 font-mono text-xs">{ep.method}</td>
@@ -147,8 +147,8 @@ export default function ApiPage() {
             <h3 className="card-header-title">Related API settings</h3>
           </div>
         </div>
-        <p className="text-muted dark:text-muted-dark text-sm mb-4">Constants and config that affect API polling and requests.</p>
-        <h4 className="text-sm font-medium text-body mb-2">Client</h4>
+        <p className="text-muted text-sm mb-4">Constants and config that affect API polling and requests.</p>
+        <h4 className="text-sm font-medium text-normal mb-2">Client</h4>
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-sm text-left table-fixed">
             <colgroup>
@@ -156,13 +156,13 @@ export default function ApiPage() {
             </colgroup>
             <thead>
               <tr className="border-b border-default">
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Name</th>
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Source</th>
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Value</th>
-                <th className="py-2 font-medium text-muted dark:text-muted-dark">Description</th>
+                <th className="py-2 pr-4 font-medium text-muted">Name</th>
+                <th className="py-2 pr-4 font-medium text-muted">Source</th>
+                <th className="py-2 pr-4 font-medium text-muted">Value</th>
+                <th className="py-2 font-medium text-muted">Description</th>
               </tr>
             </thead>
-            <tbody className="text-body">
+            <tbody className="text-normal">
               {clientSettings.map((s) => (
                 <tr key={s.name} className="border-b border-edge/60 dark:border-edge-dark/60">
                   <td className="py-2 pr-4 font-mono text-xs">{s.name}</td>
@@ -174,7 +174,7 @@ export default function ApiPage() {
             </tbody>
           </table>
         </div>
-        <h4 className="text-sm font-medium text-body mb-2">Server</h4>
+        <h4 className="text-sm font-medium text-normal mb-2">Server</h4>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left table-fixed">
             <colgroup>
@@ -182,13 +182,13 @@ export default function ApiPage() {
             </colgroup>
             <thead>
               <tr className="border-b border-default">
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Name</th>
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Source</th>
-                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Value</th>
-                <th className="py-2 font-medium text-muted dark:text-muted-dark">Description</th>
+                <th className="py-2 pr-4 font-medium text-muted">Name</th>
+                <th className="py-2 pr-4 font-medium text-muted">Source</th>
+                <th className="py-2 pr-4 font-medium text-muted">Value</th>
+                <th className="py-2 font-medium text-muted">Description</th>
               </tr>
             </thead>
-            <tbody className="text-body">
+            <tbody className="text-normal">
               {SERVER_SETTINGS.map((s) => (
                 <tr key={s.name} className="border-b border-edge/60 dark:border-edge-dark/60">
                   <td className="py-2 pr-4 font-mono text-xs">{s.name}</td>
@@ -208,7 +208,7 @@ export default function ApiPage() {
             <h3 className="card-header-title">Query the API with cURL</h3>
           </div>
         </div>
-        <p className="text-muted dark:text-muted-dark text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
+        <p className="text-muted text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
         <div className="rounded-md overflow-hidden bg-terminal-bg border border-terminal-border shadow-inner">
           <div className="flex items-center gap-2 px-3 py-2 bg-terminal-bar border-b border-terminal-border">
             <span className="w-3 h-3 rounded-full bg-terminal-dot-close" />

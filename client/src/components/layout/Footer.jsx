@@ -6,7 +6,7 @@ const FOOTER_LINKS = [
 export default function Footer() {
   return (
     <footer className="border-t border-default mt-8 py-4">
-      <div className="max-w-7xl mx-auto px-4 text-center text-muted dark:text-muted-dark text-xs">
+      <div className="max-w-7xl mx-auto px-4 text-center text-muted text-xs">
         Solo Mining Dashboard
         {FOOTER_LINKS.map((link) => (
           <span key={link.href}>
@@ -15,7 +15,7 @@ export default function Footer() {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-muted dark:text-muted-dark hover:text-body transition-colors"
+              className="text-muted hover:text-body transition-colors"
             >
               {link.label}
             </a>

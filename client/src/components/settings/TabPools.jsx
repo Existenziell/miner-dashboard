@@ -96,7 +96,7 @@ export function TabPools({ miner }) {
                 >
                   <span className={`switch-thumb ${stratumTcpKeepalive ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-body">{stratumTcpKeepalive ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{stratumTcpKeepalive ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>
@@ -216,7 +216,7 @@ export function TabPools({ miner }) {
                   >
                     <span className={`switch-thumb ${primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
-                  <span className="text-sm text-body">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
+                  <span className="text-sm text-normal">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
                 </div>
               </Field>
               <Field label="Encrypted connection (TLS)" hint="Improves security by encrypting the connection to the pool.">
@@ -236,7 +236,7 @@ export function TabPools({ miner }) {
                   >
                     <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
-                  <span className="text-sm text-body">{primaryTLS ? 'On' : 'Off'}</span>
+                  <span className="text-sm text-normal">{primaryTLS ? 'On' : 'Off'}</span>
                 </div>
               </Field>
           </div>
@@ -354,7 +354,7 @@ export function TabPools({ miner }) {
                   >
                     <span className={`switch-thumb ${fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
-                  <span className="text-sm text-body">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
+                  <span className="text-sm text-normal">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
                 </div>
               </Field>
               <Field label="Encrypted connection (TLS)" hint="Improves security by encrypting the connection to the pool.">
@@ -374,7 +374,7 @@ export function TabPools({ miner }) {
                   >
                     <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
-                  <span className="text-sm text-body">{fallbackTLS ? 'On' : 'Off'}</span>
+                  <span className="text-sm text-normal">{fallbackTLS ? 'On' : 'Off'}</span>
                 </div>
               </Field>
           </div>

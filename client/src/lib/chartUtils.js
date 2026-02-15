@@ -66,9 +66,10 @@ export function useChartCollapsed(storageKey) {
   return { collapsed, toggleCollapsed };
 }
 
+const CHART_AXIS_FONT_SIZE_PX = 11;
+
 /** Return grid/axis colors and axis font size for Recharts by theme.
- * Reads from CSS variables when in browser (--chart-axis-font-size matches --font-size-2xs);
- * uses constants as fallback (SSR/tests).
+ * Reads grid/axis from CSS variables when in browser; uses constants as fallback (SSR/tests).
  */
 export function getChartGridAxisColors(isDark) {
   if (typeof document !== 'undefined') {
@@ -77,10 +78,7 @@ export function getChartGridAxisColors(isDark) {
     const key = isDark ? 'dark' : 'light';
     const grid = style.getPropertyValue(`--chart-grid-${key}`).trim();
     const axis = style.getPropertyValue(`--chart-axis-${key}`).trim();
-    const axisFontSizeRaw = style.getPropertyValue('--chart-axis-font-size').trim();
-    const n = Number(axisFontSizeRaw);
-    const axisFontSize = Number.isFinite(n) ? n : 10;
-    if (grid && axis) return { grid, axis, axisFontSize };
+    if (grid && axis) return { grid, axis, axisFontSize: CHART_AXIS_FONT_SIZE_PX };
   }
   return CHART_GRID_AXIS_COLORS[isDark ? 'dark' : 'light'];
 }

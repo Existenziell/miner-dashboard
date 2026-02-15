@@ -32,7 +32,7 @@ function buildAccentOverrideCSS(accent) {
 .switch-on{background-color:${accent} !important;border-color:${accent} !important}
 .switch-on .switch-thumb{background-color:${toggleThumbFg} !important}
 @media (hover: hover){.hover\\:border-accent\\/20:hover{border-color:${a20} !important}}
-.highlight-box{background-color:${a10} !important;border-color:${a50} !important}
+.pending-changes{background-color:${a10} !important;border-color:${a50} !important}
 .option-row-selected{background-color:${a15} !important;border-left-color:${accent} !important}
 .dark .option-row-selected{background-color:${a20} !important}
 .option-row:has(.option-radio-input:checked) .option-radio-dot,.option-row-selected .option-radio-dot{--tw-ring-color:${a25} !important;background-color:${accent} !important;border-color:${accent} !important}

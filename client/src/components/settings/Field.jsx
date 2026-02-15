@@ -13,7 +13,7 @@ export function Field({ label, children, hint, suffix }) {
             </span>
           </span>
         )}
-        {suffix != null && <span className="ml-auto text-xs text-muted dark:text-muted-dark">{suffix}</span>}
+        {suffix != null && <span className="ml-auto text-xs text-muted">{suffix}</span>}
       </div>
       {children}
     </div>

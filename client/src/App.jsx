@@ -20,7 +20,7 @@ const ApiPage = lazy(() => import('@/components/pages/ApiPage'));
 const MinerMetrics = lazy(() => import('@/components/dashboard/MinerMetrics'));
 
 function PageFallback({ message }) {
-  return <div className="text-muted dark:text-muted-dark py-8 text-center">{message}</div>;
+  return <div className="text-muted py-8 text-center">{message}</div>;
 }
 
 export default function App() {
@@ -49,7 +49,7 @@ function AppContent({ activeTab, onTabChange }) {
   const { data: network, error: networkError } = useNetworkData(config.pollNetworkIntervalMs);
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-surface-dark text-body">
+    <div className="min-h-screen bg-surface dark:bg-surface-dark text-normal">
       <Header activeTab={activeTab} onTabChange={onTabChange} />
 
       <main className="max-w-7xl mx-auto px-6 pb-6 pt-4 space-y-4">

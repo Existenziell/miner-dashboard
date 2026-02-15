@@ -1,29 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMiner } from '@/context/MinerContext';
-import { BROWSER_NOTIFICATION_COOLDOWN_MS } from '@/lib/constants';
 import { evaluateNotifications } from '@/lib/notificationRules';
-
-function showBrowserNotification(title, body, tag = 'miner-notification') {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') {
-    try {
-      const n = new Notification(title, { body, tag });
-      n.onclick = () => {
-        window.focus();
-        n.close();
-      };
-    } catch {
-      // ignore notification errors
-    }
-  }
-}
-
-function getNotificationPermission() {
-  if (!('Notification' in window)) return Promise.resolve('unsupported');
-  if (Notification.permission === 'granted') return Promise.resolve('granted');
-  if (Notification.permission === 'denied') return Promise.resolve('denied');
-  return Notification.requestPermission();
-}
 
 // Merge evaluated (current) + sticky (ever seen); keep in list until user dismisses (no expiry)
 // If a notification is currently in evaluated (re-triggered), show it again even if previously dismissed
@@ -37,14 +14,12 @@ function buildDisplayed(evaluated, sticky, dismissedIds) {
 }
 
 /**
- * Single hook for all notification state: miner connection errors, metric notifications,
- * block-found banner, browser notifications (OS notifications when permitted). Uses miner data from context.
+ * Hook for notification state: miner connection errors, metric notifications, block-found banner.
+ * Uses miner data from context.
  */
 export function useNotifications(minerError, networkError) {
   const { data: miner } = useMiner();
 
-  const lastFiredRef = useRef({});
-  const prevActiveIdsRef = useRef(new Set());
   const stickyRef = useRef({});
   const displayedRef = useRef([]);
   const prevBlockCountRef = useRef(null);
@@ -73,36 +48,7 @@ export function useNotifications(minerError, networkError) {
     });
   }, []);
 
-  // Browser (OS) notification when a metric notification triggers (throttled by cooldown)
-  useEffect(() => {
-    if (evaluated.length === 0) {
-      prevActiveIdsRef.current = new Set();
-      return;
-    }
-
-    const now = Date.now();
-    const activeIds = new Set(evaluated.map((a) => a.id));
-    const prevIds = prevActiveIdsRef.current;
-
-    for (const notification of evaluated) {
-      const justTriggered = !prevIds.has(notification.id);
-      const lastFired = lastFiredRef.current[notification.id] ?? 0;
-      const cooldownPassed = now - lastFired >= BROWSER_NOTIFICATION_COOLDOWN_MS;
-
-      if (justTriggered || cooldownPassed) {
-        lastFiredRef.current[notification.id] = now;
-        const title = `Miner: ${notification.label}`;
-        const body = notification.detail ? `${notification.detail}` : 'Check dashboard.';
-        getNotificationPermission().then((perm) => {
-          if (perm === 'granted') showBrowserNotification(title, body, `miner-${notification.id}`);
-        });
-      }
-    }
-
-    prevActiveIdsRef.current = activeIds;
-  }, [evaluated]);
-
-  // Block found: show banner and OS notification when block count increases (works when tab in background)
+  // Block found: show banner when block count increases
   useEffect(() => {
     if (!miner) return;
     const raw = miner.totalFoundBlocks ?? miner.foundBlocks;
@@ -110,25 +56,11 @@ export function useNotifications(minerError, networkError) {
     const prev = prevBlockCountRef.current;
     if (typeof count === 'number' && count > 0 && (prev == null || count > prev)) {
       queueMicrotask(() => setBlockFoundVisible(true));
-      getNotificationPermission().then((perm) => {
-        if (perm === 'granted') {
-          showBrowserNotification('Block found!', 'Your miner found a block.', 'block-found');
-        }
-      });
     }
     prevBlockCountRef.current = count;
   }, [miner]);
 
   const dismissBlockFound = useCallback(() => setBlockFoundVisible(false), []);
-
-  const requestNotificationPermission = useCallback(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  const showPermissionPrompt =
-    typeof Notification !== 'undefined' && Notification.permission === 'default';
 
   return {
     minerError,
@@ -137,7 +69,5 @@ export function useNotifications(minerError, networkError) {
     dismissNotifications,
     blockFoundVisible,
     dismissBlockFound,
-    requestNotificationPermission,
-    showPermissionPrompt,
   };
 }

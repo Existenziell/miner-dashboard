@@ -55,11 +55,11 @@ function MetricRangeCard({
       className={`rounded-md px-4 py-3 space-y-2 min-h-[160px] border border-default ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-medium text-body capitalize min-w-0">
+        <p className="text-sm font-medium text-normal capitalize min-w-0">
           {METRIC_LABELS[metric] ?? metric}
         </p>
         <div
-          className="shrink-0 cursor-grab active:cursor-grabbing touch-none text-muted dark:text-muted-dark hover:text-body p-1 -m-1"
+          className="shrink-0 cursor-grab active:cursor-grabbing touch-none text-muted hover:text-normal p-1 -m-1"
           aria-label={`Drag to reorder ${METRIC_LABELS[metric] ?? metric}`}
           {...attributes}
           {...listeners}
@@ -70,7 +70,7 @@ function MetricRangeCard({
       <div className="space-y-2">
         {keys.map((key) => (
           <div key={key} className="flex items-center gap-2">
-            <label className="text-xs text-muted dark:text-muted-dark shrink-0 min-w-[100px]" htmlFor={`metric-${metric}-${key}`}>
+            <label className="text-xs text-muted shrink-0 min-w-[100px]" htmlFor={`metric-${metric}-${key}`}>
               {METRIC_KEY_LABELS[key] ?? key}
             </label>
             <input
@@ -117,7 +117,7 @@ function ThemePreviewCard({ themeId, isSelected, onSelect, previewClassName, use
           <div className="h-1.5 rounded w-4/5 bg-muted opacity-100" />
         </div>
         <div className="flex items-center justify-center gap-1.5 py-2 px-2 bg-surface-light border-t border-edge">
-          <ThemeIcon mode={themeId} className="w-3.5 h-3.5 text-muted dark:text-muted-dark shrink-0" />
+          <ThemeIcon mode={themeId} className="w-3.5 h-3.5 text-muted shrink-0" />
           <span className="text-xs font-medium text-fg dark:text-fg-dark truncate">{THEME_LABELS[themeId]}</span>
         </div>
       </div>
@@ -213,7 +213,7 @@ export function TabAppearance() {
           </div>
         </div>
         <div className="space-y-4">
-          <p className="text-body text-sm mb-6">
+          <p className="text-normal text-sm mb-6">
             Customize display ranges and drag'n'drop to reorder metrics. Order here matches the gauge order on the dashboard.
           </p>
           <DndContext
@@ -270,7 +270,7 @@ export function TabAppearance() {
               ) : null}
             </DragOverlay>
           </DndContext>
-          <div className="text-muted dark:text-muted-dark text-xs my-3 space-y-1">
+          <div className="text-muted text-xs my-3 space-y-1">
             <div><strong>Gauge max:</strong> value that maps to 100% on the needle (the scale).</div>
             <div><strong>Min:</strong> lower bound for &quot;higher is better&quot; (hashrate, frequency).</div>
             <div><strong>Max:</strong> upper bound for &quot;lower is better&quot; (temp, power, efficiency, current).</div>
@@ -286,7 +286,7 @@ export function TabAppearance() {
             <h3 className="card-header-title">Colors</h3>
           </div>
         </div>
-        <div className="text-muted dark:text-muted-dark text-sm my-6 space-y-1">
+        <div className="text-muted text-sm my-6 space-y-1">
           <div><strong>Accent color:</strong> Buttons, links, and highlights. Darker shade is derived automatically.</div>
           <div><strong>Chart colors:</strong> Line colors for Power, Temperature, and Hashrate charts.</div>
         </div>
@@ -317,7 +317,7 @@ export function TabAppearance() {
                 const seriesColors = chartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
                 return (
                   <div key={chart.id} className="border border-default rounded-md px-4 py-3 space-y-1">
-                    <p className="text-sm font-medium text-body">{chart.label}</p>
+                    <p className="text-sm font-medium text-normal">{chart.label}</p>
                     {chart.series.map(({ key, label }) => {
                       const value = seriesColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];
                       const effective = normalizeHex(value, DASHBOARD_DEFAULTS.chartColors[chart.id][key]);
@@ -330,7 +330,7 @@ export function TabAppearance() {
                             className="w-8 h-8 rounded border border-default cursor-pointer bg-transparent shrink-0"
                             aria-label={`${chart.label} ${label} color`}
                           />
-                          <label className="text-xs text-muted dark:text-muted-dark shrink-0 min-w-16" htmlFor={`chart-${chart.id}-${key}`}>
+                          <label className="text-xs text-muted shrink-0 min-w-16" htmlFor={`chart-${chart.id}-${key}`}>
                             {label}
                           </label>
                           <input
@@ -360,7 +360,7 @@ export function TabAppearance() {
             <h3 className="card-header-title">Theme</h3>
           </div>
         </div>
-        <p className="text-muted dark:text-muted-dark text-sm mb-4">
+        <p className="text-muted text-sm mb-4">
           Choose a theme. High contrast uses stronger text contrast. You can also cycle themes from the header.
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

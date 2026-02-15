@@ -152,7 +152,7 @@ export function TabMiner() {
                     aria-invalid={!!manualFanSpeedError}
                     aria-describedby={manualFanSpeedError ? 'manual-fan-speed-error' : undefined}
                   />
-                  <span className="text-sm text-body">{manualFanSpeed}%</span>
+                  <span className="text-sm text-normal">{manualFanSpeed}%</span>
                   {manualFanSpeedError && (
                     <p id="manual-fan-speed-error" className="text-danger text-xs mt-1" role="alert">
                       {manualFanSpeedError}
@@ -172,7 +172,7 @@ export function TabMiner() {
                   >
                     <span className={`switch-thumb ${fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
-                  <span className="text-sm text-body">{fanAuto ? 'Auto (PID)' : 'Manual'}</span>
+                  <span className="text-sm text-normal">{fanAuto ? 'Auto (PID)' : 'Manual'}</span>
                 </div>
               </Field>
             </div>
@@ -215,7 +215,7 @@ export function TabMiner() {
                 >
                   <span className={`switch-thumb ${autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-body">{autoScreenOff ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{autoScreenOff ? 'On' : 'Off'}</span>
               </div>
             </Field>
             <Field label="Flip screen" hint="Rotate display 180°.">
@@ -230,7 +230,7 @@ export function TabMiner() {
                 >
                   <span className={`switch-thumb ${flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-body">{flipScreen ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{flipScreen ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>

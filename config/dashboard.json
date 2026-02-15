@@ -56,8 +56,8 @@
   },
   "metricOrder": [
     "hashrate",
-    "fanRpm",
     "temp",
+    "fanRpm",
     "efficiency",
     "frequency",
     "current",

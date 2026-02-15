@@ -97,27 +97,27 @@ export default function SettingsPage({ onError }) {
           </form>
         )}
         {settingsSubTab === 'miner' && (
-          <div className="card p-8 text-center text-muted dark:text-muted-dark">
+          <div className="card p-8 text-center text-muted">
             Connect to the miner to change device settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
+            <button type="button" onClick={goToSetupTab} className="text-link">
               Setup
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
         )}
         {settingsSubTab === 'pools' && (
-          <div className="card p-8 text-center text-muted dark:text-muted-dark">
+          <div className="card p-8 text-center text-muted">
             Connect to the miner to change pool settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
+            <button type="button" onClick={goToSetupTab} className="text-link">
               Setup
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
         )}
         {settingsSubTab === 'firmware' && (
-          <div className="card p-8 text-center text-muted dark:text-muted-dark">
+          <div className="card p-8 text-center text-muted">
             Connect to the miner to update firmware. Set Miner IP in the{' '}
-            <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
+            <button type="button" onClick={goToSetupTab} className="text-link">
               Setup
             </button>{' '}
             tab if the dashboard cannot reach the miner.

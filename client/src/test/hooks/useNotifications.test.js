@@ -3,7 +3,7 @@
  */
 import { act } from 'react';
 import { renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { useNotifications } from '@/hooks/useNotifications';
 
 const mockUseMiner = vi.fn();
@@ -15,16 +15,6 @@ describe('useNotifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseMiner.mockReturnValue({ data: null, refetch: vi.fn() });
-    if (typeof window !== 'undefined' && window.Notification) {
-      vi.stubGlobal('Notification', {
-        permission: 'denied',
-        requestPermission: vi.fn().mockResolvedValue('denied'),
-      });
-    }
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
   });
 
   it('returns empty activeNotifications when miner is null', () => {

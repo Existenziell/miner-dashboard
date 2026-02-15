@@ -9,8 +9,6 @@ export const DEFAULT_EXPECTED_HASHRATE_GH = DASHBOARD_DEFAULTS.defaultExpectedHa
 export const POLL_MINER_INTERVAL_MS = DASHBOARD_DEFAULTS.pollMinerIntervalMs;
 export const POLL_NETWORK_INTERVAL_MS = DASHBOARD_DEFAULTS.pollNetworkIntervalMs;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
-/** Throttle: min time between browser (OS) notifications for the same metric. */
-export const BROWSER_NOTIFICATION_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
 /** How long the toast beside the save button is shown before auto-dismiss. */
 export const TOAST_AUTO_DISMISS_MS = 5_000;
 
@@ -192,10 +190,10 @@ export const CHART_COLOR_SPEC = [
   { id: 'power', label: 'Power', series: [{ key: 'power', label: 'Power' }, { key: 'currentA', label: 'Current' }] },
 ];
 
-/** Recharts grid/axis fallback when not in browser (SSR/tests). Actual values come from CSS variables (--chart-grid-* / --chart-axis-* / --chart-axis-font-size) in index.css. */
+/** Recharts grid/axis fallback when not in browser (SSR/tests). Actual values come from CSS variables (--chart-grid-* / --chart-axis-*) in index.css; axis font size is 11px. */
 export const CHART_GRID_AXIS_COLORS = {
-  light: { grid: '#d1d5db', axis: '#9ca3af', axisFontSize: 10 },
-  dark: { grid: '#333366', axis: '#666688', axisFontSize: 10 },
+  light: { grid: '#d1d5db', axis: '#9ca3af', axisFontSize: 11 },
+  dark: { grid: '#333366', axis: '#666688', axisFontSize: 11 },
 };
 
 // —— Device / firmware (ESP32 reset reasons, NerdQaxe/ESP-IDF) —————————————————
