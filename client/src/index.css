@@ -43,7 +43,7 @@
 
   /* Typography scale: 2xs (10px) | Tailwind xs (12px) | sm (14px) | base (16px) | lg (18px) | xl (20px) | 2xl (24px). */
   --font-size-2xs: 0.625rem;
-  --text-2xs: 0.625rem;
+  --text-2xs: var(--font-size-2xs);
 
   /* Semantic */
   --color-success: #16a34a;
