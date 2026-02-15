@@ -58,7 +58,7 @@ export function TabSetup({ minerReachable }) {
         </div>
         <form onSubmit={saveConnection} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Miner IP or hostname" hint="Address of the miner. Leave empty if using .env MINER_IP.">
+            <Field label="Miner IP" hint="IP address of the miner. Leave empty if using .env MINER_IP.">
               <input
                 type="text"
                 value={minerIp}
@@ -153,9 +153,6 @@ export function TabSetup({ minerReachable }) {
           </p>
         ) : (
           <>
-        <p className="text-muted dark:text-muted-dark text-sm mb-6">
-          Device hostname and WiFi network.
-        </p>
         <form onSubmit={(e) => { e.preventDefault(); wifiSave(); }} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
