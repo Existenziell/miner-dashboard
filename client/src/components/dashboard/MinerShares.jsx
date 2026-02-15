@@ -60,7 +60,7 @@ export default function MinerShares() {
         </div>
         <div>
           <div className="stat-label">Block Found</div>
-          <div className={`text-lg font-bold ${data.foundBlocks || data.blockFound ? 'text-success dark:text-success-dark' : 'text-muted-standalone'}`}>
+          <div className={`text-lg font-bold ${data.foundBlocks || data.blockFound ? 'text-success dark:text-success-dark' : 'text-muted dark:text-muted-dark'}`}>
             {data.foundBlocks || data.totalFoundBlocks || data.blockFound ? `${data.totalFoundBlocks ?? data.foundBlocks ?? 'YES!'}` : 'Not yet'}
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function MinerShares() {
       {/* Reject reasons (when miner provides them, or note when it doesn't) */}
       {rejected > 0 && (
         <div className="mt-6 pt-3 border-t border-default">
-          <div className="text-sm font-medium text-muted-standalone mb-1">Reject reasons</div>
+          <div className="text-sm font-medium text-muted dark:text-muted-dark mb-1">Reject reasons</div>
           {(() => {
             const raw = data.sharesRejectedReasons ?? data.shares_rejected_reasons;
             const reasons = Array.isArray(raw)
@@ -91,7 +91,7 @@ export default function MinerShares() {
               );
             }
             return (
-              <p className="text-sm text-muted-standalone">This device does not report reject reasons in its API.</p>
+              <p className="text-sm text-muted dark:text-muted-dark">This device does not report reject reasons in its API.</p>
             );
           })()}
         </div>
@@ -101,7 +101,7 @@ export default function MinerShares() {
       {data.duplicateHWNonces > 0 && (
         <div className="mt-4 pt-3 border-t border-default">
           <div className="text-sm">
-            <span className="text-muted-standalone">Duplicate HW Nonces:</span>{' '}
+            <span className="text-muted dark:text-muted-dark">Duplicate HW Nonces:</span>{' '}
             <span className="text-warning dark:text-warning-dark font-medium">{data.duplicateHWNonces}</span>
           </div>
         </div>

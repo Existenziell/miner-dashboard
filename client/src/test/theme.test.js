@@ -72,28 +72,18 @@ describe('useTheme (dark/light toggle)', () => {
     });
   });
 
-  it('defaults to system when no stored preference', () => {
-    matchMediaMock.mockReturnValue({
-      matches: false,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    });
+  it('defaults to light when no stored preference', () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.mode).toBe('system');
+    expect(result.current.mode).toBe('light');
     expect(result.current.resolved).toBe('light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
 
-  it('resolves system to dark when prefers-color-scheme: dark', () => {
-    matchMediaMock.mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    });
+  it('migrates stored "system" to light', () => {
+    localStorageStore[THEME_KEY] = 'system';
     const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.mode).toBe('system');
-    expect(result.current.resolved).toBe('dark');
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(result.current.mode).toBe('light');
+    expect(localStorageStore[THEME_KEY]).toBe('light');
   });
 
   it('uses stored light mode and applies light theme', () => {
@@ -120,6 +110,34 @@ describe('useTheme (dark/light toggle)', () => {
     expect(result.current.mode).toBe('dark');
     expect(result.current.resolved).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
+  });
+
+  it('uses stored light-high-contrast and applies light with high-contrast class', () => {
+    localStorageStore[THEME_KEY] = 'light-high-contrast';
+    matchMediaMock.mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    expect(result.current.mode).toBe('light-high-contrast');
+    expect(result.current.resolved).toBe('light');
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(document.documentElement.classList.contains('high-contrast')).toBe(true);
+  });
+
+  it('uses stored dark-high-contrast and applies dark with high-contrast class', () => {
+    localStorageStore[THEME_KEY] = 'dark-high-contrast';
+    matchMediaMock.mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    expect(result.current.mode).toBe('dark-high-contrast');
+    expect(result.current.resolved).toBe('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.classList.contains('high-contrast')).toBe(true);
   });
 
   it('setMode("light") switches to light and updates DOM', async () => {
@@ -160,31 +178,35 @@ describe('useTheme (dark/light toggle)', () => {
     expect(localStorageStore[THEME_KEY]).toBe('dark');
   });
 
-  it('cycle() goes system → light → dark → system', async () => {
-    matchMediaMock.mockReturnValue({
-      matches: false,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    });
+  it('cycle() goes light → light-high-contrast → dark → dark-high-contrast → light', async () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.mode).toBe('system');
+    expect(result.current.mode).toBe('light');
 
     await act(() => {
       result.current.cycle();
     });
-    expect(result.current.mode).toBe('light');
+    expect(result.current.mode).toBe('light-high-contrast');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(document.documentElement.classList.contains('high-contrast')).toBe(true);
 
     await act(() => {
       result.current.cycle();
     });
     expect(result.current.mode).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.classList.contains('high-contrast')).toBe(false);
 
     await act(() => {
       result.current.cycle();
     });
-    expect(result.current.mode).toBe('system');
+    expect(result.current.mode).toBe('dark-high-contrast');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.classList.contains('high-contrast')).toBe(true);
+
+    await act(() => {
+      result.current.cycle();
+    });
+    expect(result.current.mode).toBe('light');
     expect(result.current.resolved).toBe('light');
   });
 });

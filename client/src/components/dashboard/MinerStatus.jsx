@@ -88,7 +88,7 @@ export default function MinerStatus() {
             Miner offline
           </span>
         ) : minerLoading ? (
-          <span className="text-muted-standalone">Connecting...</span>
+          <span className="text-muted dark:text-muted-dark">Connecting...</span>
         ) : (
           <span className="flex items-center gap-1.5 text-success dark:text-success-dark text-sm">
             <span className="status-dot status-dot-success" />

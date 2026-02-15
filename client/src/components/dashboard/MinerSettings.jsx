@@ -4,7 +4,7 @@ import { getPoolInfo } from '@/lib/poolUtils';
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (
     <div className="flex justify-between items-start gap-4 py-1">
-      <span className="text-muted-standalone text-xs shrink-0">{label}</span>
+      <span className="text-muted dark:text-muted-dark text-xs shrink-0">{label}</span>
       {href ? (
         <a
           href={href}

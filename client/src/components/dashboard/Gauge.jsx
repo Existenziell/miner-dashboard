@@ -48,13 +48,13 @@ export default function Gauge({ label, value, sub, color = 'text-accent', percen
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <span className="text-xl sm:text-2xl font-bold leading-tight tabular-nums">{value}</span>
           {sub && (
-            <span className="text-[10px] sm:text-xs text-muted-standalone mt-0.5 max-w-[90%] truncate">
+            <span className="text-[10px] sm:text-xs text-muted dark:text-muted-dark mt-0.5 max-w-[90%] truncate">
               {sub}
             </span>
           )}
         </div>
       </div>
-      <div className="text-muted-standalone font-medium -mt-6 text-center">{label}</div>
+      <div className="text-muted dark:text-muted-dark font-medium -mt-6 text-center">{label}</div>
     </div>
   );
 }

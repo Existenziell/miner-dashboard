@@ -13,6 +13,7 @@ function buildAccentOverrideCSS(accent) {
   const a15 = hexWithAlpha(accent, 0.15);
   const a20 = hexWithAlpha(accent, 0.2);
   const a25 = hexWithAlpha(accent, 0.25);
+  const a30 = hexWithAlpha(accent, 0.3);
   const a50 = hexWithAlpha(accent, 0.5);
   const a60 = hexWithAlpha(accent, 0.6);
   const contrastFg = getContrastColor(accent);
@@ -36,7 +37,8 @@ function buildAccentOverrideCSS(accent) {
 .option-row:has(.option-radio-input:checked) .option-radio-dot,.option-row-selected .option-radio-dot{--tw-ring-color:${a25} !important;background-color:${accent} !important;border-color:${accent} !important}
 .checkbox-input:checked~.checkbox-box{--tw-ring-color:${a25} !important;background-color:${accent} !important;border-color:${accent} !important}
 .checkbox-input:checked~.checkbox-box .checkbox-check{color:${contrastFg} !important}
-.input-range{accent-color:${accent} !important}`;
+.input-range{accent-color:${accent} !important}
+.theme-preview-card[aria-pressed="true"]{border-color:${accent} !important;--tw-ring-color:${a30} !important}`;
 }
 
 export function ConfigProvider({ children }) {

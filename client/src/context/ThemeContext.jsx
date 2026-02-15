@@ -1,51 +1,48 @@
 /* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
-import { createContext, useCallback,useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { THEME_KEY } from '@/lib/constants';
 
-function getSystemPreference() {
-  return typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
+export const THEME_MODES = ['light', 'light-high-contrast', 'dark', 'dark-high-contrast'];
 
-function applyTheme(resolved) {
+function applyTheme(mode) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
-  if (resolved === 'dark') {
-    root.classList.add('dark');
-  } else {
-    root.classList.remove('dark');
-  }
+  const isDark = mode === 'dark' || mode === 'dark-high-contrast';
+  const isHighContrast = mode === 'light-high-contrast' || mode === 'dark-high-contrast';
+  root.classList.toggle('dark', isDark);
+  root.classList.toggle('high-contrast', isHighContrast);
+}
+
+export function getResolvedTheme(mode) {
+  if (mode === 'light' || mode === 'light-high-contrast') return 'light';
+  return 'dark';
 }
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  const [mode, setMode] = useState(() => {
-    if (typeof window === 'undefined') return 'system';
+  const [mode, setModeState] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
     const stored = localStorage.getItem(THEME_KEY);
-    return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+    return THEME_MODES.includes(stored) ? stored : 'light';
   });
 
-  const resolved = mode === 'system' ? getSystemPreference() : mode;
+  const resolved = getResolvedTheme(mode);
 
   useEffect(() => {
-    applyTheme(resolved);
+    applyTheme(mode);
     if (typeof localStorage !== 'undefined') localStorage.setItem(THEME_KEY, mode);
-  }, [mode, resolved]);
-
-  useEffect(() => {
-    if (mode !== 'system' || typeof window === 'undefined') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e) => applyTheme(e.matches ? 'dark' : 'light');
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
   }, [mode]);
 
   const cycle = useCallback(() => {
-    setMode((prev) => {
-      if (prev === 'system') return 'light';
-      if (prev === 'light') return 'dark';
-      return 'system';
+    setModeState((prev) => {
+      const i = THEME_MODES.indexOf(prev);
+      return THEME_MODES[(i + 1) % THEME_MODES.length];
     });
+  }, []);
+
+  const setMode = useCallback((next) => {
+    if (THEME_MODES.includes(next)) setModeState(next);
   }, []);
 
   const value = { mode, resolved, setMode, cycle };

@@ -97,7 +97,7 @@ export default function SettingsPage({ onError }) {
           </form>
         )}
         {settingsSubTab === 'miner' && (
-          <div className="card p-8 text-center text-muted-standalone">
+          <div className="card p-8 text-center text-muted dark:text-muted-dark">
             Connect to the miner to change device settings. Set Miner IP in the{' '}
             <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
               Setup
@@ -106,7 +106,7 @@ export default function SettingsPage({ onError }) {
           </div>
         )}
         {settingsSubTab === 'pools' && (
-          <div className="card p-8 text-center text-muted-standalone">
+          <div className="card p-8 text-center text-muted dark:text-muted-dark">
             Connect to the miner to change pool settings. Set Miner IP in the{' '}
             <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
               Setup
@@ -115,7 +115,7 @@ export default function SettingsPage({ onError }) {
           </div>
         )}
         {settingsSubTab === 'firmware' && (
-          <div className="card p-8 text-center text-muted-standalone">
+          <div className="card p-8 text-center text-muted dark:text-muted-dark">
             Connect to the miner to update firmware. Set Miner IP in the{' '}
             <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
               Setup

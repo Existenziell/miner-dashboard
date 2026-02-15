@@ -7,15 +7,15 @@ function ResponseCard({ title, path, data, error, loading }) {
   return (
     <div className="card min-w-0 flex flex-col">
       <h3 className="card-title">{title}</h3>
-      <p className="text-muted-standalone text-sm mb-2 font-mono">{path}</p>
-      {loading && <p className="text-muted-standalone text-sm">Loading…</p>}
+      <p className="text-muted dark:text-muted-dark text-sm mb-2 font-mono">{path}</p>
+      {loading && <p className="text-muted dark:text-muted-dark text-sm">Loading…</p>}
       {error && <p className="text-danger dark:text-danger-dark text-sm">{error.message}</p>}
       {!loading && !error && data != null && (
         <pre className="api-pre flex-1 min-h-0">
           {JSON.stringify(data, null, 2)}
         </pre>
       )}
-      {!loading && !error && data == null && <p className="text-muted-standalone text-sm">No data.</p>}
+      {!loading && !error && data == null && <p className="text-muted dark:text-muted-dark text-sm">No data.</p>}
     </div>
   );
 }
@@ -93,9 +93,9 @@ export default function ApiPage() {
           <table className="w-full text-sm text-left">
             <thead>
               <tr className="border-b border-default">
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Method</th>
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Path</th>
-                <th className="py-2 font-medium text-muted-standalone">Description</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Method</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Path</th>
+                <th className="py-2 font-medium text-muted dark:text-muted-dark">Description</th>
               </tr>
             </thead>
             <tbody className="text-body">
@@ -137,7 +137,7 @@ export default function ApiPage() {
 
       <div className="card">
         <h3 className="card-title">Related API settings</h3>
-        <p className="text-muted-standalone text-sm mb-4">Constants and config that affect API polling and requests.</p>
+        <p className="text-muted dark:text-muted-dark text-sm mb-4">Constants and config that affect API polling and requests.</p>
         <h4 className="text-sm font-medium text-body mb-2">Client</h4>
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-sm text-left table-fixed">
@@ -146,10 +146,10 @@ export default function ApiPage() {
             </colgroup>
             <thead>
               <tr className="border-b border-default">
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Name</th>
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Source</th>
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Value</th>
-                <th className="py-2 font-medium text-muted-standalone">Description</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Name</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Source</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Value</th>
+                <th className="py-2 font-medium text-muted dark:text-muted-dark">Description</th>
               </tr>
             </thead>
             <tbody className="text-body">
@@ -172,10 +172,10 @@ export default function ApiPage() {
             </colgroup>
             <thead>
               <tr className="border-b border-default">
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Name</th>
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Source</th>
-                <th className="py-2 pr-4 font-medium text-muted-standalone">Value</th>
-                <th className="py-2 font-medium text-muted-standalone">Description</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Name</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Source</th>
+                <th className="py-2 pr-4 font-medium text-muted dark:text-muted-dark">Value</th>
+                <th className="py-2 font-medium text-muted dark:text-muted-dark">Description</th>
               </tr>
             </thead>
             <tbody className="text-body">
@@ -194,18 +194,18 @@ export default function ApiPage() {
 
       <div className="card">
         <h3 className="card-title">Query the API with cURL</h3>
-        <p className="text-muted-standalone text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
-        <div className="rounded-md overflow-hidden bg-[#1e1e1e] border border-default shadow-inner">
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#2d2d2d] border-b border-[#3d3d3d]">
-            <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-            <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-            <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
-            <span className="text-xs text-gray-400 ml-2 font-medium">Terminal</span>
+        <p className="text-muted dark:text-muted-dark text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
+        <div className="rounded-md overflow-hidden bg-terminal-bg border border-terminal-border shadow-inner">
+          <div className="flex items-center gap-2 px-3 py-2 bg-terminal-bar border-b border-terminal-border">
+            <span className="w-3 h-3 rounded-full bg-terminal-dot-close" />
+            <span className="w-3 h-3 rounded-full bg-terminal-dot-minimize" />
+            <span className="w-3 h-3 rounded-full bg-terminal-dot-open" />
+            <span className="text-xs text-terminal-label ml-2 font-medium">Terminal</span>
           </div>
-          <div className="p-4 text-sm font-mono text-gray-300 overflow-x-auto space-y-2">
+          <div className="p-4 text-sm font-mono text-terminal-text overflow-x-auto space-y-2">
             {CURL_EXAMPLES.map(({ path, curl }) => (
               <div key={path} className="flex flex-wrap gap-x-2 items-baseline">
-                <span className="text-green-400 select-none shrink-0">$</span>
+                <span className="text-terminal-prompt select-none shrink-0">$</span>
                 <code className="break-all">{origin ? curl(origin) : curl('http://localhost:3000')}</code>
               </div>
             ))}
