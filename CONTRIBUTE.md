@@ -23,6 +23,33 @@ Thanks for your interest in contributing.
 
    Backend: `http://localhost:8001`. Frontend (Vite): `http://localhost:8000` (proxies to backend).
 
+## Project structure
+
+- **Root:** `server/` (Express), `client/` (Vite + React), `config/` (runtime `dashboard.json`), `shared/` (schemas and defaults used by both).
+- **Server:** `server/index.js` (entry; mounts routes), `server/config.js` (PORT), `server/config/dashboardConfig.js` (load/save config), `server/routes/` — `config.js`, `miner.js`, `network.js`, `firmware.js`.
+- **Client:** `client/src/` — `main.jsx`, `App.jsx`, `components/` (pages, dashboard, settings, layout, charts), `context/`, `hooks/`, `lib/` (api, formatters, utils, etc.). Tests under `client/src/test/` mirror `hooks/` and `lib/` with `*.test.js`.
+
+Route mounting in `server/index.js`: `/api/config`, `/api/firmware`, `/api/miner`, `/api/network`.
+
+## Config and API
+
+- **Dashboard config:** Persisted in `config/dashboard.json`; defaults in `shared/dashboardDefaults.js`; server merges and validates in `server/config/dashboardConfig.js`. Miner IP can come from `.env` (overrides stored config).
+- **Config API:** `GET /api/config`, `PATCH /api/config` (partial updates); used by the Settings UI. Miner/network/firmware routes proxy or aggregate external data (miner device, mempool.space, GitHub).
+
+## Tests
+
+- **Framework:** Vitest; config in `client/vite.config.js` (`test.include: ['src/test/**/*.test.js']`, `environment: 'node'`).
+- **Run:** `npm test` (from repo root) or `npm run test:watch`. Tests live in `client/src/test/` (e.g. `src/test/hooks/useMinerData.test.js`, `src/test/lib/api.test.js`). `npm run all` runs build, test, and lint together.
+
+## Lint and style
+
+- **ESLint:** `client/eslint.config.js`. Import order: React → `@/context` → `@/hooks` → `@/lib` → `@/components` → other; alphabetized; `npm run lint -- --fix` applies import order.
+- **Stylelint** for `src/**/*.css`. Run `npm run lint` from repo root (lints JS and CSS). Fix any issues before opening a PR.
+
+## Code conventions
+
+- Client uses `@/` for `src/` and `shared` for the shared package (see `client/vite.config.js` `resolve.alias`). Follow existing patterns in `context/`, `hooks/`, and `lib/` when adding features.
+
 ## Commands
 
 - **`npm run dev`** – Start backend and frontend dev servers

@@ -1,6 +1,6 @@
 # Miner Dashboard
 
-A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or similar devices.
+A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or similar devices. This document covers setup and general reference; see [Contributing](CONTRIBUTE.md) for development.
 
 ## Features
 
@@ -15,19 +15,10 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 - **Settings – Dashboard**: expected hashrate, poll intervals, and metric ranges (thresholds and gauge max for hashrate, temp, power, efficiency, etc.)
 - **Settings – Colors**: customize accent color and gauge/indicator colors; settings persisted to the server
 
----
-
-![Dashboard – miner overview (dark)](client/public/screenshots/dashboard-miner-dark.png)
-
 ## Requirements
 
 - **Node.js** 18 or later
 - A NerdQaxe++ miner on your network (for live monitoring)
-
-## Tech stack
-
-- **Backend:** Express (Node.js), proxies miner API and serves config; fetches Bitcoin data from mempool.space and (optionally) GitHub for firmware releases
-- **Frontend:** React 19, Vite, Tailwind CSS, Recharts
 
 ## Quick Start
 
@@ -48,6 +39,13 @@ This starts:
 - Vite dev server on `http://localhost:8000` (with proxy to backend)
 
 Open `http://localhost:8000` in your browser.
+
+![Dashboard – miner overview (dark)](client/public/screenshots/dashboard-miner-dark.png)
+
+## Tech stack
+
+- **Backend:** Express (Node.js), proxies miner API and serves config; fetches Bitcoin data from mempool.space and (optionally) GitHub for firmware releases
+- **Frontend:** React 19, Vite, Tailwind CSS, Recharts
 
 ## Production
 
@@ -141,4 +139,4 @@ The Express backend proxies requests to the miner (avoiding CORS issues) and agg
 
 ## Contribute
 
-[Docs](CONTRIBUTE.md)
+[Contributing](CONTRIBUTE.md)
