@@ -66,7 +66,18 @@ export function useChartCollapsed(storageKey) {
   return { collapsed, toggleCollapsed };
 }
 
-/** Return grid/axis colors for Recharts by theme. */
+/** Return grid/axis colors for Recharts by theme. 
+ * Reads from CSS variables when in browser; 
+ * uses constants as fallback (SSR/tests). 
+ **/
 export function getChartGridAxisColors(isDark) {
+  if (typeof document !== 'undefined') {
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
+    const key = isDark ? 'dark' : 'light';
+    const grid = style.getPropertyValue(`--chart-grid-${key}`).trim();
+    const axis = style.getPropertyValue(`--chart-axis-${key}`).trim();
+    if (grid && axis) return { grid, axis };
+  }
   return CHART_GRID_AXIS_COLORS[isDark ? 'dark' : 'light'];
 }

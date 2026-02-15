@@ -192,7 +192,7 @@ export const CHART_COLOR_SPEC = [
   { id: 'power', label: 'Power', series: [{ key: 'power', label: 'Power' }, { key: 'currentA', label: 'Current' }] },
 ];
 
-/** Recharts grid and axis stroke colors by theme (light/dark). Not the data series colors. */
+/** Recharts grid/axis fallback when not in browser (SSR/tests). Actual values come from CSS variables (--chart-grid-* / --chart-axis-*) in index.css. */
 export const CHART_GRID_AXIS_COLORS = {
   light: { grid: '#d1d5db', axis: '#9ca3af' },
   dark: { grid: '#333366', axis: '#666688' },

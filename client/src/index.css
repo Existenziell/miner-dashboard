@@ -27,10 +27,16 @@
   --color-edge-dark: var(--color-gray-700);
 
   /* Text (Tailwind gray by name, softer contrast) */
-  --color-fg: var(--color-gray-800);
-  --color-fg-dark: var(--color-gray-200);
-  --color-muted: var(--color-gray-500);
-  --color-muted-dark: var(--color-gray-400);
+  --color-fg: var(--color-gray-700);
+  --color-fg-dark: var(--color-gray-300);
+  --color-muted: var(--color-gray-600);
+  --color-muted-dark: var(--color-gray-500);
+
+  /* Chart grid/axis stroke (Recharts); read in JS so no hardcoded hex in app code */
+  --chart-grid-light: #d1d5db;
+  --chart-axis-light: #9ca3af;
+  --chart-grid-dark: #336;
+  --chart-axis-dark: #668;
 
   /* Semantic */
   --color-success: #16a34a;
@@ -102,10 +108,10 @@ html.high-contrast.dark .theme-preview-card:hover:not([aria-pressed="true"]) {
   --color-surface-card: var(--color-white);
   --color-surface-hover: var(--color-gray-200);
   --color-edge: var(--color-gray-200);
-  --color-fg: var(--color-gray-800);
-  --color-fg-dark: var(--color-gray-800);
-  --color-muted: var(--color-gray-500);
-  --color-muted-dark: var(--color-gray-500);
+  --color-fg: var(--color-gray-700);
+  --color-fg-dark: var(--color-gray-700);
+  --color-muted: var(--color-gray-600);
+  --color-muted-dark: var(--color-gray-600);
 }
 
 .theme-preview-dark {
@@ -114,10 +120,10 @@ html.high-contrast.dark .theme-preview-card:hover:not([aria-pressed="true"]) {
   --color-surface-card: var(--color-gray-900);
   --color-surface-hover: var(--color-gray-800);
   --color-edge: var(--color-gray-700);
-  --color-fg: var(--color-gray-200);
-  --color-fg-dark: var(--color-gray-200);
-  --color-muted: var(--color-gray-400);
-  --color-muted-dark: var(--color-gray-400);
+  --color-fg: var(--color-gray-300);
+  --color-fg-dark: var(--color-gray-300);
+  --color-muted: var(--color-gray-500);
+  --color-muted-dark: var(--color-gray-500);
 }
 
 .theme-preview-light-hc {
@@ -164,9 +170,9 @@ html.high-contrast a {
   text-decoration-style: solid;
 }
 
-/* Smooth transitions when switching themes */
+/* Smooth transitions when switching themes; font smoothing for softer text */
 html {
-  @apply transition-colors duration-200 ease-[ease];
+  @apply antialiased transition-colors duration-200 ease-[ease];
 }
 
 /* ==========================================================================
