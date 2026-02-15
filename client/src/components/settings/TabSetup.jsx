@@ -162,7 +162,7 @@ export function TabSetup({ minerReachable }) {
               <input
                 type="text"
                 value={hostname}
-                onChange={(e) => setHostname(e.target.value)}
+                onChange={(e) => setHostname(e.target.value.toLowerCase())}
                 placeholder="bitaxe"
                 maxLength={MAX_HOSTNAME_LENGTH}
                 className={`input ${hostnameError ? 'input-danger' : ''}`}
