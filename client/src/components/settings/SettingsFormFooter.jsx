@@ -1,5 +1,5 @@
 /**
- * Footer for Appearance tab: Save button, message, Reset to defaults + confirm dialog.
+ * Footer for Appearance tab: Save button, message, Reset to defaults? + confirm dialog.
  * Receives form state as props (from useAppearance).
  */
 import { useEffect } from 'react';
@@ -10,7 +10,7 @@ export function SettingsFormFooter({
   form,
   resetDialogDescription = 'Reset all settings to their default values and save.',
   saveButtonLabel = 'Save settings',
-  resetDialogTitle = 'Reset to defaults',
+  resetDialogTitle = 'Reset to defaults?',
 }) {
   if (!form) throw new Error('SettingsFormFooter requires a form prop.');
   const { saving, hasChanges, message, setMessage, hasDefaultsDiff, showResetConfirm, setShowResetConfirm, resetToDefaults } = form;

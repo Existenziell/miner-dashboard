@@ -15,6 +15,7 @@ export function ConfirmModal({
   confirmDisabled = false,
 }) {
   const titleId = useId();
+  const descriptionId = useId();
 
   if (!open) return null;
 
@@ -28,13 +29,14 @@ export function ConfirmModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
+      aria-describedby={descriptionId}
       onClick={onClose}
     >
       <div className="card max-w-md w-full shadow-xl -mt-30" onClick={(e) => e.stopPropagation()}>
         <h2 id={titleId} className="text-lg font-semibold text-body mb-2">
           {title}
         </h2>
-        <p className="text-muted dark:text-muted-dark text-sm mb-6">{description}</p>
+        <p id={descriptionId} className="text-muted dark:text-muted-dark text-sm mb-6">{description}</p>
         <div className="flex justify-end gap-2">
           <button
             type="button"

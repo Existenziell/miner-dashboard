@@ -37,7 +37,7 @@ function PowerChart({ history }) {
     <ChartCard
       title="Power"
       loading={!history || history.length < 2}
-      loadingMessage="Collecting power data..."
+      loadingMessage="Collecting power data…"
       collapsed={collapsed}
       onToggleCollapsed={toggleCollapsed}
     >

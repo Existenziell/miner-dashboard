@@ -34,7 +34,7 @@ function TemperatureChart({ history }) {
     <ChartCard
       title="Temperature"
       loading={!history || history.length < 2}
-      loadingMessage="Collecting temperature data..."
+      loadingMessage="Collecting temperature data…"
       collapsed={collapsed}
       onToggleCollapsed={toggleCollapsed}
     >

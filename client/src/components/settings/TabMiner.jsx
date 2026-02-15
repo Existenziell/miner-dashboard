@@ -209,6 +209,7 @@ export function TabMiner() {
                   type="button"
                   role="switch"
                   aria-checked={autoScreenOff}
+                  aria-label="Automatic screen shutdown"
                   onClick={() => setAutoScreenOff((v) => !v)}
                   className={`switch ${autoScreenOff ? 'switch-on' : 'switch-off'}`}
                 >
@@ -223,6 +224,7 @@ export function TabMiner() {
                   type="button"
                   role="switch"
                   aria-checked={flipScreen}
+                  aria-label="Flip screen"
                   onClick={() => setFlipScreen((v) => !v)}
                   className={`switch ${flipScreen ? 'switch-on' : 'switch-off'}`}
                 >

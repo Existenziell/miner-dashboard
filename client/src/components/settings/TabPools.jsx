@@ -164,6 +164,7 @@ export function TabPools({ miner }) {
                   value={primaryStratumPort}
                   onChange={(e) => setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
                   className={`input ${!primaryPortValid ? 'input-danger' : ''}`}
+                  aria-label="Primary pool Stratum port"
                   aria-invalid={!primaryPortValid}
                 />
               </Field>
@@ -175,6 +176,7 @@ export function TabPools({ miner }) {
                   placeholder="bc1q..."
                   maxLength={MAX_STRATUM_USER_LENGTH}
                   className={`input ${primaryStratumUserError ? 'input-danger' : ''}`}
+                  aria-label="Primary pool Worker / payout address"
                   aria-invalid={!!primaryStratumUserError}
                   aria-describedby={primaryStratumUserError ? 'primary-stratum-user-error' : undefined}
                 />
@@ -300,6 +302,7 @@ export function TabPools({ miner }) {
                   value={fallbackStratumPort}
                   onChange={(e) => setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
                   className={`input ${!fallbackPortValid ? 'input-danger' : ''}`}
+                  aria-label="Fallback pool Stratum port"
                   aria-invalid={!fallbackPortValid}
                 />
               </Field>
@@ -311,6 +314,7 @@ export function TabPools({ miner }) {
                   placeholder="bc1q..."
                   maxLength={MAX_STRATUM_USER_LENGTH}
                   className={`input ${fallbackStratumUserError ? 'input-danger' : ''}`}
+                  aria-label="Fallback pool Worker / payout address"
                   aria-invalid={!!fallbackStratumUserError}
                   aria-describedby={fallbackStratumUserError ? 'fallback-stratum-user-error' : undefined}
                 />

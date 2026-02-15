@@ -67,6 +67,7 @@ export function ChartCard({ title, loading, loadingMessage, collapsed, onToggleC
           onClick={onToggleCollapsed}
           className={`card-header cursor-pointer border-0 focus:outline-none${collapsed ? ' rounded-b-md' : ''}`}
           aria-expanded={!collapsed}
+          aria-label={`${title}, ${collapsed ? 'Expand' : 'Collapse'}`}
         >
           <h3 className="card-header-title">{title}</h3>
           <span className="text-muted dark:text-muted-dark text-sm shrink-0">{collapsed ? 'Expand' : 'Collapse'}</span>

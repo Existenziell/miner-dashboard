@@ -36,7 +36,7 @@ function HashrateChart({ history }) {
     <ChartCard
       title="Hashrate"
       loading={!history || history.length < 2}
-      loadingMessage="Collecting hashrate data..."
+      loadingMessage="Collecting hashrate data…"
       collapsed={collapsed}
       onToggleCollapsed={toggleCollapsed}
     >

@@ -53,7 +53,7 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Miner settings</h3>
+            <h3 className="card-header-title">Miner Settings</h3>
           </div>
         </div>
         <form onSubmit={saveConnection} className="space-y-4">
@@ -80,7 +80,7 @@ export function TabSetup({ minerReachable }) {
                 value={expectedHashrateGh}
                 onChange={(e) => setExpectedHashrateGh(Number(e.target.value) || DASHBOARD_DEFAULTS.defaultExpectedHashrateGh)}
                 className="input"
-                aria-label="Expected hashrate GH/s"
+                aria-label="Expected hashrate (GH/s)"
               />
             </Field>
             <Field
@@ -95,7 +95,7 @@ export function TabSetup({ minerReachable }) {
                 value={pollMinerMs}
                 onChange={(e) => setPollMinerMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollMinerIntervalMs)}
                 className="input"
-                aria-label="Miner poll interval ms"
+                aria-label="Miner poll interval (ms)"
               />
             </Field>
             <Field
@@ -110,7 +110,7 @@ export function TabSetup({ minerReachable }) {
                 value={pollNetworkMs}
                 onChange={(e) => setPollNetworkMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollNetworkIntervalMs)}
                 className="input"
-                aria-label="Network poll interval ms"
+                aria-label="Network poll interval (ms)"
               />
             </Field>
           </div>
@@ -144,7 +144,7 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">WiFi settings</h3>
+            <h3 className="card-header-title">WiFi Settings</h3>
           </div>
         </div>
         {!minerReachable ? (

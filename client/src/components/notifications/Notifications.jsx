@@ -21,7 +21,7 @@ export default function Notifications({ minerError, networkError }) {
         <NotificationBanner
           type="warning"
           dismissable={false}
-          message={`Cannot reach miner: `}
+          message="Cannot reach miner:"
           summary={minerError}
         />
       )}
