@@ -3,7 +3,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
-   Theme: design tokens
    Use @theme so high-contrast and theme previews can override variables.
    ========================================================================== */
 
@@ -318,6 +317,10 @@ input[type="number"] {
 
 .stat-label {
   @apply text-xs uppercase tracking-wide text-muted dark:text-muted-dark;
+}
+
+.stat-value {
+  @apply truncate min-w-0 text-base font-medium;
 }
 
 .field-hint-trigger {

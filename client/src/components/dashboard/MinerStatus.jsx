@@ -18,9 +18,9 @@ function ItemGrid({ items }) {
       {items.map((item) => (
         <div key={item.label}>
           <div className="stat-label">{item.label}</div>
-          <div className="text-body text-sm font-medium mt-0.5 truncate flex items-center gap-2">
+          <div className="mt-0.5 truncate flex items-center gap-2">
             {item.status != null && <StatusDot connected={item.status === 'connected'} />}
-            <span className="truncate min-w-0">{item.value}</span>
+            <span className="stat-value">{item.value}</span>
           </div>
           {item.warning && (
             <div className="text-xs text-warning dark:text-warning-dark mt-0.5">

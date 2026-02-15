@@ -54,7 +54,7 @@ export default function MinerSettings() {
       {/* Primary Pool */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className="label font-semibold">Primary Pool</span>
+          <span className="text-sm font-semibold">Primary Pool</span>
           {!isUsingFallback && (
             <span className="badge-success">ACTIVE</span>
           )}
@@ -76,7 +76,7 @@ export default function MinerSettings() {
       {/* Fallback Pool */}
       <div className="pt-3 border-t border-default">
         <div className="flex items-center gap-2 mb-2">
-          <span className="label font-semibold">Fallback Pool</span>
+          <span className="text-sm font-semibold">Fallback Pool</span>
           {isUsingFallback && (
             <span className="badge-warning">ACTIVE</span>
           )}
