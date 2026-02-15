@@ -56,7 +56,7 @@ export default function MinerSettings() {
         <div className="flex items-center gap-2 mb-2">
           <span className="text-sm font-semibold">Primary Pool</span>
           {!isUsingFallback && (
-            <span className="badge-success">ACTIVE</span>
+            <span className="status-active">ACTIVE</span>
           )}
         </div>
         {primaryMisconfigured && (
@@ -78,7 +78,7 @@ export default function MinerSettings() {
         <div className="flex items-center gap-2 mb-2">
           <span className="text-sm font-semibold">Fallback Pool</span>
           {isUsingFallback && (
-            <span className="badge-warning">ACTIVE</span>
+            <span className="status-active">ACTIVE</span>
           )}
         </div>
         {fallbackMisconfigured && (

@@ -9,7 +9,7 @@ import { useMinerDevice } from '@/hooks/useMinerDevice';
 import { useMinerPools } from '@/hooks/useMinerPools';
 import { useMinerWifi } from '@/hooks/useMinerWifi';
 import { useSetup } from '@/hooks/useSetup';
-import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { PendingChanges } from '@/components/settings/PendingChanges';
@@ -55,7 +55,7 @@ export default function SettingsPage({ onError }) {
 
   useEffect(() => {
     if (activeErrorMessage?.type !== 'error' || !activeErrorMessage?.text) return;
-    const id = setTimeout(() => clearActiveMessage(null), TOAST_AUTO_DISMISS_MS);
+    const id = setTimeout(() => clearActiveMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(id);
   }, [settingsSubTab, activeErrorMessage?.type, activeErrorMessage?.text, clearActiveMessage]);
 
@@ -214,12 +214,12 @@ export default function SettingsPage({ onError }) {
                     {activeForm.saving ? 'Saving…' : 'Save settings'}
                   </button>
                   {activeForm.message?.type === 'success' && (
-                    <span role="status" className="toast-success">
+                    <span role="status" className="message-success">
                       <span>Saved successfully</span>
                     </span>
                   )}
                   {activeForm.message?.type === 'error' && (
-                    <span role="alert" className="toast-warning">
+                    <span role="alert" className="message-warning">
                       {activeForm.message.text}
                     </span>
                   )}

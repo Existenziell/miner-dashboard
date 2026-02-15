@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { fetchMinerAsic, patchMinerSettings, restartMiner, shutdownMiner } from '@/lib/api';
-import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { toBool } from '@/lib/minerApiBools';
 
 export function useMinerDevice(miner, refetch, onError) {
@@ -167,7 +167,7 @@ export function useMinerDevice(miner, refetch, onError) {
 
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 

@@ -9,8 +9,7 @@ export const DEFAULT_EXPECTED_HASHRATE_GH = DASHBOARD_DEFAULTS.defaultExpectedHa
 export const POLL_MINER_INTERVAL_MS = DASHBOARD_DEFAULTS.pollMinerIntervalMs;
 export const POLL_NETWORK_INTERVAL_MS = DASHBOARD_DEFAULTS.pollNetworkIntervalMs;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
-/** How long the toast beside the save button is shown before auto-dismiss. */
-export const TOAST_AUTO_DISMISS_MS = 5_000;
+export const MESSAGE_AUTO_DISMISS_MS = 5_000;
 
 // —— Chart history & persistence ——————————————————————————————————————————————
 export const MAX_CHART_HISTORY = 500; // cap per chart

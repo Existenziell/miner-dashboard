@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
-import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 
 export function useSetup(config, refetchConfig, onError) {
   const [minerIp, setMinerIp] = useState(config.minerIp);
@@ -116,7 +116,7 @@ export function useSetup(config, refetchConfig, onError) {
 
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 

@@ -3,7 +3,7 @@
  * Receives form state as props (from useAppearance).
  */
 import { useEffect } from 'react';
-import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { ConfirmModal } from '@/components/ConfirmModal';
 
 export function SettingsFormFooter({
@@ -17,7 +17,7 @@ export function SettingsFormFooter({
 
   useEffect(() => {
     if (message?.type !== 'error' || !message?.text) return;
-    const id = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    const id = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(id);
   }, [message?.type, message?.text, setMessage]);
 
@@ -34,12 +34,12 @@ export function SettingsFormFooter({
               {saving ? 'Saving…' : saveButtonLabel}
             </button>
             {message?.type === 'success' && (
-              <span role="status" className="toast-success">
+              <span role="status" className="message-success">
                 {message.text}
               </span>
             )}
             {message?.type === 'error' && message?.text && (
-              <span role="alert" className="toast-warning">
+              <span role="alert" className="message-warning">
                 {message.text}
               </span>
             )}

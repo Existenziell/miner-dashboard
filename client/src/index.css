@@ -323,15 +323,15 @@ input[type="number"] {
   @apply truncate min-w-0 text-base font-medium;
 }
 
-.field-hint-trigger {
+.hint-trigger {
   @apply relative inline-flex shrink-0 rounded-full text-muted dark:text-muted-dark hover:text-fg dark:hover:text-fg-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:ring-offset-surface dark:focus:ring-offset-surface-dark;
 }
 
-.field-hint-tooltip {
+.hint-tooltip {
   @apply absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 z-20 px-3 py-2 min-w-60 max-w-sm rounded-md text-sm text-muted dark:text-muted-dark bg-surface-card dark:bg-surface-card-dark border border-edge dark:border-edge-dark shadow-lg pointer-events-none opacity-0 invisible transition-opacity duration-150;
 }
 
-.field-hint-trigger:hover .field-hint-tooltip {
+.hint-trigger:hover .hint-tooltip {
   @apply opacity-100 visible;
 }
 
@@ -430,45 +430,36 @@ input[type="number"] {
   @apply relative overflow-hidden rounded-md border-l-4 border-l-danger dark:border-l-danger-dark bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20 text-danger dark:text-danger-dark shadow-sm;
 }
 
-/* Pending / highlight callout (e.g. pending changes) */
 .pending-changes {
   @apply rounded-md px-5 py-4 border border-accent/50 bg-accent/10;
 }
 
-/* Chart tooltip container (card-style, compact) */
 .tooltip-card {
   @apply rounded-md px-3 py-2 text-sm shadow-xl bg-surface-card dark:bg-surface-card-dark border border-edge dark:border-edge-dark;
 }
 
-/* Toast / inline message (success or warning) */
-.toast-success {
+.message-success {
   @apply text-sm text-success dark:text-success-dark;
 }
 
-.toast-warning {
+.message-warning {
   @apply text-sm text-danger dark:text-danger-dark;
 }
 
-/* Status pills / badges */
-.badge-success {
+.status-active {
   @apply text-2xs bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium;
 }
 
-.badge-warning {
-  @apply text-2xs bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium;
-}
-
-/* Status dots (connection indicator) */
-.status-dot {
+.indicator {
   @apply inline-block w-2 h-2 rounded-full;
 }
 
-.status-dot-danger {
-  @apply bg-danger dark:bg-danger-dark;
+.indicator-connected {
+  @apply bg-success dark:bg-success-dark;
 }
 
-.status-dot-success {
-  @apply bg-success dark:bg-success-dark animate-pulse;
+.indicator-disconnected {
+  @apply bg-danger dark:bg-danger-dark animate-pulse;
 }
 
 /* ==========================================================================

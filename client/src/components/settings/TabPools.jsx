@@ -111,7 +111,7 @@ export function TabPools({ miner }) {
               <h3 className="card-header-title flex items-center gap-2">
                 {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
                 {!(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.stratumURL || '').trim() ? (
-                  <span className="badge-success">ACTIVE</span>
+                  <span className="status-active">ACTIVE</span>
                 ) : null}
               </h3>
             </div>
@@ -248,7 +248,7 @@ export function TabPools({ miner }) {
               <h3 className="card-header-title flex items-center gap-2">
                 {poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
                 {(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.fallbackStratumURL || '').trim() ? (
-                  <span className="badge-warning">ACTIVE</span>
+                  <span className="status-active">ACTIVE</span>
                 ) : null}
               </h3>
             </div>

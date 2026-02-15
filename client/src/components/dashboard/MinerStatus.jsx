@@ -3,10 +3,10 @@ import { useMiner } from '@/context/MinerContext';
 import { LOW_HEAP_INT_THRESHOLD_BYTES } from '@/lib/constants';
 import { formatBytes,formatResetReason, formatUptime } from '@/lib/formatters';
 
-function StatusDot({ connected }) {
+function ConnectionIndicator({ connected }) {
   return (
     <span
-      className={`status-dot shrink-0 ${connected ? 'status-dot-success' : 'status-dot-danger'}`}
+      className={`indicator shrink-0 ${connected ? 'indicator-connected' : 'indicator-disconnected'}`}
       aria-hidden
     />
   );
@@ -19,7 +19,7 @@ function ItemGrid({ items }) {
         <div key={item.label}>
           <div className="stat-label">{item.label}</div>
           <div className="mt-0.5 truncate flex items-center gap-2">
-            {item.status != null && <StatusDot connected={item.status === 'connected'} />}
+            {item.status != null && <ConnectionIndicator connected={item.status === 'connected'} />}
             <span className="stat-value">{item.value}</span>
           </div>
           {item.warning && (
@@ -82,14 +82,14 @@ export default function MinerStatus() {
           </h2>
         {minerError ? (
           <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark text-sm">
-            <span className="status-dot status-dot-danger" />
+            <span className="indicator indicator-disconnected" />
             Miner offline
           </span>
         ) : minerLoading ? (
           <span className="text-muted">Connecting…</span>
         ) : (
           <span className="flex items-center gap-1.5 text-success dark:text-success-dark text-sm">
-            <span className="status-dot status-dot-success" />
+            <span className="indicator indicator-connected" />
             Connected
           </span>
         )}

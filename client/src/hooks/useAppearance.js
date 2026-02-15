@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
 import { isValidHex, normalizeHex } from '@/lib/colorUtils';
-import { CHART_COLOR_SPEC, TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { CHART_COLOR_SPEC, MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { deepCopy } from '@/lib/utils';
 
 export const METRIC_LABELS = {
@@ -229,7 +229,7 @@ export function useAppearance(config, refetchConfig, onError) {
 
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 

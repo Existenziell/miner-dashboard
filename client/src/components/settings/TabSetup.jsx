@@ -128,12 +128,12 @@ export function TabSetup({ minerReachable }) {
               {savingConnection ? 'Saving…' : 'Save settings'}
             </button>
             {configMessage?.type === 'success' && (
-              <span role="status" className="toast-success">
+              <span role="status" className="message-success">
                 <span>{configMessage.text}</span>
               </span>
             )}
             {configMessage?.type === 'error' && (
-              <span role="alert" className="toast-warning">
+              <span role="alert" className="message-warning">
                 {configMessage.text}
               </span>
             )}
@@ -232,12 +232,12 @@ export function TabSetup({ minerReachable }) {
               {saving ? 'Saving…' : 'Save settings'}
             </button>
             {minerMessage?.type === 'success' && (
-              <span role="status" className="toast-success">
+              <span role="status" className="message-success">
                 <span>Saved successfully</span>
               </span>
             )}
             {minerMessage?.type === 'error' && (
-              <span role="alert" className="toast-warning">
+              <span role="alert" className="message-warning">
                 {minerMessage.text}
               </span>
             )}

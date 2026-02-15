@@ -6,7 +6,7 @@ import {
   MIN_WIFI_PASSWORD_LENGTH,
 } from 'shared/schemas/minerApi';
 import { patchMinerSettings } from '@/lib/api';
-import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
+import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 
 export function useMinerWifi(miner, refetch, onError) {
   const [saving, setSaving] = useState(false);
@@ -57,7 +57,7 @@ export function useMinerWifi(miner, refetch, onError) {
 
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 

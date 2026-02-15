@@ -10,7 +10,7 @@ import { patchMinerSettings } from '@/lib/api';
 import {
   DEFAULT_STRATUM_PORT,
   SOLO_POOLS,
-  TOAST_AUTO_DISMISS_MS,
+  MESSAGE_AUTO_DISMISS_MS,
 } from '@/lib/constants';
 import { toBool } from '@/lib/minerApiBools';
 import { findSoloPoolOption, getStratumPayloadFromOption } from '@/lib/poolUtils';
@@ -195,7 +195,7 @@ export function useMinerPools(miner, refetch, onError) {
 
   useEffect(() => {
     if (message?.type !== 'success') return;
-    const t = setTimeout(() => setMessage(null), TOAST_AUTO_DISMISS_MS);
+    const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
     return () => clearTimeout(t);
   }, [message?.type]);
 
