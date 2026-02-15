@@ -97,11 +97,11 @@ a:hover {
 
 /* Card header: full-bleed bar above card content (use inside .card) */
 .card-header-wrapper {
-  @apply -mx-5 -mt-5 mb-4 min-w-0;
+  @apply -mx-5 -mt-4 mb-4 min-w-0 rounded-t-md;
 }
 
 .card-header {
-  @apply w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-xl flex items-center justify-between gap-2;
+  @apply w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-md flex items-center justify-between gap-2;
 }
 
 /* Collapsed chart card: no extra space below header */
