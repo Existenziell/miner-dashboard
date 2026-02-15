@@ -6,7 +6,11 @@ import { fetchMinerAsic, fetchNetworkStatus } from '@/lib/api';
 function ResponseCard({ title, path, data, error, loading }) {
   return (
     <div className="card min-w-0 flex flex-col">
-      <h3 className="card-title">{title}</h3>
+      <div className="card-header-wrapper">
+        <div className="card-header">
+          <h3 className="card-header-title">{title}</h3>
+        </div>
+      </div>
       <p className="text-muted dark:text-muted-dark text-sm mb-2 font-mono">{path}</p>
       {loading && <p className="text-muted dark:text-muted-dark text-sm">Loading…</p>}
       {error && <p className="text-danger dark:text-danger-dark text-sm">{error.message}</p>}
@@ -88,7 +92,11 @@ export default function ApiPage() {
   return (
     <div className="space-y-4">
       <div className="card">
-        <h2 className="card-title">Endpoints</h2>
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h2 className="card-header-title">Endpoints</h2>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
@@ -113,22 +121,19 @@ export default function ApiPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ResponseCard
-          title="API response:"
-          path="GET /api/miner/info"
+          title="GET /api/miner/info"
           data={miner}
           error={minerError}
           loading={minerLoading}
         />
         <ResponseCard
-          title="API response:"
-          path="GET /api/miner/asic"
+          title="GET /api/miner/asic"
           data={asic}
           error={asicError}
           loading={asicLoading}
         />
         <ResponseCard
-          title="API response:"
-          path="GET /api/network/status"
+          title="GET /api/network/status"
           data={network}
           error={networkError}
           loading={networkLoading}
@@ -136,7 +141,11 @@ export default function ApiPage() {
       </div>
 
       <div className="card">
-        <h3 className="card-title">Related API settings</h3>
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h3 className="card-header-title">Related API settings</h3>
+          </div>
+        </div>
         <p className="text-muted dark:text-muted-dark text-sm mb-4">Constants and config that affect API polling and requests.</p>
         <h4 className="text-sm font-medium text-body mb-2">Client</h4>
         <div className="overflow-x-auto mb-4">
@@ -193,7 +202,11 @@ export default function ApiPage() {
       </div>
 
       <div className="card">
-        <h3 className="card-title">Query the API with cURL</h3>
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h3 className="card-header-title">Query the API with cURL</h3>
+          </div>
+        </div>
         <p className="text-muted dark:text-muted-dark text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
         <div className="rounded-md overflow-hidden bg-terminal-bg border border-terminal-border shadow-inner">
           <div className="flex items-center gap-2 px-3 py-2 bg-terminal-bar border-b border-terminal-border">

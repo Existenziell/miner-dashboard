@@ -155,6 +155,7 @@ a {
 }
 
 a:hover {
+  color: var(--color-accent);
   text-decoration-style: solid;
 }
 
@@ -564,24 +565,77 @@ input[type="number"] {
 }
 
 .doc-page {
-  @apply px-10 py-6;
+  @apply px-6 py-8;
+}
+
+.doc-section {
+  @apply mb-12;
+}
+
+.doc-section:last-child {
+  @apply mb-0;
+}
+
+.doc-heading {
+  @apply text-2xl font-semibold text-fg dark:text-fg-dark mb-4 mt-0;
+}
+
+.doc-subheading {
+  @apply text-xl font-medium text-fg dark:text-fg-dark mb-3 mt-8;
+}
+
+.doc-section > .doc-subheading:first-of-type {
+  @apply mt-4;
+}
+
+.doc-prose {
+  @apply max-w-prose;
 }
 
 .doc-page .doc-body {
-  @apply text-base leading-relaxed;
+  @apply text-base leading-7 text-fg dark:text-fg-dark;
+  margin-bottom: 1em;
+}
+
+.doc-page .doc-body:last-child {
+  margin-bottom: 0;
+}
+
+.doc-lead-in {
+  margin-bottom: 0.5em;
+}
+
+.doc-list {
+  @apply list-disc list-outside pl-6 text-fg dark:text-fg-dark text-base leading-7 space-y-2 mb-4;
+}
+
+.doc-list:last-child {
+  @apply mb-0;
 }
 
 .doc-page .code-inline {
   @apply text-sm;
 }
 
-.doc-page table th,
-.doc-page table td {
-  @apply p-3;
+.doc-table-wrap {
+  @apply my-4;
 }
 
-.doc-page table {
-  @apply text-base;
+.doc-th {
+  @apply p-3 font-semibold text-left;
+}
+
+.doc-td {
+  @apply p-3 text-left;
+}
+
+.doc-th--compact,
+.doc-td--compact {
+  @apply p-2;
+}
+
+.doc-td--compact {
+  @apply whitespace-nowrap;
 }
 
 /* Theme-aware table: border and row styles (use .doc-table or .doc-pools-table on table) */
@@ -600,14 +654,8 @@ input[type="number"] {
   @apply border-b border-edge dark:border-edge-dark;
 }
 
-/* Smaller font for solo pools table (overrides .doc-page table above) */
 .doc-page table.doc-pools-table {
   @apply text-xs;
-}
-
-.doc-page table.doc-pools-table th,
-.doc-page table.doc-pools-table td {
-  @apply p-2 whitespace-nowrap;
 }
 
 .doc-page table.doc-pools-table .code-inline {

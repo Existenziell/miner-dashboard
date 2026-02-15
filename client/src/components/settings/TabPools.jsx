@@ -69,7 +69,7 @@ export function TabPools({ miner }) {
           </div>
         </div>
         <div>
-          <div className="flex flex-col gap-4 md:max-w-1/3 mb-4">
+          <div className="flex flex-col gap-4 md:max-w-[33%]">
             <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
               <select
                 value={poolMode}
@@ -101,16 +101,22 @@ export function TabPools({ miner }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4 border-t border-default">
-            <div className="flex flex-col gap-4 pr-4 md:border-r md:border-edge dark:md:border-edge-dark">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-lg mb-0">
-                  {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
-                </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="card">
+          <div className="card-header-wrapper">
+            <div className="card-header">
+              <h3 className="card-header-title flex items-center gap-2">
+                {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
                 {!(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.stratumURL || '').trim() ? (
                   <span className="badge-success">ACTIVE</span>
                 ) : null}
-              </div>
+              </h3>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4">
               <Field label="Pool" hint="Solo mining pool for block templates. See Docs for full list.">
                 <select
                   value={primaryPoolKey}
@@ -231,16 +237,21 @@ export function TabPools({ miner }) {
                   <span className="text-sm text-body">{primaryTLS ? 'On' : 'Off'}</span>
                 </div>
               </Field>
-            </div>
-            <div className="flex flex-col gap-4 pt-4 md:pt-0 md:pl-4">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-lg mb-0">
-                  {poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
-                </p>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header-wrapper">
+            <div className="card-header">
+              <h3 className="card-header-title flex items-center gap-2">
+                {poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
                 {(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.fallbackStratumURL || '').trim() ? (
                   <span className="badge-warning">ACTIVE</span>
                 ) : null}
-              </div>
+              </h3>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4">
               <Field label="Pool" hint="Used when primary is unreachable.">
                 <select
                   value={fallbackPoolKey}
@@ -362,7 +373,6 @@ export function TabPools({ miner }) {
                   <span className="text-sm text-body">{fallbackTLS ? 'On' : 'Off'}</span>
                 </div>
               </Field>
-            </div>
           </div>
         </div>
       </div>

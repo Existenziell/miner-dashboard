@@ -125,7 +125,7 @@ function ThemePreviewCard({ themeId, isSelected, onSelect, previewClassName, use
   );
 }
 
-export function Appearance() {
+export function TabAppearance() {
   const { mode, setMode } = useTheme();
   const {
     metricRanges,
@@ -209,7 +209,7 @@ export function Appearance() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Metric ranges</h3>
+            <h3 className="card-header-title">Gauges</h3>
           </div>
         </div>
         <div className="space-y-4">
@@ -276,33 +276,6 @@ export function Appearance() {
             <div><strong>Max:</strong> upper bound for &quot;lower is better&quot; (temp, power, efficiency, current).</div>
             <div><strong>Max (mV):</strong> allowed voltage deviation from set.</div>
           </div>
-        </div>
-      </div>
-
-      {/* Theme */}
-      <div className="card">
-        <div className="card-header-wrapper">
-          <div className="card-header mb-4">
-            <h3 className="card-header-title">Theme</h3>
-          </div>
-        </div>
-        <p className="text-muted dark:text-muted-dark text-sm mb-4">
-          Choose a theme. High contrast uses stronger text contrast. You can also cycle themes from the header.
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {THEME_MODES.map((themeId) => {
-            const { previewClassName, useDarkVariant } = themePreviewConfig(themeId);
-            return (
-              <ThemePreviewCard
-                key={themeId}
-                themeId={themeId}
-                isSelected={mode === themeId}
-                onSelect={setMode}
-                previewClassName={previewClassName}
-                useDarkVariant={useDarkVariant}
-              />
-            );
-          })}
         </div>
       </div>
 
@@ -377,6 +350,33 @@ export function Appearance() {
               })}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Theme - last before save */}
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header mb-4">
+            <h3 className="card-header-title">Theme</h3>
+          </div>
+        </div>
+        <p className="text-muted dark:text-muted-dark text-sm mb-4">
+          Choose a theme. High contrast uses stronger text contrast. You can also cycle themes from the header.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {THEME_MODES.map((themeId) => {
+            const { previewClassName, useDarkVariant } = themePreviewConfig(themeId);
+            return (
+              <ThemePreviewCard
+                key={themeId}
+                themeId={themeId}
+                isSelected={mode === themeId}
+                onSelect={setMode}
+                previewClassName={previewClassName}
+                useDarkVariant={useDarkVariant}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

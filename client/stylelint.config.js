@@ -7,6 +7,7 @@ export default {
     {
       files: ['**/*.css'],
       rules: {
+        'declaration-empty-line-before': null,
         /* Tailwind v4 at-rules */
         'at-rule-no-unknown': [
           true,

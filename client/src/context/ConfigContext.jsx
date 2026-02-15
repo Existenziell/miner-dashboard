@@ -19,6 +19,7 @@ function buildAccentOverrideCSS(accent) {
   const contrastFg = getContrastColor(accent);
   const toggleThumbFg = getContrastColor(accent, CONTRAST_THRESHOLD_TOGGLE);
   return `/* Accent override - Tailwind compiles to literal hex */
+:root{--color-accent:${accent};--color-accent-dark:color-mix(in srgb,${accent} 78%,black)}
 .drop-zone-indicator{border-color:${a60} !important}
 .bg-accent{background-color:${accent} !important}
 .text-accent{color:${accent} !important}

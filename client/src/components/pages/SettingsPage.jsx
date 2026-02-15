@@ -12,10 +12,10 @@ import { useSetup } from '@/hooks/useSetup';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import { Appearance } from '@/components/settings/Appearance';
 import { PendingChanges } from '@/components/settings/PendingChanges';
 import { SettingsFormFooter } from '@/components/settings/SettingsFormFooter';
 import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
+import { TabAppearance } from '@/components/settings/TabAppearance';
 import { TabFirmware } from '@/components/settings/TabFirmware';
 import { TabMiner } from '@/components/settings/TabMiner';
 import { TabPools } from '@/components/settings/TabPools';
@@ -83,7 +83,7 @@ export default function SettingsPage({ onError }) {
         {settingsSubTab === 'appearance' && (
           <form onSubmit={appearanceForm.save} className="space-y-4">
             <AppearanceProvider value={appearanceForm}>
-              <Appearance />
+              <TabAppearance />
               <PendingChanges
                 changes={appearanceForm.changes}
                 onReset={appearanceForm.revert}
@@ -142,7 +142,7 @@ export default function SettingsPage({ onError }) {
       {settingsSubTab === 'appearance' && (
         <form onSubmit={appearanceForm.save} className="space-y-4">
           <AppearanceProvider value={appearanceForm}>
-            <Appearance />
+            <TabAppearance />
             <PendingChanges
               changes={appearanceForm.changes}
               onReset={appearanceForm.revert}

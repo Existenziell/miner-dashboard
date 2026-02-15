@@ -53,7 +53,7 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Settings</h3>
+            <h3 className="card-header-title">Miner settings</h3>
           </div>
         </div>
         <form onSubmit={saveConnection} className="space-y-4">

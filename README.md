@@ -8,7 +8,7 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 - **Charts**: hashrate and temperature/power history (rolling 1h buffer)
 - **Mining details**: shares accepted/rejected, best difficulty, pool info
 - **Bitcoin network**: block height, difficulty adjustment, BTC price, fee estimates (60s polling)
-- **Settings – Init**: first-time setup — miner IP/hostname, expected hashrate (GH/s), poll intervals; WiFi (hostname, SSID, password) stored on the miner
+- **Settings – Setup**: first-time setup — miner IP/hostname, expected hashrate (GH/s), poll intervals; WiFi (hostname, SSID, password) stored on the miner
 - **Settings – Miner**: configure miner IP/hostname and connection
 - **Settings – Pools**: view and manage pool configuration (URL, worker, password)
 - **Settings – Firmware**: check firmware releases and install updates (via URL or file upload)
@@ -70,7 +70,7 @@ Then open `http://localhost:8001`.
 
 **Dashboard config:** (server-persisted, stored in `config/dashboard.json`):
 
-- **Init tab:** Miner IP or hostname, Expected hashrate (GH/s), Miner / Network poll intervals (ms). WiFi (hostname, SSID, password).
+- **Setup tab:** Miner IP or hostname, Expected hashrate (GH/s), Miner / Network poll intervals (ms). WiFi (hostname, SSID, password).
 - **Dashboard tab:** Metric ranges — single threshold and gauge max per metric.
 
 **Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it. Used by the Settings UI.
@@ -116,9 +116,9 @@ The Express backend proxies requests to the miner (avoiding CORS issues) and agg
 ![API](client/public/screenshots/api.png)
 
 
-| Init | Miner | Pools |
+| Setup | Miner | Pools |
 |------|-------|-------|
-| ![Settings – Init](client/public/screenshots/settings-init.png) | ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) |
+| ![Settings – Setup](client/public/screenshots/settings-setup.png) | ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) |
 
 
 | Miner (dark) | Pools (dark) |

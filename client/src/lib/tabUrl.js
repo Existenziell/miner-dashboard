@@ -7,14 +7,12 @@ import { SETTINGS_SECTION_KEY } from '@/lib/constants.js';
 
 const VALID_SETTINGS_SECTIONS = new Set(['setup', 'miner', 'pools', 'firmware', 'appearance']);
 
-const LEGACY_SECTION_MAP = { init: 'setup', dashboard: 'appearance', colors: 'appearance' };
-
 function getStoredSettingsSection() {
   if (typeof window === 'undefined') return 'setup';
   try {
     const s = window.localStorage.getItem(SETTINGS_SECTION_KEY);
     if (VALID_SETTINGS_SECTIONS.has(s)) return s;
-    return LEGACY_SECTION_MAP[s] ?? 'setup';
+    return 'setup';
   } catch {
     return 'setup';
   }
@@ -55,7 +53,7 @@ export function getSettingsSectionFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const s = params.get('section');
   if (VALID_SETTINGS_SECTIONS.has(s)) return s;
-  return LEGACY_SECTION_MAP[s] ?? 'setup';
+  return 'setup';
 }
 
 export function setSettingsSectionInUrl(section) {

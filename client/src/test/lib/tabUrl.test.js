@@ -147,13 +147,11 @@ describe('tabUrl', () => {
       expect(getSettingsSectionFromUrl()).toBe('appearance');
     });
 
-    it('maps legacy section=init to setup and legacy dashboard/colors to appearance', () => {
-      mockWindow({ search: '?tab=settings&section=init', href: 'http://localhost/?tab=settings&section=init' });
-      expect(getSettingsSectionFromUrl()).toBe('setup');
+    it('returns setup for unknown section values', () => {
       mockWindow({ search: '?tab=settings&section=dashboard', href: 'http://localhost/?tab=settings&section=dashboard' });
-      expect(getSettingsSectionFromUrl()).toBe('appearance');
+      expect(getSettingsSectionFromUrl()).toBe('setup');
       mockWindow({ search: '?tab=settings&section=colors', href: 'http://localhost/?tab=settings&section=colors' });
-      expect(getSettingsSectionFromUrl()).toBe('appearance');
+      expect(getSettingsSectionFromUrl()).toBe('setup');
     });
   });
 
