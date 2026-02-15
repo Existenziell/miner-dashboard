@@ -347,6 +347,7 @@ input[type="number"] {
 /* ==========================================================================
    Surface & border utilities
    ========================================================================== */
+
 /* Use these in components instead of repeating theme pairs:
    border-default, bg-surface-subtle, text-body, text-muted-standalone.
    Layout combos (flex items-center justify-center, grid...) are kept inline
