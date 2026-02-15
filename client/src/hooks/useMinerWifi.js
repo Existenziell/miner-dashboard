@@ -12,13 +12,13 @@ export function useMinerWifi(miner, refetch, onError) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const [hostname, setHostname] = useState(miner?.hostname ?? '');
+  const [hostname, setHostname] = useState((miner?.hostname ?? '').toLowerCase());
   const [wifiSsid, setWifiSsid] = useState(miner?.ssid ?? '');
   const [wifiPassword, setWifiPassword] = useState('');
 
   useEffect(() => {
     if (!miner) return;
-    setHostname(miner.hostname ?? '');
+    setHostname((miner.hostname ?? '').toLowerCase());
     setWifiSsid(miner.ssid ?? '');
   }, [miner]);
 
@@ -50,7 +50,7 @@ export function useMinerWifi(miner, refetch, onError) {
 
   const revert = useCallback(() => {
     if (!baseline) return;
-    setHostname(baseline.hostname);
+    setHostname((baseline.hostname ?? '').toLowerCase());
     setWifiSsid(baseline.wifiSsid);
     setWifiPassword(baseline.wifiPassword ?? '');
   }, [baseline]);
@@ -91,7 +91,7 @@ export function useMinerWifi(miner, refetch, onError) {
     setSaving(true);
     try {
       const payload = {
-        hostname: hostname.trim(),
+        hostname: hostname.trim().toLowerCase(),
         ssid: wifiSsid.trim(),
         ...(wifiPassword.length > 0 ? { wifiPass: wifiPassword } : {}),
       };

@@ -18,7 +18,21 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 ## Requirements
 
 - **Node.js** 18 or later
-- A NerdQaxe++ miner on your network (for live monitoring)
+- A NerdQaxe++ miner (or compatible device) on your network (for live monitoring)
+
+## Compatible devices
+
+The dashboard talks to the miner over the **ESP-Miner** / AxeOS API (`/api/system/info`, etc.). ESP-Miner is open-source ESP32 firmware for the Bitaxe, NerdQaxe, and similar Bitcoin ASIC miners; devices running it (or AxeOS on top of it) expose the same web API. Compatible devices include:
+
+| Device        | Notes                          |
+|---------------|--------------------------------|
+| **Bitaxe**    | Single BM1370, ~1 TH/s         |
+| **NerdQaxe+** | 4× BM1368, 2.4 TH/s            |
+| **NerdQaxe++**| 4× BM1370, 4.8 TH/s            |
+| **Qaxe**      | 4× BM1366, ~1.8 TH/s           |
+| **QAxe+**     | 4× BM1368, 2.4 TH/s            |
+
+Other devices that expose the same web API are likely compatible as well.
 
 ## Quick Start
 
@@ -40,7 +54,7 @@ This starts:
 
 Open `http://localhost:8000` in your browser.
 
-![Dashboard – miner overview (dark)](client/public/screenshots/dashboard-miner-dark.png)
+![Dashboard – miner overview](client/public/screenshots/dashboard.png)
 
 ## Tech stack
 
@@ -105,33 +119,13 @@ The Express backend proxies requests to the miner (avoiding CORS issues) and agg
 
 ## More screenshots
 
-| Dashboard (light) | Docs |
-|-------------------|------|
-| ![Dashboard](client/public/screenshots/dashboard.png) | ![Docs](client/public/screenshots/docs.png) |
+| Dashboard | Settings – Miner | Settings – Appearance |
+|-----------|------------------|------------------------|
+| ![Dashboard](client/public/screenshots/dashboard.png) | ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Appearance](client/public/screenshots/settings-appearance.png) |
 
-**API**
-
-![API](client/public/screenshots/api.png)
-
-
-| Setup | Miner | Pools |
-|------|-------|-------|
-| ![Settings – Setup](client/public/screenshots/settings-setup.png) | ![Settings – Miner](client/public/screenshots/settings-miner.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) |
-
-
-| Miner (dark) | Pools (dark) |
-|--------------|--------------|
-| ![Settings – Miner dark](client/public/screenshots/settings-miner-dark.png) | ![Settings – Pools dark](client/public/screenshots/settings-pools-dark.png) |
-
-
-| Dashboard | Firmware | Colors |
-|-----------|----------|--------|
-| ![Settings – Dashboard](client/public/screenshots/settings-dashboard.png) | ![Settings – Firmware](client/public/screenshots/settings-firmware.png) | ![Settings – Colors](client/public/screenshots/settings-colors.png) |
-
-
-| Dashboard (dark) | Colors (dark) |
-|------------------|---------------|
-| ![Settings – Dashboard dark](client/public/screenshots/settings-dashboard-dark.png) | ![Settings – Colors dark](client/public/screenshots/settings-colors-dark.png) |
+| Settings – Setup | Settings – Pools | Settings – Firmware |
+|------------------|------------------|---------------------|
+| ![Settings – Setup](client/public/screenshots/settings-setup.png) | ![Settings – Pools](client/public/screenshots/settings-pools.png) | ![Settings – Firmware](client/public/screenshots/settings-firmware.png) |
 
 ## License
 
