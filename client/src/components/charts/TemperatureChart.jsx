@@ -47,11 +47,11 @@ function TemperatureChart({ history }) {
               dataKey="time"
               tickFormatter={formatTime}
               stroke={chartColors.axis}
-              fontSize={11}
+              fontSize={chartColors.axisFontSize}
               tickCount={6}
             />
             {showTempAxis && (
-              <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={11} domain={[40, 'auto']} tickFormatter={(v) => `${v}\u00B0`} />
+              <YAxis yAxisId="temp" stroke={chartColors.axis} fontSize={chartColors.axisFontSize} domain={[40, 'auto']} tickFormatter={(v) => `${v}\u00B0`} />
             )}
             {!showTempAxis && <YAxis yAxisId="temp" hide />}
             <Tooltip content={<ChartTooltip formatValue={formatTempValue} />} />

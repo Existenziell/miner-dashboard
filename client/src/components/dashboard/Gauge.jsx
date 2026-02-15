@@ -48,7 +48,7 @@ export default function Gauge({ label, value, sub, color = 'text-accent', percen
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <span className="text-xl sm:text-2xl font-bold leading-tight tabular-nums">{value}</span>
           {sub && (
-            <span className="text-[10px] sm:text-xs text-muted dark:text-muted-dark mt-0.5 max-w-[90%] truncate">
+            <span className="text-caption-sm sm:text-xs text-muted dark:text-muted-dark mt-0.5 max-w-[90%] truncate">
               {sub}
             </span>
           )}

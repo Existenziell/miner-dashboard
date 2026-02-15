@@ -49,12 +49,12 @@ function HashrateChart({ history }) {
               dataKey="time"
               tickFormatter={formatTime}
               stroke={chartColors.axis}
-              fontSize={11}
+              fontSize={chartColors.axisFontSize}
               tickCount={6}
             />
             <YAxis
               stroke={chartColors.axis}
-              fontSize={11}
+              fontSize={chartColors.axisFontSize}
               domain={[5000, 'auto']}
               tickCount={10}
               tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(1)}` : v.toFixed(0))}

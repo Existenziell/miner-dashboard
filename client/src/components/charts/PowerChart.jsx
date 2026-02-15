@@ -50,14 +50,14 @@ function PowerChart({ history }) {
               dataKey="time"
               tickFormatter={formatTime}
               stroke={chartColors.axis}
-              fontSize={11}
+              fontSize={chartColors.axisFontSize}
               tickCount={6}
             />
             <YAxis
               yAxisId="power"
               orientation="left"
               stroke={chartColors.axis}
-              fontSize={11}
+              fontSize={chartColors.axisFontSize}
               tickFormatter={(v) => `${v} W`}
               domain={[80, 'auto']}
               allowDataOverflow
@@ -67,7 +67,7 @@ function PowerChart({ history }) {
               yAxisId="current"
               orientation="right"
               stroke={chartColors.axis}
-              fontSize={11}
+              fontSize={chartColors.axisFontSize}
               tickFormatter={(v) => `${v} A`}
               domain={[4, 'auto']}
               allowDataOverflow

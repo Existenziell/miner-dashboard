@@ -38,6 +38,13 @@
   --chart-grid-dark: #336;
   --chart-axis-dark: #668;
 
+  /* Chart axis tick label size (px, for Recharts); matches --font-size-2xs (10px) */
+  --chart-axis-font-size: 10;
+
+  /* Typography scale: 2xs (10px) | Tailwind xs (12px) | sm (14px) | base (16px) | lg (18px) | xl (20px) | 2xl (24px). Prefer semantic classes (.card-header-title, .card-title, .label, .stat-label, .link-text, .text-caption-sm, etc.) where they exist. */
+  --font-size-2xs: 0.625rem;
+  --text-2xs: var(--font-size-2xs);
+
   /* Semantic */
   --color-success: #16a34a;
   --color-success-dark: #4ade80;
@@ -188,6 +195,11 @@ html {
 /* ==========================================================================
    Typography & links
    ========================================================================== */
+
+/* Smallest caption size (10px); use for badges, gauge sublabels, chart axis. Prefer semantic classes below when they fit. */
+.text-caption-sm {
+  font-size: var(--font-size-2xs);
+}
 
 /* Inline text that looks like a link (dotted underline, hover solid) */
 .link-text {
@@ -527,11 +539,11 @@ input[type="number"] {
 
 /* Status pills / badges */
 .badge-success {
-  @apply text-[10px] bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium;
+  @apply text-2xs bg-success/20 dark:bg-success-dark/20 text-success dark:text-success-dark px-1.5 py-0.5 rounded font-medium;
 }
 
 .badge-warning {
-  @apply text-[10px] bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium;
+  @apply text-2xs bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium;
 }
 
 /* Status dots (connection indicator) */
