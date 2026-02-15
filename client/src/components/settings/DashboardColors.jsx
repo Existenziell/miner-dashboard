@@ -27,7 +27,7 @@ export function DashboardColors() {
               type="color"
               value={effectiveAccent}
               onChange={(e) => setAccentColor(e.target.value)}
-              className="w-10 h-10 rounded border border-edge dark:border-edge-dark cursor-pointer bg-transparent"
+              className="w-10 h-10 rounded border border-default cursor-pointer bg-transparent"
               aria-label="Accent color picker"
             />
             <input
@@ -46,7 +46,7 @@ export function DashboardColors() {
             {CHART_COLOR_SPEC.map((chart) => {
               const seriesColors = chartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
               return (
-                <div key={chart.id} className="border border-edge dark:border-edge-dark rounded-md px-4 py-3 space-y-1">
+                <div key={chart.id} className="border border-default rounded-md px-4 py-3 space-y-1">
                   <p className="text-sm font-medium text-body">{chart.label}</p>
                   {chart.series.map(({ key, label }) => {
                     const value = seriesColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];
@@ -57,7 +57,7 @@ export function DashboardColors() {
                           type="color"
                           value={effective}
                           onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
-                          className="w-8 h-8 rounded border border-edge dark:border-edge-dark cursor-pointer bg-transparent shrink-0"
+                          className="w-8 h-8 rounded border border-default cursor-pointer bg-transparent shrink-0"
                           aria-label={`${chart.label} ${label} color`}
                         />
                         <label className="text-xs text-muted shrink-0 min-w-16" htmlFor={`chart-${chart.id}-${key}`}>

@@ -9,7 +9,7 @@ const SETTINGS_TABS = [
 
 export function SettingsTabBar({ currentTab, onTabChange }) {
   return (
-    <nav className="flex gap-1 border-b border-edge dark:border-edge-dark pb-3 mb-4" aria-label="Settings sections">
+    <nav className="flex gap-1 border-b border-default pb-3 mb-4" aria-label="Settings sections">
       {SETTINGS_TABS.map((tab) => (
         <button
           key={tab.id}

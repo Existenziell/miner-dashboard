@@ -92,7 +92,7 @@ export default function ApiPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
-              <tr className="border-b border-edge dark:border-edge-dark">
+              <tr className="border-b border-default">
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Method</th>
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Path</th>
                 <th className="py-2 font-medium text-muted-standalone">Description</th>
@@ -145,7 +145,7 @@ export default function ApiPage() {
               <col className="w-52" />
             </colgroup>
             <thead>
-              <tr className="border-b border-edge dark:border-edge-dark">
+              <tr className="border-b border-default">
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Name</th>
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Source</th>
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Value</th>
@@ -171,7 +171,7 @@ export default function ApiPage() {
               <col className="w-52" />
             </colgroup>
             <thead>
-              <tr className="border-b border-edge dark:border-edge-dark">
+              <tr className="border-b border-default">
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Name</th>
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Source</th>
                 <th className="py-2 pr-4 font-medium text-muted-standalone">Value</th>
@@ -195,7 +195,7 @@ export default function ApiPage() {
       <div className="card">
         <h3 className="card-title">Query the API with cURL</h3>
         <p className="text-muted-standalone text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
-        <div className="rounded-md overflow-hidden bg-[#1e1e1e] border border-edge dark:border-edge-dark shadow-inner">
+        <div className="rounded-md overflow-hidden bg-[#1e1e1e] border border-default shadow-inner">
           <div className="flex items-center gap-2 px-3 py-2 bg-[#2d2d2d] border-b border-[#3d3d3d]">
             <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
             <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />

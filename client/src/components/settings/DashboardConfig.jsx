@@ -48,7 +48,7 @@ function MetricRangeCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`rounded-md px-4 py-3 space-y-2 min-h-[160px] border border-edge dark:border-edge-dark ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
+      className={`rounded-md px-4 py-3 space-y-2 min-h-[160px] border border-default ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
     >
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-medium text-body capitalize min-w-0">

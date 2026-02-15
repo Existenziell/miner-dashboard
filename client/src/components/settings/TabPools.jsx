@@ -101,7 +101,7 @@ export function TabPools({ miner }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4 border-t border-edge dark:border-edge-dark">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 pt-4 border-t border-default">
             <div className="flex flex-col gap-4 pr-4 md:border-r md:border-edge dark:md:border-edge-dark">
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-lg mb-0">

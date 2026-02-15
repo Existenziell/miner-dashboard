@@ -2,6 +2,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ==========================================================================
+   Theme & base
+   ========================================================================== */
+
 /* --- Tailwind theme: light (default) + dark variant colors --- */
 @theme inline {
   /* Accent; dark shade derived for hover/active (only --color-accent is overridden at runtime) */
@@ -42,11 +46,19 @@ html {
   @apply transition-colors duration-200 ease-[ease];
 }
 
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
 /* Sticky app header bar */
 .header-bar {
   @apply border-b border-edge dark:border-edge-dark
     bg-surface-card/80 dark:bg-surface-card-dark/80 backdrop-blur-sm sticky top-0 z-10;
 }
+
+/* ==========================================================================
+   Typography & links
+   ========================================================================== */
 
 /* Links */
 a {
@@ -57,6 +69,24 @@ a {
 a:hover {
   text-decoration-style: solid;
 }
+
+/* Inline text that looks like a link (dotted underline, hover solid) */
+.link-text {
+  @apply text-xs underline decoration-dotted underline-offset-2 hover:decoration-solid;
+}
+
+/* Semantic text utilities (standalone dark-mode pairs) */
+.text-body {
+  @apply text-fg dark:text-fg-dark;
+}
+
+.text-muted-standalone {
+  @apply text-muted dark:text-muted-dark;
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
 
 /* Card container */
 .card {
@@ -87,7 +117,7 @@ a:hover {
   @apply text-lg font-semibold text-fg dark:text-fg-dark m-0;
 }
 
-/* Gauge cards: less padding, no clip, so the ring isn’t cut off at the sides */
+/* Gauge cards: less padding, no clip, so the ring isn't cut off at the sides */
 .gauge-card {
   @apply rounded-md px-4 py-3 border overflow-visible
     bg-surface-card dark:bg-surface-card-dark
@@ -100,24 +130,10 @@ a:hover {
     text-muted dark:text-muted-dark;
 }
 
-/* Input error state (combine with .input) */
-.input-danger {
-  @apply border-danger dark:border-danger-dark;
-}
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
 
-/* Form / field label */
-.label {
-  @apply text-xs font-medium uppercase tracking-wide
-    text-muted dark:text-muted-dark;
-}
-
-/* Small label above a stat value */
-.stat-label {
-  @apply text-xs uppercase tracking-wide
-    text-muted dark:text-muted-dark;
-}
-
-/* Buttons */
 .btn-primary {
   @apply rounded-lg px-5 py-2.5 text-sm font-medium transition-colors cursor-pointer
     disabled:opacity-50 disabled:cursor-not-allowed
@@ -144,6 +160,28 @@ a:hover {
     opacity-90 hover:opacity-100 hover:bg-current/10 transition-colors cursor-pointer;
 }
 
+/* Nav tab button */
+.btn-tab {
+  @apply cursor-pointer px-3 py-1.5 rounded-md text-sm font-medium transition-colors;
+}
+
+.btn-tab-active {
+  @apply bg-surface-hover dark:bg-surface-hover-dark text-fg dark:text-fg-dark;
+}
+
+.btn-tab-inactive {
+  @apply text-muted dark:text-muted-dark hover:text-fg dark:hover:text-fg-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
+}
+
+/* Chart legend toggle button */
+.legend-btn {
+  @apply flex items-center gap-1.5 text-xs cursor-pointer select-none transition-opacity;
+}
+
+/* ==========================================================================
+   Form: inputs & labels
+   ========================================================================== */
+
 /* Text inputs and selects */
 .input {
   @apply w-full rounded-md border px-3 py-2 text-sm
@@ -151,6 +189,11 @@ a:hover {
     bg-surface-light dark:bg-surface-light-dark
     text-fg dark:text-fg-dark
     focus:outline-none focus:ring-2 focus:ring-accent;
+}
+
+/* Input error state (combine with .input) */
+.input-danger {
+  @apply border-danger dark:border-danger-dark;
 }
 
 /* Hide number input spinner (Chrome, Safari, Edge) */
@@ -166,34 +209,21 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Inline text that looks like a link (dotted underline, hover solid) */
-.link-text {
-  @apply text-xs underline decoration-dotted underline-offset-2 hover:decoration-solid;
+/* Range input */
+.input-range {
+  @apply w-full h-2 rounded-md appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
 }
 
-/* Nav tab button */
-.btn-tab {
-  @apply cursor-pointer px-3 py-1.5 rounded-md text-sm font-medium transition-colors;
+/* Form / field label */
+.label {
+  @apply text-xs font-medium uppercase tracking-wide
+    text-muted dark:text-muted-dark;
 }
 
-.btn-tab-active {
-  @apply bg-surface-hover dark:bg-surface-hover-dark text-fg dark:text-fg-dark;
-}
-
-.btn-tab-inactive {
-  @apply text-muted dark:text-muted-dark hover:text-fg dark:hover:text-fg-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
-}
-
-/* Pending / highlight callout (e.g. pending changes) */
-.highlight-box {
-  @apply rounded-md px-5 py-4 border border-accent/50 bg-accent/10;
-}
-
-/* Chart tooltip container (card-style, compact) */
-.tooltip-card {
-  @apply rounded-md px-3 py-2 text-sm shadow-xl
-    bg-surface-card dark:bg-surface-card-dark
-    border border-edge dark:border-edge-dark;
+/* Small label above a stat value */
+.stat-label {
+  @apply text-xs uppercase tracking-wide
+    text-muted dark:text-muted-dark;
 }
 
 /* Field label hint (trigger + tooltip on hover) */
@@ -216,49 +246,9 @@ input[type="number"] {
   @apply opacity-100 visible;
 }
 
-/* Chart legend toggle button */
-.legend-btn {
-  @apply flex items-center gap-1.5 text-xs cursor-pointer select-none transition-opacity;
-}
-
-/* --- Semantic utilities (standalone dark-mode pairs) --- */
-.text-body {
-  @apply text-fg dark:text-fg-dark;
-}
-
-.text-muted-standalone {
-  @apply text-muted dark:text-muted-dark;
-}
-
-.border-default {
-  @apply border-edge dark:border-edge-dark;
-}
-
-.bg-surface-subtle {
-  @apply bg-surface-light dark:bg-surface-light-dark;
-}
-
-/* Notification banner wrappers */
-.notification-success {
-  @apply relative overflow-hidden rounded-md border-l-4 border-l-success dark:border-l-success-dark
-    bg-success/10 dark:bg-success-dark/10 border border-success/20 dark:border-success-dark/20
-    text-success dark:text-success-dark shadow-sm;
-}
-
-.notification-warning {
-  @apply relative overflow-hidden rounded-md border-l-4 border-l-danger dark:border-l-danger-dark
-    bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20
-    text-danger dark:text-danger-dark shadow-sm;
-}
-
-/* Toast / inline message (success or warning) */
-.toast-success {
-  @apply text-sm text-success dark:text-success-dark
-}
-
-.toast-warning {
-  @apply text-sm text-danger dark:text-danger-dark
-}
+/* ==========================================================================
+   Form: switch
+   ========================================================================== */
 
 /* Toggle switch (track + thumb) */
 .switch {
@@ -286,7 +276,10 @@ input[type="number"] {
   @apply translate-x-0.5;
 }
 
-/* Option list (exclusive radio list) */
+/* ==========================================================================
+   Form: option list (exclusive radio list)
+   ========================================================================== */
+
 .option-list {
   @apply flex flex-col rounded-md border border-edge dark:border-edge-dark overflow-hidden
     bg-surface-light dark:bg-surface-light-dark max-h-72 overflow-y-auto;
@@ -324,6 +317,10 @@ input[type="number"] {
   @apply ml-1.5 text-xs text-muted dark:text-muted-dark font-normal;
 }
 
+/* ==========================================================================
+   Form: checkbox
+   ========================================================================== */
+
 /* Custom checkbox (accent color, like option-radio) */
 .checkbox-input {
   @apply sr-only;
@@ -347,17 +344,66 @@ input[type="number"] {
   @apply opacity-100;
 }
 
-/* Range input */
-.input-range {
-  @apply w-full h-2 rounded-md appearance-none bg-surface-light dark:bg-surface-light-dark accent-accent;
+/* ==========================================================================
+   Surface & border utilities
+   ========================================================================== */
+/* Use these in components instead of repeating theme pairs:
+   border-default, bg-surface-subtle, text-body, text-muted-standalone.
+   Layout combos (flex items-center justify-center, grid...) are kept inline
+   in JSX unless the exact same string appears 5+ times—then add a utility here. */
+
+.border-default {
+  @apply border-edge dark:border-edge-dark;
 }
 
-/* Drop zone indicator (border color overridden by ConfigContext with user accent) */
-.drop-zone-indicator {
-  border-width: 3px;
-  border-style: dashed;
-  border-color: color-mix(in oklch, var(--color-accent) 60%, transparent);
+.bg-surface-subtle {
+  @apply bg-surface-light dark:bg-surface-light-dark;
 }
+
+/* ==========================================================================
+   Callouts & tooltips
+   ========================================================================== */
+
+/* Pending / highlight callout (e.g. pending changes) */
+.highlight-box {
+  @apply rounded-md px-5 py-4 border border-accent/50 bg-accent/10;
+}
+
+/* Chart tooltip container (card-style, compact) */
+.tooltip-card {
+  @apply rounded-md px-3 py-2 text-sm shadow-xl
+    bg-surface-card dark:bg-surface-card-dark
+    border border-edge dark:border-edge-dark;
+}
+
+/* ==========================================================================
+   Notifications & toasts
+   ========================================================================== */
+
+.notification-success {
+  @apply relative overflow-hidden rounded-md border-l-4 border-l-success dark:border-l-success-dark
+    bg-success/10 dark:bg-success-dark/10 border border-success/20 dark:border-success-dark/20
+    text-success dark:text-success-dark shadow-sm;
+}
+
+.notification-warning {
+  @apply relative overflow-hidden rounded-md border-l-4 border-l-danger dark:border-l-danger-dark
+    bg-danger/10 dark:bg-danger-dark/10 border border-danger/20 dark:border-danger-dark/20
+    text-danger dark:text-danger-dark shadow-sm;
+}
+
+/* Toast / inline message (success or warning) */
+.toast-success {
+  @apply text-sm text-success dark:text-success-dark;
+}
+
+.toast-warning {
+  @apply text-sm text-danger dark:text-danger-dark;
+}
+
+/* ==========================================================================
+   Badges & status indicators
+   ========================================================================== */
 
 /* Status pills / badges */
 .badge-success {
@@ -368,7 +414,34 @@ input[type="number"] {
   @apply text-[10px] bg-warning/20 dark:bg-warning-dark/20 text-warning dark:text-warning-dark px-1.5 py-0.5 rounded font-medium;
 }
 
-/* Documentation page */
+/* Status dots (connection indicator) */
+.status-dot {
+  @apply inline-block w-2 h-2 rounded-full;
+}
+
+.status-dot-danger {
+  @apply bg-danger dark:bg-danger-dark;
+}
+
+.status-dot-success {
+  @apply bg-success dark:bg-success-dark animate-pulse;
+}
+
+/* ==========================================================================
+   Drop zone
+   ========================================================================== */
+
+/* Drop zone indicator (border color overridden by ConfigContext with user accent) */
+.drop-zone-indicator {
+  border-width: 3px;
+  border-style: dashed;
+  border-color: color-mix(in oklch, var(--color-accent) 60%, transparent);
+}
+
+/* ==========================================================================
+   Documentation page
+   ========================================================================== */
+
 .doc-body {
   @apply text-fg dark:text-fg-dark text-sm leading-relaxed;
 }
@@ -433,17 +506,4 @@ input[type="number"] {
   @apply text-xs text-fg dark:text-fg-dark overflow-auto max-h-96 p-4 rounded-md
     bg-surface-light dark:bg-surface-light-dark border border-edge dark:border-edge-dark
     whitespace-pre-wrap break-all;
-}
-
-/* Status dots (connection indicator) */
-.status-dot {
-  @apply inline-block w-2 h-2 rounded-full;
-}
-
-.status-dot-danger {
-  @apply bg-danger dark:bg-danger-dark;
-}
-
-.status-dot-success {
-  @apply bg-success dark:bg-success-dark animate-pulse;
 }

@@ -263,8 +263,8 @@ export function TabFirmware() {
             Errors (e.g. checksum mismatch or miner unreachable) are shown below. The dashboard does not control how the miner handles a failed OTA; many devices keep the previous firmware and reboot back to it on failure.
           </p>
           {lastChecksumResult && (
-            <div className="rounded-md border border-edge dark:border-edge-dark bg-surface-light dark:bg-surface-light-dark px-3 py-2 text-xs font-mono space-y-1">
-              <div className="font-semibold text-fg dark:text-fg-dark">Checksum verification</div>
+            <div className="rounded-md border border-default bg-surface-subtle px-3 py-2 text-xs font-mono space-y-1">
+              <div className="font-semibold text-body">Checksum verification</div>
               {lastChecksumResult.mismatch ? (
                 <p className="text-danger dark:text-danger-dark">Mismatch: file does not match expected SHA256.</p>
               ) : lastChecksumResult.checksumVerified ? (
@@ -275,13 +275,13 @@ export function TabFirmware() {
               {lastChecksumResult.computedSha256 != null && (
                 <div>
                   <span className="text-muted dark:text-muted-dark">Computed: </span>
-                  <span className="text-fg dark:text-fg-dark break-all">{lastChecksumResult.computedSha256}</span>
+                  <span className="text-body break-all">{lastChecksumResult.computedSha256}</span>
                 </div>
               )}
               {lastChecksumResult.expectedSha256 != null && (
                 <div>
                   <span className="text-muted dark:text-muted-dark">Expected: </span>
-                  <span className="text-fg dark:text-fg-dark break-all">{lastChecksumResult.expectedSha256}</span>
+                  <span className="text-body break-all">{lastChecksumResult.expectedSha256}</span>
                 </div>
               )}
             </div>

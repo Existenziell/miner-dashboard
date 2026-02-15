@@ -102,7 +102,7 @@ export default function MinerStatus() {
         <ItemGrid items={deviceItems} />
       </section>
 
-      <hr className="border-edge dark:border-edge-dark my-6" />
+      <hr className="border-default my-6" />
 
       <section className={hasHeap ? 'mb-5' : ''}>
         <ItemGrid items={networkItems} />
@@ -110,7 +110,7 @@ export default function MinerStatus() {
 
       {hasHeap && (
         <>
-          <hr className="border-edge dark:border-edge-dark my-6" />
+          <hr className="border-default my-6" />
           <section>
             <ItemGrid items={heapItems} />
           </section>
