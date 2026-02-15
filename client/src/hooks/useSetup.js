@@ -3,7 +3,7 @@ import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 
-export function useInit(config, refetchConfig, onError) {
+export function useSetup(config, refetchConfig, onError) {
   const [minerIp, setMinerIp] = useState(config.minerIp);
   const [expectedHashrateGh, setExpectedHashrateGh] = useState(config.defaultExpectedHashrateGh);
   const [pollMinerMs, setPollMinerMs] = useState(config.pollMinerIntervalMs);

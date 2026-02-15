@@ -1,19 +1,22 @@
 /**
  * Tab state synced with URL query (?tab=settings|docs|api).
  * Valid tab ids: 'dashboard' | 'settings' | 'docs' | 'api'
- * Settings sub-tabs use ?tab=settings&section=init|miner|pools|firmware|dashboard|colors
+ * Settings sub-tabs use ?tab=settings&section=setup|miner|pools|firmware|appearance
  */
 import { SETTINGS_SECTION_KEY } from '@/lib/constants.js';
 
-const VALID_SETTINGS_SECTIONS = new Set(['init', 'miner', 'pools', 'firmware', 'dashboard', 'colors']);
+const VALID_SETTINGS_SECTIONS = new Set(['setup', 'miner', 'pools', 'firmware', 'appearance']);
+
+const LEGACY_SECTION_MAP = { init: 'setup', dashboard: 'appearance', colors: 'appearance' };
 
 function getStoredSettingsSection() {
-  if (typeof window === 'undefined') return 'init';
+  if (typeof window === 'undefined') return 'setup';
   try {
     const s = window.localStorage.getItem(SETTINGS_SECTION_KEY);
-    return VALID_SETTINGS_SECTIONS.has(s) ? s : 'init';
+    if (VALID_SETTINGS_SECTIONS.has(s)) return s;
+    return LEGACY_SECTION_MAP[s] ?? 'setup';
   } catch {
-    return 'init';
+    return 'setup';
   }
 }
 
@@ -48,10 +51,11 @@ export function setTabInUrl(tab) {
 }
 
 export function getSettingsSectionFromUrl() {
-  if (typeof window === 'undefined') return 'init';
+  if (typeof window === 'undefined') return 'setup';
   const params = new URLSearchParams(window.location.search);
   const s = params.get('section');
-  return VALID_SETTINGS_SECTIONS.has(s) ? s : 'init';
+  if (VALID_SETTINGS_SECTIONS.has(s)) return s;
+  return LEGACY_SECTION_MAP[s] ?? 'setup';
 }
 
 export function setSettingsSectionInUrl(section) {

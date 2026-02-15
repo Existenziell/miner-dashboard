@@ -71,16 +71,16 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'dashboard' }, '', '/');
     });
 
-    it('sets tab=settings and section=init in URL when no stored section', () => {
+    it('sets tab=settings and section=setup in URL when no stored section', () => {
       const { replaceState } = mockWindow({ href: 'http://localhost/', pathname: '/', storedSettingsSection: null });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=init');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=setup');
     });
 
     it('sets tab=settings and section from localStorage when URL has no section', () => {
-      const { replaceState } = mockWindow({ href: 'http://localhost/', pathname: '/', storedSettingsSection: 'colors' });
+      const { replaceState } = mockWindow({ href: 'http://localhost/', pathname: '/', storedSettingsSection: 'appearance' });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=colors');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=appearance');
     });
 
     it('sets tab=docs in URL', () => {
@@ -89,14 +89,14 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'docs' }, '', '/?tab=docs');
     });
 
-    it('replaces existing tab param when switching to settings and uses stored section or init', () => {
+    it('replaces existing tab param when switching to settings and uses stored section or setup', () => {
       const { replaceState } = mockWindow({
         href: 'http://localhost/?tab=docs',
         pathname: '/',
         storedSettingsSection: null,
       });
       setTabInUrl('settings');
-      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=init');
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=setup');
     });
 
     it('removes tab and section when switching to dashboard', () => {
@@ -119,34 +119,41 @@ describe('tabUrl', () => {
   });
 
   describe('getSettingsSectionFromUrl', () => {
-    it('returns init when window is undefined', () => {
+    it('returns setup when window is undefined', () => {
       vi.stubGlobal('window', undefined);
-      expect(getSettingsSectionFromUrl()).toBe('init');
+      expect(getSettingsSectionFromUrl()).toBe('setup');
     });
 
-    it('returns init when section param is missing', () => {
+    it('returns setup when section param is missing', () => {
       mockWindow({ search: '', href: 'http://localhost/' });
-      expect(getSettingsSectionFromUrl()).toBe('init');
+      expect(getSettingsSectionFromUrl()).toBe('setup');
     });
 
-    it('returns init when section param is invalid', () => {
+    it('returns setup when section param is invalid', () => {
       mockWindow({ search: '?tab=settings&section=invalid', href: 'http://localhost/?tab=settings&section=invalid' });
-      expect(getSettingsSectionFromUrl()).toBe('init');
+      expect(getSettingsSectionFromUrl()).toBe('setup');
     });
 
-    it('returns section when valid (init, miner, pools, firmware, dashboard, colors)', () => {
-      mockWindow({ search: '?tab=settings&section=init', href: 'http://localhost/?tab=settings&section=init' });
-      expect(getSettingsSectionFromUrl()).toBe('init');
+    it('returns section when valid (setup, miner, pools, firmware, appearance)', () => {
+      mockWindow({ search: '?tab=settings&section=setup', href: 'http://localhost/?tab=settings&section=setup' });
+      expect(getSettingsSectionFromUrl()).toBe('setup');
       mockWindow({ search: '?tab=settings&section=miner', href: 'http://localhost/?tab=settings&section=miner' });
       expect(getSettingsSectionFromUrl()).toBe('miner');
       mockWindow({ search: '?tab=settings&section=pools', href: 'http://localhost/?tab=settings&section=pools' });
       expect(getSettingsSectionFromUrl()).toBe('pools');
       mockWindow({ search: '?tab=settings&section=firmware', href: 'http://localhost/?tab=settings&section=firmware' });
       expect(getSettingsSectionFromUrl()).toBe('firmware');
+      mockWindow({ search: '?tab=settings&section=appearance', href: 'http://localhost/?tab=settings&section=appearance' });
+      expect(getSettingsSectionFromUrl()).toBe('appearance');
+    });
+
+    it('maps legacy section=init to setup and legacy dashboard/colors to appearance', () => {
+      mockWindow({ search: '?tab=settings&section=init', href: 'http://localhost/?tab=settings&section=init' });
+      expect(getSettingsSectionFromUrl()).toBe('setup');
       mockWindow({ search: '?tab=settings&section=dashboard', href: 'http://localhost/?tab=settings&section=dashboard' });
-      expect(getSettingsSectionFromUrl()).toBe('dashboard');
+      expect(getSettingsSectionFromUrl()).toBe('appearance');
       mockWindow({ search: '?tab=settings&section=colors', href: 'http://localhost/?tab=settings&section=colors' });
-      expect(getSettingsSectionFromUrl()).toBe('colors');
+      expect(getSettingsSectionFromUrl()).toBe('appearance');
     });
   });
 

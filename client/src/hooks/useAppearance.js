@@ -5,7 +5,32 @@ import { isValidHex, normalizeHex } from '@/lib/colorUtils';
 import { CHART_COLOR_SPEC, TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { deepCopy } from '@/lib/utils';
 
-export function useColor(config, refetchConfig, onError) {
+export const METRIC_LABELS = {
+  hashrate: 'Hashrate (GH/s)',
+  efficiency: 'Efficiency (J/TH)',
+  temp: 'Temp (°C)',
+  fanRpm: 'Fan RPM (%)',
+  current: 'Current (A)',
+  frequency: 'Frequency (MHz)',
+  voltage: 'Voltage (mV)',
+  power: 'Power (W)',
+};
+
+export const METRIC_KEY_LABELS = {
+  min: 'Min',
+  max: 'Max',
+  gaugeMax: 'Gauge max',
+  maxPct: 'Max %',
+  maxMv: 'Max (mV)',
+};
+
+const defaultMetricOrder = () => DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
+
+export function useAppearance(config, refetchConfig, onError) {
+  const [metricRanges, setMetricRanges] = useState(() => deepCopy(config.metricRanges));
+  const [metricOrder, setMetricOrder] = useState(
+    () => config.metricOrder ?? defaultMetricOrder()
+  );
   const [accentColor, setAccentColor] = useState(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
   const [chartColors, setChartColors] = useState(() =>
     deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors)
@@ -13,6 +38,14 @@ export function useColor(config, refetchConfig, onError) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  useEffect(() => {
+    setMetricRanges(deepCopy(config.metricRanges));
+  }, [config.metricRanges]);
+
+  useEffect(() => {
+    setMetricOrder(config.metricOrder ?? defaultMetricOrder());
+  }, [config.metricOrder]);
 
   useEffect(() => {
     setAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
@@ -23,17 +56,43 @@ export function useColor(config, refetchConfig, onError) {
   const configAccent = normalizeHex(config.accentColor ?? '', DASHBOARD_DEFAULTS.accentColor);
   const defaultAccent = normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor);
 
+  const rangesChanged = JSON.stringify(metricRanges) !== JSON.stringify(config.metricRanges);
+  const orderChanged = JSON.stringify(metricOrder) !== JSON.stringify(config.metricOrder ?? defaultMetricOrder());
   const hasChartColorsChange =
     JSON.stringify(chartColors) !== JSON.stringify(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors);
-
-  const hasChanges =
-    effectiveAccent !== configAccent || hasChartColorsChange;
+  const dashboardHasChanges = rangesChanged || orderChanged;
+  const colorHasChanges = effectiveAccent !== configAccent || hasChartColorsChange;
+  const hasChanges = dashboardHasChanges || colorHasChanges;
 
   const hasDefaultsDiff =
+    JSON.stringify(metricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges) ||
+    JSON.stringify(metricOrder) !== JSON.stringify(defaultMetricOrder()) ||
     effectiveAccent !== defaultAccent ||
     JSON.stringify(chartColors) !== JSON.stringify(DASHBOARD_DEFAULTS.chartColors);
 
-  const changes = useMemo(() => {
+  const dashboardChanges = useMemo(() => {
+    const list = [];
+    const saved = config.metricRanges ?? DASHBOARD_DEFAULTS.metricRanges;
+    Object.keys(DASHBOARD_DEFAULTS.metricRanges).forEach((metric) => {
+      const keys = Object.keys(DASHBOARD_DEFAULTS.metricRanges[metric]);
+      keys.forEach((key) => {
+        const fromVal = saved[metric]?.[key];
+        const toVal = metricRanges[metric]?.[key];
+        if (fromVal !== toVal && (fromVal !== undefined || toVal !== undefined)) {
+          const metricLabel = METRIC_LABELS[metric] ?? metric;
+          const keyLabel = METRIC_KEY_LABELS[key] ?? key;
+          list.push({
+            label: `${metricLabel} → ${keyLabel}`,
+            from: fromVal !== undefined ? String(fromVal) : '—',
+            to: toVal !== undefined ? String(toVal) : '—',
+          });
+        }
+      });
+    });
+    return list;
+  }, [config.metricRanges, metricRanges]);
+
+  const colorChanges = useMemo(() => {
     const list = [];
     if (effectiveAccent !== configAccent) {
       list.push({ label: 'Accent color', from: configAccent, to: effectiveAccent });
@@ -59,10 +118,17 @@ export function useColor(config, refetchConfig, onError) {
     return list;
   }, [config.chartColors, configAccent, chartColors, effectiveAccent]);
 
+  const changes = useMemo(
+    () => [...dashboardChanges, ...colorChanges],
+    [dashboardChanges, colorChanges]
+  );
+
   const revert = useCallback(() => {
+    setMetricRanges(deepCopy(config.metricRanges));
+    setMetricOrder(config.metricOrder ?? defaultMetricOrder());
     setAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
     setChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
-  }, [config]);
+  }, [config.metricRanges, config.metricOrder, config.accentColor, config.chartColors]);
 
   const save = useCallback(
     async (e) => {
@@ -70,7 +136,11 @@ export function useColor(config, refetchConfig, onError) {
       setMessage(null);
       setSaving(true);
       try {
-        const payload = { accentColor: effectiveAccent };
+        const payload = {
+          metricRanges: deepCopy(metricRanges),
+          metricOrder: [...metricOrder],
+          accentColor: effectiveAccent,
+        };
         if (hasChartColorsChange) {
           const normalized = deepCopy(DASHBOARD_DEFAULTS.chartColors);
           CHART_COLOR_SPEC.forEach(({ id }) => {
@@ -89,7 +159,7 @@ export function useColor(config, refetchConfig, onError) {
         }
         await patchDashboardConfig(payload);
         await refetchConfig();
-        setMessage({ type: 'success', text: 'Colors saved.' });
+        setMessage({ type: 'success', text: 'Appearance saved.' });
       } catch (err) {
         setMessage({ type: 'error', text: err.message });
         onError?.(err);
@@ -97,7 +167,15 @@ export function useColor(config, refetchConfig, onError) {
         setSaving(false);
       }
     },
-    [effectiveAccent, chartColors, hasChartColorsChange, refetchConfig, onError]
+    [
+      metricRanges,
+      metricOrder,
+      effectiveAccent,
+      chartColors,
+      hasChartColorsChange,
+      refetchConfig,
+      onError,
+    ]
   );
 
   const resetToDefaults = useCallback(async () => {
@@ -105,14 +183,18 @@ export function useColor(config, refetchConfig, onError) {
     setSaving(true);
     try {
       await patchDashboardConfig({
+        metricRanges: deepCopy(DASHBOARD_DEFAULTS.metricRanges),
+        metricOrder: [...defaultMetricOrder()],
         accentColor: normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor),
         chartColors: deepCopy(DASHBOARD_DEFAULTS.chartColors),
       });
       await refetchConfig();
+      setMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
+      setMetricOrder(defaultMetricOrder());
       setAccentColor(DASHBOARD_DEFAULTS.accentColor);
       setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
       setShowResetConfirm(false);
-      setMessage({ type: 'success', text: 'Colors reset to default values.' });
+      setMessage({ type: 'success', text: 'Appearance reset to default values.' });
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);
@@ -120,6 +202,20 @@ export function useColor(config, refetchConfig, onError) {
       setSaving(false);
     }
   }, [refetchConfig, onError]);
+
+  const setMetricRangeValue = useCallback((metric, key, value) => {
+    setMetricRanges((prev) => ({
+      ...prev,
+      [metric]: {
+        ...prev[metric],
+        [key]: value,
+      },
+    }));
+  }, []);
+
+  const setMetricOrderList = useCallback((newOrder) => {
+    setMetricOrder(Array.isArray(newOrder) ? [...newOrder] : newOrder);
+  }, []);
 
   const setChartColorValue = useCallback((chartId, seriesKey, value) => {
     setChartColors((prev) => ({
@@ -138,7 +234,13 @@ export function useColor(config, refetchConfig, onError) {
   }, [message?.type]);
 
   return {
+    METRIC_LABELS,
+    METRIC_KEY_LABELS,
     CHART_COLOR_SPEC,
+    metricRanges,
+    metricOrder,
+    setMetricOrder: setMetricOrderList,
+    setMetricRangeValue,
     accentColor,
     setAccentColor,
     chartColors,

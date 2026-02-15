@@ -1,10 +1,9 @@
 const SETTINGS_TABS = [
-  { id: 'init', label: 'Initialization' },
+  { id: 'setup', label: 'Setup' },
   { id: 'miner', label: 'Miner' },
   { id: 'pools', label: 'Pools' },
   { id: 'firmware', label: 'Firmware' },
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'colors', label: 'Colors' },
+  { id: 'appearance', label: 'Appearance' },
 ];
 
 export function SettingsTabBar({ currentTab, onTabChange }) {

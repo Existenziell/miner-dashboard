@@ -63,7 +63,7 @@ export default function DocsPage() {
           <li><strong>Network</strong>: Miner and dashboard host must reach the pool's Stratum server (and optionally mempool.space for network stats).</li>
         </ul>
         <p className="doc-body">
-          Set the miner's IP in Settings → Init (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
+          Set the miner's IP in Settings → Setup (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
         </p>
         <p className="doc-body mt-2">
           <a href="https://github.com/shufps/qaxe" target="_blank" rel="noopener noreferrer" className="hover:underline">NerdQ Hardware Repository</a>

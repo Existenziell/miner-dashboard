@@ -1,6 +1,6 @@
 /**
- * Footer for Dashboard and Colors tabs: Save button, message, Reset to defaults + confirm dialog.
- * Receives form state as props (from useDashboard or useColor).
+ * Footer for Appearance tab: Save button, message, Reset to defaults + confirm dialog.
+ * Receives form state as props (from useAppearance).
  */
 import { useEffect } from 'react';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';

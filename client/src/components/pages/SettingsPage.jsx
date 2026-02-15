@@ -1,28 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ColorProvider } from '@/context/ColorContext';
+import { AppearanceProvider } from '@/context/AppearanceContext';
 import { useConfig } from '@/context/ConfigContext';
-import { DashboardProvider } from '@/context/DashboardContext';
-import { InitProvider } from '@/context/InitContext';
 import { useMiner } from '@/context/MinerContext';
 import { MinerSettingsProvider } from '@/context/MinerSettingsContext';
-import { useColor } from '@/hooks/useColor';
-import { useDashboard } from '@/hooks/useDashboard';
-import { useInit } from '@/hooks/useInit';
+import { SetupProvider } from '@/context/SetupContext';
+import { useAppearance } from '@/hooks/useAppearance';
 import { useMinerDevice } from '@/hooks/useMinerDevice';
 import { useMinerPools } from '@/hooks/useMinerPools';
 import { useMinerWifi } from '@/hooks/useMinerWifi';
+import { useSetup } from '@/hooks/useSetup';
 import { TOAST_AUTO_DISMISS_MS } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import { DashboardColors } from '@/components/settings/DashboardColors';
-import { DashboardConfig } from '@/components/settings/DashboardConfig';
+import { Appearance } from '@/components/settings/Appearance';
 import { PendingChanges } from '@/components/settings/PendingChanges';
 import { SettingsFormFooter } from '@/components/settings/SettingsFormFooter';
 import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
 import { TabFirmware } from '@/components/settings/TabFirmware';
-import { TabInit } from '@/components/settings/TabInit';
 import { TabMiner } from '@/components/settings/TabMiner';
 import { TabPools } from '@/components/settings/TabPools';
+import { TabSetup } from '@/components/settings/TabSetup';
 
 export default function SettingsPage({ onError }) {
   const { data: miner, refetch } = useMiner();
@@ -37,9 +34,8 @@ export default function SettingsPage({ onError }) {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  const initForm = useInit(config, refetchConfig, onError);
-  const dashboardForm = useDashboard(config, refetchConfig, onError);
-  const colorForm = useColor(config, refetchConfig, onError);
+  const setupForm = useSetup(config, refetchConfig, onError);
+  const appearanceForm = useAppearance(config, refetchConfig, onError);
   const deviceForm = useMinerDevice(miner, refetch, onError);
   const wifiForm = useMinerWifi(miner, refetch, onError);
   const poolsForm = useMinerPools(miner, refetch, onError);
@@ -68,59 +64,43 @@ export default function SettingsPage({ onError }) {
     setSettingsSectionInUrl(id);
   };
 
-  const goToInitTab = () => {
-    setSettingsSubTab('init');
-    setSettingsSectionInUrl('init');
+  const goToSetupTab = () => {
+    setSettingsSubTab('setup');
+    setSettingsSectionInUrl('setup');
   };
 
   if (!miner) {
     return (
       <div className="space-y-4">
         <SettingsTabBar currentTab={settingsSubTab} onTabChange={handleTabChange} />
-        {settingsSubTab === 'init' && (
-          <InitProvider value={initForm}>
+        {settingsSubTab === 'setup' && (
+          <SetupProvider value={setupForm}>
             <MinerSettingsProvider value={minerSettingsValue}>
-              <TabInit minerReachable={false} />
+              <TabSetup minerReachable={false} />
             </MinerSettingsProvider>
-          </InitProvider>
+          </SetupProvider>
         )}
-        {settingsSubTab === 'dashboard' && (
-          <form onSubmit={dashboardForm.save} className="space-y-4">
-            <DashboardProvider value={dashboardForm}>
-              <DashboardConfig />
+        {settingsSubTab === 'appearance' && (
+          <form onSubmit={appearanceForm.save} className="space-y-4">
+            <AppearanceProvider value={appearanceForm}>
+              <Appearance />
               <PendingChanges
-                changes={dashboardForm.changes}
-                onReset={dashboardForm.revert}
+                changes={appearanceForm.changes}
+                onReset={appearanceForm.revert}
                 title="Pending changes"
               />
               <SettingsFormFooter
-                form={dashboardForm}
-                resetDialogDescription="Reset metric ranges to default values and save."
+                form={appearanceForm}
+                resetDialogDescription="Reset appearance (metric ranges and colors) to default values."
               />
-            </DashboardProvider>
-          </form>
-        )}
-        {settingsSubTab === 'colors' && (
-          <form onSubmit={colorForm.save} className="space-y-4">
-            <ColorProvider value={colorForm}>
-              <DashboardColors />
-              <PendingChanges
-                changes={colorForm.changes}
-                onReset={colorForm.revert}
-                title="Pending changes"
-              />
-              <SettingsFormFooter
-                form={colorForm}
-                resetDialogDescription="Reset accent and chart colors to default values."
-              />
-            </ColorProvider>
+            </AppearanceProvider>
           </form>
         )}
         {settingsSubTab === 'miner' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to change device settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToInitTab} className="link-text text-body cursor-pointer underline">
-              Init
+            <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
+              Setup
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
@@ -128,8 +108,8 @@ export default function SettingsPage({ onError }) {
         {settingsSubTab === 'pools' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to change pool settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToInitTab} className="link-text text-body cursor-pointer underline">
-              Init
+            <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
+              Setup
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
@@ -137,8 +117,8 @@ export default function SettingsPage({ onError }) {
         {settingsSubTab === 'firmware' && (
           <div className="card p-8 text-center text-muted-standalone">
             Connect to the miner to update firmware. Set Miner IP in the{' '}
-            <button type="button" onClick={goToInitTab} className="link-text text-body cursor-pointer underline">
-              Init
+            <button type="button" onClick={goToSetupTab} className="link-text text-body cursor-pointer underline">
+              Setup
             </button>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
@@ -151,45 +131,28 @@ export default function SettingsPage({ onError }) {
     <div className="space-y-4">
       <SettingsTabBar currentTab={settingsSubTab} onTabChange={handleTabChange} />
 
-      {settingsSubTab === 'init' && (
-        <InitProvider value={initForm}>
+      {settingsSubTab === 'setup' && (
+        <SetupProvider value={setupForm}>
           <MinerSettingsProvider value={minerSettingsValue}>
-            <TabInit minerReachable={true} />
+            <TabSetup minerReachable={true} />
           </MinerSettingsProvider>
-        </InitProvider>
+        </SetupProvider>
       )}
 
-      {settingsSubTab === 'dashboard' && (
-        <form onSubmit={dashboardForm.save} className="space-y-4">
-          <DashboardProvider value={dashboardForm}>
-            <DashboardConfig />
+      {settingsSubTab === 'appearance' && (
+        <form onSubmit={appearanceForm.save} className="space-y-4">
+          <AppearanceProvider value={appearanceForm}>
+            <Appearance />
             <PendingChanges
-              changes={dashboardForm.changes}
-              onReset={dashboardForm.revert}
+              changes={appearanceForm.changes}
+              onReset={appearanceForm.revert}
               title="Pending changes"
             />
             <SettingsFormFooter
-              form={dashboardForm}
-              resetDialogDescription="Reset Dashboard metric ranges to default values and save."
+              form={appearanceForm}
+              resetDialogDescription="Reset appearance (metric ranges and colors) to default values."
             />
-          </DashboardProvider>
-        </form>
-      )}
-
-      {settingsSubTab === 'colors' && (
-        <form onSubmit={colorForm.save} className="space-y-4">
-          <ColorProvider value={colorForm}>
-            <DashboardColors />
-            <PendingChanges
-              changes={colorForm.changes}
-              onReset={colorForm.revert}
-              title="Pending changes"
-            />
-            <SettingsFormFooter
-              form={colorForm}
-              resetDialogDescription="Reset accent and chart colors to default values."
-            />
-          </ColorProvider>
+          </AppearanceProvider>
         </form>
       )}
 

@@ -5,13 +5,13 @@ import {
   MAX_WIFI_SSID_LENGTH,
   MIN_WIFI_PASSWORD_LENGTH,
 } from 'shared/schemas/minerApi';
-import { useInitContext } from '@/context/InitContext';
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
+import { useSetupContext } from '@/context/SetupContext';
 import { Field } from '@/components/settings/Field';
 import { PendingChanges } from '@/components/settings/PendingChanges';
 
-export function TabInit({ minerReachable }) {
-  const initForm = useInitContext();
+export function TabSetup({ minerReachable }) {
+  const setupForm = useSetupContext();
   const {
     minerIp,
     setMinerIp,
@@ -27,7 +27,7 @@ export function TabInit({ minerReachable }) {
     save: saveConnection,
     saving: savingConnection,
     message: configMessage,
-  } = initForm;
+  } = setupForm;
 
   const { wifi: wifiForm } = useMinerSettingsContext();
   const {
@@ -168,10 +168,10 @@ export function TabInit({ minerReachable }) {
                 className={`input ${hostnameError ? 'input-danger' : ''}`}
                 aria-label="Hostname"
                 aria-invalid={!!hostnameError}
-                aria-describedby={hostnameError ? 'init-hostname-error' : undefined}
+                aria-describedby={hostnameError ? 'setup-hostname-error' : undefined}
               />
               {hostnameError && (
-                <p id="init-hostname-error" className="text-danger text-xs mt-1" role="alert">
+                <p id="setup-hostname-error" className="text-danger text-xs mt-1" role="alert">
                   {hostnameError}
                 </p>
               )}
@@ -186,10 +186,10 @@ export function TabInit({ minerReachable }) {
                 className={`input ${wifiSsidError ? 'input-danger' : ''}`}
                 aria-label="WiFi Network (SSID)"
                 aria-invalid={!!wifiSsidError}
-                aria-describedby={wifiSsidError ? 'init-wifi-ssid-error' : undefined}
+                aria-describedby={wifiSsidError ? 'setup-wifi-ssid-error' : undefined}
               />
               {wifiSsidError && (
-                <p id="init-wifi-ssid-error" className="text-danger text-xs mt-1" role="alert">
+                <p id="setup-wifi-ssid-error" className="text-danger text-xs mt-1" role="alert">
                   {wifiSsidError}
                 </p>
               )}
@@ -204,10 +204,10 @@ export function TabInit({ minerReachable }) {
                 className={`input ${wifiPasswordError ? 'input-danger' : ''}`}
                 aria-label="WiFi Password"
                 aria-invalid={!!wifiPasswordError}
-                aria-describedby={wifiPasswordError ? 'init-wifi-password-error' : undefined}
+                aria-describedby={wifiPasswordError ? 'setup-wifi-password-error' : undefined}
               />
               {wifiPasswordError && (
-                <p id="init-wifi-password-error" className="text-danger text-xs mt-1" role="alert">
+                <p id="setup-wifi-password-error" className="text-danger text-xs mt-1" role="alert">
                   {wifiPasswordError}
                 </p>
               )}

@@ -4,7 +4,7 @@
 import { act } from 'react';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { useInit } from '@/hooks/useInit';
+import { useSetup } from '@/hooks/useSetup';
 
 const mockPatchDashboardConfig = vi.fn();
 
@@ -12,7 +12,7 @@ vi.mock('@/lib/api', () => ({
   patchDashboardConfig: (...args) => mockPatchDashboardConfig(...args),
 }));
 
-describe('useInit', () => {
+describe('useSetup', () => {
   const refetchConfig = vi.fn();
   const onError = vi.fn();
 
@@ -27,7 +27,7 @@ describe('useInit', () => {
       pollMinerIntervalMs: 5000,
       pollNetworkIntervalMs: 30000,
     };
-    const { result } = renderHook(() => useInit(config, refetchConfig, onError));
+    const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     expect(result.current.minerIp).toBe('192.168.1.1');
     expect(result.current.expectedHashrateGh).toBe(1000);
@@ -45,7 +45,7 @@ describe('useInit', () => {
       pollMinerIntervalMs: 5000,
       pollNetworkIntervalMs: 30000,
     };
-    const { result } = renderHook(() => useInit(config, refetchConfig, onError));
+    const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     act(() => {
       result.current.setMinerIp('10.0.0.5');
@@ -64,7 +64,7 @@ describe('useInit', () => {
       pollMinerIntervalMs: 5000,
       pollNetworkIntervalMs: 30000,
     };
-    const { result } = renderHook(() => useInit(config, refetchConfig, onError));
+    const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     act(() => {
       result.current.setMinerIp('10.0.0.5');
@@ -89,7 +89,7 @@ describe('useInit', () => {
       pollNetworkIntervalMs: 30000,
     };
     mockPatchDashboardConfig.mockResolvedValue({});
-    const { result } = renderHook(() => useInit(config, refetchConfig, onError));
+    const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     act(() => {
       result.current.setMinerIp('10.0.0.5');
