@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Router } from 'express';
 
 /**
@@ -79,6 +80,67 @@ router.get('/releases', async (req, res) => {
     console.error('Firmware releases fetch failed:', err.message);
     const status = err.message.includes('403') ? 429 : 502;
     res.status(status).json({ error: 'Failed to fetch releases', detail: err.message });
+  }
+});
+
+/** Parse SHA256 from a checksum file (first token or line). */
+function parseSha256FromChecksumContent(text) {
+  if (!text || typeof text !== 'string') return null;
+  const trimmed = text.trim();
+  const match = trimmed.match(/^([a-fA-F0-9]{64})\s/);
+  if (match) return match[1].toLowerCase();
+  if (/^[a-fA-F0-9]{64}$/.test(trimmed)) return trimmed.toLowerCase();
+  return null;
+}
+
+/**
+ * POST /api/firmware/download
+ * Downloads firmware from URL, verifies SHA256 if expectedSha256 provided, returns binary.
+ * Response: body = raw firmware, headers: X-Computed-Sha256, X-Expected-Sha256 (if any), X-Checksum-Verified (true|false).
+ * On checksum mismatch: 400 JSON with checksumVerified, computedSha256, expectedSha256.
+ */
+router.post('/download', async (req, res) => {
+  const { url, expectedSha256: expectedFromBody } = req.body || {};
+  if (!url || typeof url !== 'string') {
+    return res.status(400).json({ error: 'Missing url', detail: 'Body must include url (firmware download URL).' });
+  }
+  try {
+    const firmwareRes = await fetch(url);
+    if (!firmwareRes.ok) {
+      return res.status(502).json({ error: 'Firmware download failed', detail: `HTTP ${firmwareRes.status}` });
+    }
+    const buffer = Buffer.from(await firmwareRes.arrayBuffer());
+    const computedSha256 = crypto.createHash('sha256').update(buffer).digest('hex').toLowerCase();
+
+    let expected = expectedFromBody && String(expectedFromBody).trim().toLowerCase();
+    if (!expected) {
+      const checksumUrl = url.endsWith('.sha256') ? null : `${url}.sha256`;
+      if (checksumUrl) {
+        const csRes = await fetch(checksumUrl);
+        if (csRes.ok) {
+          const text = await csRes.text();
+          expected = parseSha256FromChecksumContent(text);
+        }
+      }
+    }
+    if (expected && computedSha256 !== expected) {
+      return res.status(400).json({
+        error: 'Checksum mismatch',
+        detail: 'Firmware file does not match the expected SHA256. Download may be corrupted or tampered.',
+        checksumVerified: false,
+        computedSha256,
+        expectedSha256: expected,
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('X-Computed-Sha256', computedSha256);
+    if (expected) res.setHeader('X-Expected-Sha256', expected);
+    res.setHeader('X-Checksum-Verified', expected ? 'true' : 'false');
+    res.send(buffer);
+  } catch (err) {
+    console.error('Firmware download failed:', err.message);
+    res.status(502).json({ error: 'Download failed', detail: err.message });
   }
 });
 

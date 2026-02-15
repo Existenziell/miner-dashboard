@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   fetchDashboardConfig,
+  downloadFirmwareFromUrl,
   fetchFirmwareChecksum,
   fetchFirmwareReleases,
   flashFirmwareFile,
@@ -199,6 +200,37 @@ describe('api', () => {
     it('returns null when response not ok', async () => {
       fetchStub.mockResolvedValueOnce({ ok: false });
       expect(await fetchFirmwareChecksum('https://example.com/file.sha256')).toBeNull();
+    });
+  });
+
+  describe('downloadFirmwareFromUrl', () => {
+    it('POSTs /api/firmware/download and returns blob with verification headers', async () => {
+      const blob = new Blob(['firmware-binary']);
+      const res = {
+        ok: true,
+        blob: () => Promise.resolve(blob),
+        headers: { get: (name) => ({ 'X-Computed-Sha256': 'abc', 'X-Expected-Sha256': 'abc', 'X-Checksum-Verified': 'true' }[name]) },
+      };
+      fetchStub.mockResolvedValueOnce(res);
+      const result = await downloadFirmwareFromUrl({ url: 'https://example.com/fw.bin', expectedSha256: 'abc' });
+      expect(result.blob).toBe(blob);
+      expect(result.computedSha256).toBe('abc');
+      expect(result.expectedSha256).toBe('abc');
+      expect(result.checksumVerified).toBe(true);
+      expect(fetchStub).toHaveBeenCalledWith('/api/firmware/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: 'https://example.com/fw.bin', expectedSha256: 'abc' }),
+      });
+    });
+
+    it('throws and attaches installErrorBody when response has checksum fields (400)', async () => {
+      const body = { error: 'Checksum mismatch', checksumVerified: false, computedSha256: 'aaa', expectedSha256: 'bbb' };
+      fetchStub.mockResolvedValueOnce({ ok: false, json: () => Promise.resolve(body) });
+      const err = await downloadFirmwareFromUrl({ url: 'https://x/fw.bin' }).catch((e) => e);
+      expect(err).toBeInstanceOf(Error);
+      expect(err.message).toContain('Checksum mismatch');
+      expect(err.installErrorBody).toEqual(body);
     });
   });
 

@@ -128,6 +128,42 @@ export async function fetchFirmwareChecksum(checksumUrl) {
   return match ? match[1].toLowerCase() : null;
 }
 
+/** Download firmware from URL and verify checksum. Returns { blob, computedSha256, expectedSha256, checksumVerified }. Does not flash. */
+export async function downloadFirmwareFromUrl(payload) {
+  const { url, expectedSha256 } = payload;
+  const res = await fetch(`${BASE}/api/firmware/download`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, expectedSha256 }),
+  });
+  if (!res.ok) {
+    let msg = 'Firmware download failed';
+    let body = null;
+    try {
+      body = await res.json();
+      if (body.detail) msg = body.detail;
+      else if (body.error) msg = body.error;
+    } catch {
+      // ignore
+    }
+    const err = new Error(msg);
+    if (body && (body.checksumVerified !== undefined || body.computedSha256 != null)) {
+      err.installErrorBody = body;
+    }
+    throw err;
+  }
+  const blob = await res.blob();
+  const computedSha256 = res.headers.get('X-Computed-Sha256') || null;
+  const expectedFromHeader = res.headers.get('X-Expected-Sha256') || null;
+  const checksumVerified = res.headers.get('X-Checksum-Verified') === 'true';
+  return {
+    blob,
+    computedSha256,
+    expectedSha256: expectedFromHeader || expectedSha256 || null,
+    checksumVerified,
+  };
+}
+
 export async function installFirmwareFromUrl(payload) {
   const { url, keepSettings = false, expectedSha256 } = payload;
   const res = await fetch(`${BASE}/api/miner/firmware/install`, {

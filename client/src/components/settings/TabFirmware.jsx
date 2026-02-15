@@ -3,7 +3,7 @@ import { useMiner } from '@/context/MinerContext';
 import {
   fetchFirmwareReleases,
   fetchFirmwareChecksum,
-  installFirmwareFromUrl,
+  downloadFirmwareFromUrl,
   flashFirmwareFile,
 } from '@/lib/api';
 import { ConfirmModal } from '@/components/ConfirmModal';
@@ -36,17 +36,21 @@ export function TabFirmware() {
   const [showPrereleases, setShowPrereleases] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(null);
   const [expectedSha256, setExpectedSha256] = useState(null);
-  const [installing, setInstalling] = useState(false);
-  const [installMessage, setInstallMessage] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadMessage, setDownloadMessage] = useState(null);
+  const [downloadedGitHubFirmware, setDownloadedGitHubFirmware] = useState(null);
   const [firmwareFile, setFirmwareFile] = useState(null);
   const [wwwFile, setWwwFile] = useState(null);
   const [flashingFirmware, setFlashingFirmware] = useState(false);
   const [flashingWww, setFlashingWww] = useState(false);
   const [flashMessage, setFlashMessage] = useState(null);
-  const [showInstallConfirmModal, setShowInstallConfirmModal] = useState(false);
+  const [flashedVersionPending, setFlashedVersionPending] = useState(null);
+  const [showDownloadConfirmModal, setShowDownloadConfirmModal] = useState(false);
   const [lastChecksumResult, setLastChecksumResult] = useState(null);
 
   const currentVersion = miner?.version ? (miner.version.startsWith('v') ? miner.version : `v${miner.version}`) : '—';
+
+  const normalizedCurrentVersion = currentVersion !== '—' ? currentVersion.toLowerCase() : null;
 
   const isSameVersionAsInstalled =
     currentVersion !== '—' &&
@@ -64,7 +68,7 @@ export function TabFirmware() {
         return list[0];
       });
     } catch (err) {
-      setInstallMessage({ type: 'error', text: err.message });
+      setDownloadMessage({ type: 'error', text: err.message });
     } finally {
       setLoadingReleases(false);
     }
@@ -91,22 +95,37 @@ export function TabFirmware() {
     return () => { cancelled = true; };
   }, [selectedRelease]);
 
+  useEffect(() => {
+    setDownloadedGitHubFirmware(null);
+    setLastChecksumResult(null);
+  }, [selectedRelease?.tag_name]);
+
+  useEffect(() => {
+    if (!flashedVersionPending || !normalizedCurrentVersion) return;
+    const expected = flashedVersionPending.toLowerCase();
+    if (normalizedCurrentVersion === expected) {
+      setFlashMessage({ type: 'success', text: `Flash successful. Device is now on ${currentVersion}.` });
+      setFlashedVersionPending(null);
+    }
+  }, [flashedVersionPending, normalizedCurrentVersion, currentVersion]);
+
   const selectedAsset = selectedRelease ? pickFirmwareAsset(selectedRelease.assets) : null;
   const downloadUrl = selectedAsset?.browser_download_url || null;
   const filename = selectedAsset?.name || '—';
   const published = selectedRelease ? formatPublished(selectedRelease.published_at) : '—';
 
-  const handleInstallFromGitHub = async () => {
+  const handleDownloadFromGitHub = async () => {
     if (!downloadUrl) {
-      setInstallMessage({ type: 'error', text: 'No firmware file in this release.' });
+      setDownloadMessage({ type: 'error', text: 'No firmware file in this release.' });
       return;
     }
-    setShowInstallConfirmModal(false);
-    setInstalling(true);
-    setInstallMessage(null);
+    setShowDownloadConfirmModal(false);
+    setDownloading(true);
+    setDownloadMessage(null);
     setLastChecksumResult(null);
+    setDownloadedGitHubFirmware(null);
     try {
-      const data = await installFirmwareFromUrl({
+      const data = await downloadFirmwareFromUrl({
         url: downloadUrl,
         expectedSha256: expectedSha256 || undefined,
       });
@@ -115,7 +134,13 @@ export function TabFirmware() {
         computedSha256: data.computedSha256 ?? null,
         expectedSha256: data.expectedSha256 ?? null,
       });
-      setInstallMessage({ type: 'success', text: data.message || 'Install started. Device may reboot.' });
+      setDownloadedGitHubFirmware({
+        blob: data.blob,
+        computedSha256: data.computedSha256,
+        expectedSha256: data.expectedSha256,
+        checksumVerified: data.checksumVerified,
+      });
+      setDownloadMessage({ type: 'success', text: 'Download complete. Verify checksum above, then click Flash.' });
     } catch (err) {
       const body = err.installErrorBody;
       if (body) {
@@ -126,9 +151,33 @@ export function TabFirmware() {
           mismatch: true,
         });
       }
-      setInstallMessage({ type: 'error', text: err.message });
+      setDownloadMessage({ type: 'error', text: err.message });
     } finally {
-      setInstalling(false);
+      setDownloading(false);
+    }
+  };
+
+  const handleFlashDownloadedFirmware = async () => {
+    if (!downloadedGitHubFirmware?.blob) return;
+    setFlashingFirmware(true);
+    setFlashMessage(null);
+    try {
+      await flashFirmwareFile(downloadedGitHubFirmware.blob, 'firmware');
+      const versionTag = selectedRelease?.tag_name ?? null;
+      setFlashedVersionPending(versionTag);
+      setFlashMessage({
+        type: 'success',
+        text: versionTag
+          ? `Flash started. Device may reboot. Success will be confirmed when it comes back online with ${versionTag}.`
+          : 'Firmware flash started. Device may reboot.',
+      });
+      setDownloadedGitHubFirmware(null);
+      setLastChecksumResult(null);
+      setDownloadMessage(null);
+    } catch (err) {
+      setFlashMessage({ type: 'error', text: err.message });
+    } finally {
+      setFlashingFirmware(false);
     }
   };
 
@@ -141,7 +190,10 @@ export function TabFirmware() {
     setFlashMessage(null);
     try {
       await flashFirmwareFile(firmwareFile, 'firmware');
-      setFlashMessage({ type: 'success', text: 'Firmware flash started. Device may reboot.' });
+      setFlashMessage({
+        type: 'success',
+        text: 'Firmware flash started. Device may reboot. Success can only be confirmed after it comes back online.',
+      });
       setFirmwareFile(null);
     } catch (err) {
       setFlashMessage({ type: 'error', text: err.message });
@@ -159,7 +211,10 @@ export function TabFirmware() {
     setFlashMessage(null);
     try {
       await flashFirmwareFile(wwwFile, 'www');
-      setFlashMessage({ type: 'success', text: 'WWW upload started.' });
+      setFlashMessage({
+        type: 'success',
+        text: 'WWW upload started. Device may reboot. Success can only be confirmed after it comes back online.',
+      });
       setWwwFile(null);
     } catch (err) {
       setFlashMessage({ type: 'error', text: err.message });
@@ -246,21 +301,29 @@ export function TabFirmware() {
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               type="button"
-              onClick={() => setShowInstallConfirmModal(true)}
-              disabled={disabled || installing || !downloadUrl || loadingReleases || isSameVersionAsInstalled}
+              onClick={() => setShowDownloadConfirmModal(true)}
+              disabled={disabled || downloading || !downloadUrl || loadingReleases || isSameVersionAsInstalled}
               className="btn-primary inline-flex items-center gap-2"
             >
               <IconCloudDownload className="w-4 h-4 shrink-0" />
-              {installing ? 'Installing…' : 'Install from GitHub'}
+              {downloading ? 'Downloading…' : 'Download from GitHub'}
+            </button>
+            <button
+              type="button"
+              onClick={handleFlashDownloadedFirmware}
+              disabled={disabled || flashingFirmware || !downloadedGitHubFirmware}
+              className="btn-ghost-accent"
+            >
+              {flashingFirmware ? 'Flashing…' : 'Flash'}
             </button>
           </div>
           {expectedSha256 && !lastChecksumResult && (
             <p className="text-xs text-muted dark:text-muted-dark">
-              Checksum will be verified (SHA256) before install.
+              Checksum will be verified (SHA256) after download.
             </p>
           )}
           <p className="text-xs text-muted dark:text-muted-dark">
-            Errors (e.g. checksum mismatch or miner unreachable) are shown below. The dashboard does not control how the miner handles a failed OTA; many devices keep the previous firmware and reboot back to it on failure.
+            Download the firmware first; verification is shown below. Then click Flash to install. Errors (e.g. checksum mismatch or miner unreachable) are shown below. The dashboard does not control how the miner handles a failed OTA; many devices keep the previous firmware and reboot back to it on failure.
           </p>
           {lastChecksumResult && (
             <div className="rounded-md border border-default bg-surface-subtle px-3 py-2 text-xs font-mono space-y-1">
@@ -270,7 +333,7 @@ export function TabFirmware() {
               ) : lastChecksumResult.checksumVerified ? (
                 <p className="text-success dark:text-success-dark">Verified (SHA256).</p>
               ) : (
-                <p className="text-muted dark:text-muted-dark">No checksum file in release; install proceeded without verification.</p>
+                <p className="text-muted dark:text-muted-dark">No checksum file in release; download proceeded without verification.</p>
               )}
               {lastChecksumResult.computedSha256 != null && (
                 <div>
@@ -286,35 +349,43 @@ export function TabFirmware() {
               )}
             </div>
           )}
-          {installMessage && (
+          {downloadMessage && (
             <p
               role="alert"
-              className={`text-sm ${installMessage.type === 'error' ? 'text-danger dark:text-danger-dark' : 'text-success dark:text-success-dark'}`}
+              className={`text-sm ${downloadMessage.type === 'error' ? 'text-danger dark:text-danger-dark' : 'text-success dark:text-success-dark'}`}
             >
-              {installMessage.text}
+              {downloadMessage.text}
+            </p>
+          )}
+          {flashMessage && (
+            <p
+              role="alert"
+              className={`text-sm ${flashMessage.type === 'error' ? 'text-danger dark:text-danger-dark' : 'text-success dark:text-success-dark'}`}
+            >
+              {flashMessage.text}
             </p>
           )}
         </div>
       </div>
 
       <ConfirmModal
-        open={showInstallConfirmModal}
-        onClose={() => setShowInstallConfirmModal(false)}
-        title="Install firmware?"
+        open={showDownloadConfirmModal}
+        onClose={() => setShowDownloadConfirmModal(false)}
+        title="Download firmware?"
         description={
           <>
-            Install <strong>{selectedRelease?.tag_name ?? 'selected release'}</strong>?
+            Download <strong>{selectedRelease?.tag_name ?? 'selected release'}</strong> from GitHub?
             <br />
             File: <span className="font-mono text-sm">{filename}</span>
             <br />
             {expectedSha256
-              ? 'Checksum (SHA256) will be verified before flashing.'
-              : 'No checksum file for this release; install will proceed without verification.'}
+              ? 'Checksum (SHA256) will be verified after download. Flash will be enabled only after a successful download.'
+              : 'No checksum file for this release; download will proceed without verification.'}
           </>
         }
-        confirmLabel="Install"
-        onConfirm={handleInstallFromGitHub}
-        confirmDisabled={installing}
+        confirmLabel="Download"
+        onConfirm={handleDownloadFromGitHub}
+        confirmDisabled={downloading}
       />
 
       {/* Legacy Update */}
@@ -327,6 +398,9 @@ export function TabFirmware() {
         <div className="space-y-6">
           <div>
             <h4 className="card-title">Manual Firmware Upload</h4>
+            <p className="text-xs text-muted dark:text-muted-dark mb-2">
+              Upload a firmware .bin file (e.g. esp-miner-NerdQAxe++.bin) from your computer. Use this when you have a local build or a file from a source other than GitHub. No checksum verification is performed, ensure the file is from a trusted source. The device may reboot after flashing.
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm">
                 <span>Browse</span>
@@ -347,10 +421,13 @@ export function TabFirmware() {
                 {flashingFirmware ? 'Flashing…' : 'Flash'}
               </button>
             </div>
-            <p className="text-xs text-muted dark:text-muted-dark mt-1">(esp-miner-NerdQAxe++.bin)</p>
+            <p className="text-xs text-muted dark:text-muted-dark mt-1">Accepted: .bin (e.g. esp-miner-NerdQAxe++.bin)</p>
           </div>
           <div>
             <h4 className="card-title">Manual WWW Upload</h4>
+            <p className="text-xs text-muted dark:text-muted-dark mb-2">
+              Upload a packed web UI .bin file (e.g. www.bin) to update only the dashboard/UI on the device without changing the miner firmware. Useful for updating the web interface from a custom or pre-built www bundle. No checksum verification is performed.
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               <label className="btn-ghost-accent cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm">
                 <span>Browse</span>
@@ -371,7 +448,7 @@ export function TabFirmware() {
                 {flashingWww ? 'Flashing…' : 'Flash'}
               </button>
             </div>
-            <p className="text-xs text-muted dark:text-muted-dark mt-1">(www.bin)</p>
+            <p className="text-xs text-muted dark:text-muted-dark mt-1">Accepted: .bin (e.g. www.bin)</p>
           </div>
           {flashMessage && (
             <p

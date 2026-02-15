@@ -33,6 +33,7 @@ const API_ENDPOINTS = [
   { method: 'POST', path: '/api/miner/restart', description: 'Restart miner' },
   { method: 'POST', path: '/api/miner/shutdown', description: 'Shutdown miner' },
   { method: 'GET', path: '/api/firmware/releases', description: 'GitHub firmware releases (query: includePrereleases)' },
+  { method: 'POST', path: '/api/firmware/download', description: 'Download firmware from URL and verify checksum (JSON: url, expectedSha256?). Returns binary + X-* headers.' },
   { method: 'POST', path: '/api/miner/firmware/install', description: 'Install firmware from URL (JSON: url, keepSettings?, expectedSha256?)' },
   { method: 'POST', path: '/api/miner/firmware/flash', description: 'Flash firmware or www file (multipart file, query: type=firmware|www)' },
   { method: 'GET', path: '/api/network/status', description: 'Bitcoin network data' },
