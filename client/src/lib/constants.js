@@ -158,7 +158,7 @@ export const SOLO_POOLS = [
     registration: 'No signup',
     region: 'EU',
     workerFormat: 'Address or Address.RIG_ID',
-    notes: 'Low-end port (250K diff); 7005, 9005 for higher hashrate.',
+    notes: 'Low-end port; 7005, 9005 for higher hashrate.',
   },
   {
     identifier: 'viabtc',
