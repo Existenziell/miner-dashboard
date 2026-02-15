@@ -7,7 +7,6 @@ function StatusDot({ connected }) {
   return (
     <span
       className={`status-dot shrink-0 ${connected ? 'status-dot-success' : 'status-dot-danger'}`}
-      title={connected ? 'WiFi connected' : 'WiFi disconnected'}
       aria-hidden
     />
   );
@@ -19,12 +18,12 @@ function ItemGrid({ items }) {
       {items.map((item) => (
         <div key={item.label}>
           <div className="stat-label">{item.label}</div>
-          <div className="text-body text-sm font-medium mt-0.5 truncate flex items-center gap-2" title={String(item.value)}>
+          <div className="text-body text-sm font-medium mt-0.5 truncate flex items-center gap-2">
             {item.status != null && <StatusDot connected={item.status === 'connected'} />}
             <span className="truncate min-w-0">{item.value}</span>
           </div>
           {item.warning && (
-            <div className="text-xs text-warning dark:text-warning-dark mt-0.5" title={item.warningTitle}>
+            <div className="text-xs text-warning dark:text-warning-dark mt-0.5">
               {item.warning}
             </div>
           )}
@@ -69,7 +68,6 @@ export default function MinerStatus() {
       label: 'Free Heap (int RAM)',
       value: data.freeHeapInt != null ? formatBytes(data.freeHeapInt) : '--',
       warning: data.freeHeapInt != null && data.freeHeapInt < LOW_HEAP_INT_THRESHOLD_BYTES ? 'Low memory' : undefined,
-      warningTitle: data.freeHeapInt != null && data.freeHeapInt < LOW_HEAP_INT_THRESHOLD_BYTES ? 'Internal RAM free heap is below 50 KB; device may become unstable.' : undefined,
     },
     { label: 'Running Partition', value: data.runningPartition ?? '--' },
     { label: 'Poll interval', value: `${(config.pollMinerIntervalMs / 1000).toFixed(0)} s` },

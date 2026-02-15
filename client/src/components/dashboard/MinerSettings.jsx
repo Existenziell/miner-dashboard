@@ -11,14 +11,12 @@ function SettingRow({ label, value, highlight, truncate, href }) {
           target="_blank"
           rel="noopener noreferrer"
           className={`text-sm text-right ${truncate ? 'truncate max-w-[250px]' : ''}`}
-          title={truncate ? String(value) : undefined}
         >
           {value}
         </a>
       ) : (
         <span
           className={`text-sm text-right ${highlight ? 'text-accent font-medium' : 'text-body'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
-          title={truncate ? String(value) : undefined}
         >
           {value}
         </span>

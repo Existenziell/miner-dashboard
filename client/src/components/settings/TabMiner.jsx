@@ -160,7 +160,7 @@ export function TabMiner() {
                   )}
                 </Field>
               )}
-              <Field label="Fan mode" hint="Auto (PID) mode uses a PID controller to adjust fan speed based on temperature.">
+              <Field label="Fan mode" hint="PID adjusts fan speed from ASIC temperature.">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

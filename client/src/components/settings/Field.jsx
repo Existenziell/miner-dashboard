@@ -6,7 +6,7 @@ export function Field({ label, children, hint, suffix }) {
       <div className="flex items-center gap-1.5">
         <label className="label">{label}</label>
         {hint && (
-          <span className="field-hint-trigger" aria-label="More info">
+          <span className="field-hint-trigger" aria-label={label ? `Info: ${label}` : 'More info'}>
             <IconInfo className="w-4 h-4" />
             <span className="field-hint-tooltip" role="tooltip">
               {hint}

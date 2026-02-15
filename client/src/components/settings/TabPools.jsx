@@ -84,7 +84,7 @@ export function TabPools({ miner }) {
                 ))}
               </select>
             </Field>
-            <Field label="Enable Stratum TCP Keepalive" hint="Prevents connection timeouts by sending a keepalive packet every 30 seconds.">
+            <Field label="Enable Stratum TCP Keepalive" hint="Sends keepalive every 30 s to prevent timeouts.">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -202,12 +202,12 @@ export function TabPools({ miner }) {
                   </p>
                 )}
               </Field>
-              <Field label="Enable Extranonce Subscribe" hint="Improves mining efficiency by allowing the miner to use a longer extranonce.">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={primaryExtranonceSubscribe}
+<Field label="Enable Extranonce Subscribe" hint="Allows longer extranonce for better efficiency.">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={primaryExtranonceSubscribe}
                     aria-label="Primary pool Enable Extranonce Subscribe"
                     onClick={() => setPrimaryExtranonceSubscribe((v) => !v)}
                     className={`switch ${primaryExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
@@ -338,7 +338,7 @@ export function TabPools({ miner }) {
                   </p>
                 )}
               </Field>
-              <Field label="Enable Extranonce Subscribe" hint="Improves mining efficiency by allowing the miner to use a longer extranonce.">
+              <Field label="Enable Extranonce Subscribe" hint="Allows longer extranonce for better efficiency.">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

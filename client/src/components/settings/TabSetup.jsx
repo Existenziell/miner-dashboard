@@ -58,7 +58,7 @@ export function TabSetup({ minerReachable }) {
         </div>
         <form onSubmit={saveConnection} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Miner IP" hint="IP address of the miner. Leave empty if using .env MINER_IP.">
+            <Field label="Miner IP" hint="Miner IP. Leave empty to use .env MINER_IP.">
               <input
                 type="text"
                 value={minerIp}
@@ -85,7 +85,7 @@ export function TabSetup({ minerReachable }) {
             </Field>
             <Field
               label="Miner poll interval (ms)"
-              hint="How often to fetch miner status for dashboard refresh."
+              hint="How often the dashboard fetches miner status."
               suffix={`(= ${(pollMinerMs / 1000).toFixed(1)} sec)`}
             >
               <input
