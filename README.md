@@ -4,7 +4,7 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 
 ## Features
 
-- **Monitoring:** live miner metrics, hashrate, temp, power, fan speed; history graphs; shares and pool info; network difficulty and more
+- **Monitoring:** live miner metrics, hashrate, temp, power, fan speed; history charts; shares and pool info; network difficulty and more
 - **Fully Customizable:** adjust colors for accents, charts, gauges, and drag'n'drop to reorder gauges on the dashboard
 - **Network Context:** observe public network metrics via mempool.space
 - **API Monitoring:** check live API calls and results

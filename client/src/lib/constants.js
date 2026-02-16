@@ -20,6 +20,14 @@ export const CHART_POINTS_1H = 360;
 
 // —— LocalStorage keys ———————————————————————————————————————————————————————
 export const THEME_KEY = 'md.theme';
+
+export const THEME_LABELS = {
+  light: 'Light',
+  dark: 'Dark',
+  'light-high-contrast': 'Light (high contrast)',
+  'dark-high-contrast': 'Dark (high contrast)',
+};
+
 export const CHART_LEGEND_HR = 'md.chart.hr.legend';
 export const CHART_LEGEND_TMP = 'md.chart.tmp.legend';
 export const CHART_LEGEND_PW = 'md.chart.pw.legend';
