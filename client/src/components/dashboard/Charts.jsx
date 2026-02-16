@@ -27,7 +27,7 @@ function getChartSpec(id) {
   return CHART_SPEC.find((c) => c.id === id);
 }
 
-export default function DashboardCharts({
+export default function Charts({
   historyHashrate,
   historyTemperature,
   historyPower,
