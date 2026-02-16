@@ -63,9 +63,9 @@ export default function MinerStatus() {
 
   const hasHeap = data.freeHeap != null || data.freeHeapInt != null || data.runningPartition != null;
   const heapItems = [
-    { label: 'Free Heap', value: formatBytes(data.freeHeap) },
+    { label: 'Free Heap (PSRAM)', value: formatBytes(data.freeHeap) },
     {
-      label: 'Free Heap (int RAM)',
+      label: 'Free Heap (SRAM)',
       value: data.freeHeapInt != null ? formatBytes(data.freeHeapInt) : '--',
       warning: data.freeHeapInt != null && data.freeHeapInt < LOW_HEAP_INT_THRESHOLD_BYTES ? 'Low memory' : undefined,
     },
