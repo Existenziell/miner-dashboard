@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { patchDashboardConfig } from '@/lib/api';
-import { isValidHex, normalizeHex } from '@/lib/colorUtils';
+import { buildPendingChanges } from '@/lib/buildPendingChanges';
+import { normalizeHex } from '@/lib/colorUtils';
 import { CHART_COLOR_SPEC, MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { deepCopy } from '@/lib/utils';
 
@@ -110,57 +111,27 @@ export function useAppearance(config, refetchConfig, onError) {
     effectiveAccent !== defaultAccent ||
     JSON.stringify(chartColors) !== JSON.stringify(DASHBOARD_DEFAULTS.chartColors);
 
-  const dashboardChanges = useMemo(() => {
-    const list = [];
-    const saved = config.metricRanges ?? DASHBOARD_DEFAULTS.metricRanges;
-    Object.keys(DASHBOARD_DEFAULTS.metricRanges).forEach((metric) => {
-      const keys = Object.keys(DASHBOARD_DEFAULTS.metricRanges[metric]);
-      keys.forEach((key) => {
-        const fromVal = saved[metric]?.[key];
-        const toVal = metricRanges[metric]?.[key];
-        if (fromVal !== toVal && (fromVal !== undefined || toVal !== undefined)) {
-          const metricLabel = METRIC_LABELS[metric] ?? metric;
-          const keyLabel = METRIC_KEY_LABELS[key] ?? key;
-          list.push({
-            label: `${metricLabel} → ${keyLabel}`,
-            from: fromVal !== undefined ? String(fromVal) : '—',
-            to: toVal !== undefined ? String(toVal) : '—',
-          });
-        }
-      });
-    });
-    return list;
-  }, [config.metricRanges, metricRanges]);
-
-  const colorChanges = useMemo(() => {
-    const list = [];
-    if (effectiveAccent !== configAccent) {
-      list.push({ label: 'Accent color', from: configAccent, to: effectiveAccent });
-    }
-    const saved = config.chartColors ?? DASHBOARD_DEFAULTS.chartColors;
-    CHART_COLOR_SPEC.forEach((chart) => {
-      chart.series.forEach(({ key, label: seriesLabel }) => {
-        const defaultHex = DASHBOARD_DEFAULTS.chartColors[chart.id]?.[key];
-        const fromVal = saved[chart.id]?.[key] ?? defaultHex;
-        const toVal = chartColors[chart.id]?.[key] ?? defaultHex;
-        const fromHex = normalizeHex(fromVal, defaultHex);
-        const toHex = normalizeHex(toVal, defaultHex);
-        const toDisplay = isValidHex(toVal) ? toHex : (String(toVal ?? '').trim() || fromHex);
-        if (fromHex !== toHex || fromHex !== toDisplay) {
-          list.push({
-            label: `${chart.label} → ${seriesLabel}`,
-            from: fromHex,
-            to: toDisplay,
-          });
-        }
-      });
-    });
-    return list;
-  }, [config.chartColors, configAccent, chartColors, effectiveAccent]);
-
   const changes = useMemo(
-    () => [...dashboardChanges, ...colorChanges],
-    [dashboardChanges, colorChanges]
+    () =>
+      buildPendingChanges(config, {
+        metricRanges,
+        metricOrder,
+        chartOrder,
+        gaugeVisible,
+        chartVisible,
+        chartColors,
+        effectiveAccent,
+      }),
+    [
+      config,
+      metricRanges,
+      metricOrder,
+      chartOrder,
+      gaugeVisible,
+      chartVisible,
+      chartColors,
+      effectiveAccent,
+    ]
   );
 
   const revert = useCallback(() => {
