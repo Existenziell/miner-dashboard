@@ -1,7 +1,8 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
 import { fetchMinerAsic, fetchNetworkStatus } from '@/lib/api';
+import RealtimeLogs from '@/components/logs/RealtimeLogs';
 
 function ResponseCard({ title, path, data, error, loading }) {
   return (
@@ -119,6 +120,8 @@ export default function ApiPage() {
           </table>
         </div>
       </div>
+
+      <RealtimeLogs />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ResponseCard

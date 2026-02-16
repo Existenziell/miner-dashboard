@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -9,6 +10,7 @@ import configRoutes from './routes/config.js';
 import firmwareRoutes from './routes/firmware.js';
 import minerRoutes from './routes/miner.js';
 import networkRoutes from './routes/network.js';
+import { attachLogsWebSocket } from './wsLogsProxy.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -31,7 +33,10 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+attachLogsWebSocket(server);
+
+server.listen(PORT, () => {
   const minerIp = getMinerIp();
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Miner API target: ${minerIp ? `http://${minerIp}` : '(not set — configure in Dashboard Settings or .env MINER_IP)'}`);
