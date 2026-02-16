@@ -12,10 +12,10 @@ import { useAppearanceContext } from '@/context/AppearanceContext';
 import { useTheme } from '@/context/ThemeContext';
 import { THEME_MODES } from '@/context/ThemeContext';
 import { useOrderDnd } from '@/hooks/useOrderDnd';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import { ChartColors } from '@/components/settings/ChartColors';
 import { Field } from '@/components/settings/Field';
 import { MetricRanges } from '@/components/settings/MetricRanges';
-import { PendingIndicator } from '@/components/settings/PendingChanges';
 import { ThemePreviews } from '@/components/settings/ThemePreviews';
 
 export function TabAppearance() {
@@ -42,6 +42,19 @@ export function TabAppearance() {
     hasGaugeChanges,
     hasChartChanges,
     hasAccentChanges,
+    hasGaugeDefaultsDiff,
+    hasChartDefaultsDiff,
+    hasAccentDefaultsDiff,
+    saving,
+    message,
+    saveGaugesSection,
+    saveChartsSection,
+    saveAccentSection,
+    resetConfirmSection,
+    setResetConfirmSection,
+    resetGaugesToDefaults,
+    resetChartsToDefaults,
+    resetAccentToDefaults,
   } = useAppearanceContext();
 
   const order = metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
@@ -60,11 +73,41 @@ export function TabAppearance() {
 
   return (
     <div className="space-y-4">
+      {message?.type === 'error' && message?.text && (
+        <div role="alert" className="message-warning">
+          {message.text}
+        </div>
+      )}
       {/* Metric ranges */}
       <div className="card">
         <div className="card-header-wrapper">
-          <div className="card-header mb-4">
-            <h3 className="card-header-title">Gauges<PendingIndicator hasPending={hasGaugeChanges} /></h3>
+          <div className="card-header mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="card-header-title">Gauges</h3>
+            <div className="flex items-center gap-3 ml-auto">
+              {message?.type === 'success' && message?.section === 'gauges' && (
+                <span role="status" className="message-success text-sm">
+                  Saved successfully
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => setResetConfirmSection('gauges')}
+                disabled={!hasGaugeDefaultsDiff}
+                className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                aria-disabled={!hasGaugeDefaultsDiff}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={saveGaugesSection}
+                disabled={!hasGaugeChanges || saving || (message?.type === 'success' && message?.section === 'gauges')}
+                className="btn-ghost-sm min-w-[5.5rem]"
+                aria-disabled={!hasGaugeChanges || saving}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
         <div className="space-y-4">
@@ -141,8 +184,33 @@ export function TabAppearance() {
       {/* Charts */}
       <div className="card">
         <div className="card-header-wrapper">
-          <div className="card-header">
-            <h3 className="card-header-title">Charts<PendingIndicator hasPending={hasChartChanges} /></h3>
+          <div className="card-header flex flex-wrap items-center justify-between gap-2">
+            <h3 className="card-header-title">Charts</h3>
+            <div className="flex items-center gap-3 ml-auto">
+              {message?.type === 'success' && message?.section === 'charts' && (
+                <span role="status" className="message-success text-sm">
+                  Saved successfully
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => setResetConfirmSection('charts')}
+                disabled={!hasChartDefaultsDiff}
+                className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                aria-disabled={!hasChartDefaultsDiff}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={saveChartsSection}
+                disabled={!hasChartChanges || saving || (message?.type === 'success' && message?.section === 'charts')}
+                className="btn-ghost-sm min-w-[5.5rem]"
+                aria-disabled={!hasChartChanges || saving}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
         <p className="card-subtitle">
@@ -217,8 +285,33 @@ export function TabAppearance() {
       {/* Accent color */}
       <div className="card">
         <div className="card-header-wrapper">
-          <div className="card-header">
-            <h3 className="card-header-title">Accent color<PendingIndicator hasPending={hasAccentChanges} /></h3>
+          <div className="card-header flex flex-wrap items-center justify-between gap-2">
+            <h3 className="card-header-title">Accent color</h3>
+            <div className="flex items-center gap-3 ml-auto">
+              {message?.type === 'success' && message?.section === 'accent' && (
+                <span role="status" className="message-success text-sm">
+                  Saved successfully
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => setResetConfirmSection('accent')}
+                disabled={!hasAccentDefaultsDiff}
+                className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
+                aria-disabled={!hasAccentDefaultsDiff}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                onClick={saveAccentSection}
+                disabled={!hasAccentChanges || saving || (message?.type === 'success' && message?.section === 'accent')}
+                className="btn-ghost-sm min-w-[5.5rem]"
+                aria-disabled={!hasAccentChanges || saving}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
         <p className="card-subtitle">
@@ -273,6 +366,34 @@ export function TabAppearance() {
           })}
         </div>
       </div>
+
+      <ConfirmModal
+        open={resetConfirmSection === 'gauges'}
+        onClose={() => setResetConfirmSection(null)}
+        title="Reset gauge settings to defaults?"
+        description="Gauge ranges, order, and visibility will be reset to default values and saved."
+        confirmLabel="Reset"
+        onConfirm={resetGaugesToDefaults}
+        confirmDisabled={saving}
+      />
+      <ConfirmModal
+        open={resetConfirmSection === 'charts'}
+        onClose={() => setResetConfirmSection(null)}
+        title="Reset chart settings to defaults?"
+        description="Chart order, visibility, and colors will be reset to default values and saved."
+        confirmLabel="Reset"
+        onConfirm={resetChartsToDefaults}
+        confirmDisabled={saving}
+      />
+      <ConfirmModal
+        open={resetConfirmSection === 'accent'}
+        onClose={() => setResetConfirmSection(null)}
+        title="Reset accent color to default?"
+        description="Accent color will be reset to the default and saved."
+        confirmLabel="Reset"
+        onConfirm={resetAccentToDefaults}
+        confirmDisabled={saving}
+      />
     </div>
   );
 }

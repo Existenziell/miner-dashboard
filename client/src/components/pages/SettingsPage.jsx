@@ -13,7 +13,6 @@ import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { PendingChanges } from '@/components/settings/PendingChanges';
-import { SettingsFormFooter } from '@/components/settings/SettingsFormFooter';
 import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
 import { TabAppearance } from '@/components/settings/TabAppearance';
 import { TabFirmware } from '@/components/settings/TabFirmware';
@@ -81,20 +80,9 @@ export default function SettingsPage({ onError }) {
           </SetupProvider>
         )}
         {settingsSubTab === 'appearance' && (
-          <form onSubmit={appearanceForm.save} className="space-y-4">
-            <AppearanceProvider value={appearanceForm}>
-              <TabAppearance />
-              <PendingChanges
-                changes={appearanceForm.changes}
-                onReset={appearanceForm.revert}
-                title="Pending changes"
-              />
-              <SettingsFormFooter
-                form={appearanceForm}
-                resetDialogDescription="Reset appearance (metric ranges and colors) to default values."
-              />
-            </AppearanceProvider>
-          </form>
+          <AppearanceProvider value={appearanceForm}>
+            <TabAppearance />
+          </AppearanceProvider>
         )}
         {settingsSubTab === 'miner' && (
           <div className="card p-8 text-center text-muted">
@@ -140,20 +128,9 @@ export default function SettingsPage({ onError }) {
       )}
 
       {settingsSubTab === 'appearance' && (
-        <form onSubmit={appearanceForm.save} className="space-y-4">
-          <AppearanceProvider value={appearanceForm}>
-            <TabAppearance />
-            <PendingChanges
-              changes={appearanceForm.changes}
-              onReset={appearanceForm.revert}
-              title="Pending changes"
-            />
-            <SettingsFormFooter
-              form={appearanceForm}
-              resetDialogDescription="Reset appearance (metric ranges and colors) to default values."
-            />
-          </AppearanceProvider>
-        </form>
+        <AppearanceProvider value={appearanceForm}>
+          <TabAppearance />
+        </AppearanceProvider>
       )}
 
       {settingsSubTab === 'firmware' && (

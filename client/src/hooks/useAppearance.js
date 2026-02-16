@@ -4,7 +4,7 @@ import { patchDashboardConfig } from '@/lib/api';
 import { buildPendingChanges } from '@/lib/buildPendingChanges';
 import { normalizeHex } from '@/lib/colorUtils';
 import { CHART_COLOR_SPEC, MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
-import { deepCopy } from '@/lib/utils';
+import { deepCopy, sortedStringify } from '@/lib/utils';
 
 export const METRIC_LABELS = {
   hashrate: 'Hashrate (GH/s)',
@@ -51,8 +51,9 @@ export function useAppearance(config, refetchConfig, onError) {
     deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors)
   );
   const [saving, setSaving] = useState(false);
+  const [savingSection, setSavingSection] = useState(null); // 'gauges' | 'charts' | 'accent' | null
   const [message, setMessage] = useState(null);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetConfirmSection, setResetConfirmSection] = useState(null); // 'gauges' | 'charts' | 'accent' | null
 
   useEffect(() => {
     setMetricRanges(deepCopy(config.metricRanges));
@@ -98,18 +99,29 @@ export function useAppearance(config, refetchConfig, onError) {
   const colorHasChanges = effectiveAccent !== configAccent || hasChartColorsChange;
   const hasChanges = dashboardHasChanges || colorHasChanges;
 
-  const hasGaugeChanges = rangesChanged || orderChanged || gaugeVisibleChanged;
-  const hasChartChanges = chartVisibleChanged || chartOrderChanged || hasChartColorsChange;
+  // Section dirty: only ranges/colors/accent (order/visibility save immediately)
+  const hasGaugeChanges = rangesChanged;
+  const hasChartChanges = hasChartColorsChange;
   const hasAccentChanges = effectiveAccent !== configAccent;
 
-  const hasDefaultsDiff =
-    JSON.stringify(metricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges) ||
+  const hasGaugeDefaultsDiff =
+    sortedStringify(metricRanges) !== sortedStringify(DASHBOARD_DEFAULTS.metricRanges) ||
     JSON.stringify(metricOrder) !== JSON.stringify(defaultMetricOrder()) ||
-    JSON.stringify(gaugeVisible) !== JSON.stringify(defaultGaugeVisible()) ||
-    JSON.stringify(chartVisible) !== JSON.stringify(defaultChartVisible()) ||
+    sortedStringify(gaugeVisible) !== sortedStringify(defaultGaugeVisible());
+  const hasChartDefaultsDiff =
+    JSON.stringify(chartOrder) !== JSON.stringify(defaultChartOrder()) ||
+    sortedStringify(chartVisible) !== sortedStringify(defaultChartVisible()) ||
+    sortedStringify(chartColors) !== sortedStringify(DASHBOARD_DEFAULTS.chartColors);
+  const hasAccentDefaultsDiff = effectiveAccent !== defaultAccent;
+
+  const hasDefaultsDiff =
+    sortedStringify(metricRanges) !== sortedStringify(DASHBOARD_DEFAULTS.metricRanges) ||
+    JSON.stringify(metricOrder) !== JSON.stringify(defaultMetricOrder()) ||
+    sortedStringify(gaugeVisible) !== sortedStringify(defaultGaugeVisible()) ||
+    sortedStringify(chartVisible) !== sortedStringify(defaultChartVisible()) ||
     JSON.stringify(chartOrder) !== JSON.stringify(defaultChartOrder()) ||
     effectiveAccent !== defaultAccent ||
-    JSON.stringify(chartColors) !== JSON.stringify(DASHBOARD_DEFAULTS.chartColors);
+    sortedStringify(chartColors) !== sortedStringify(DASHBOARD_DEFAULTS.chartColors);
 
   const changes = useMemo(
     () =>
@@ -219,8 +231,128 @@ export function useAppearance(config, refetchConfig, onError) {
       setChartOrder(defaultChartOrder());
       setAccentColor(DASHBOARD_DEFAULTS.accentColor);
       setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
-      setShowResetConfirm(false);
+      setResetConfirmSection(null);
       setMessage({ type: 'success', text: 'Appearance reset to default values.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+    }
+  }, [refetchConfig, onError]);
+
+  const saveGaugesSection = useCallback(async () => {
+    setSaving(true);
+    setSavingSection('gauges');
+    try {
+      await patchDashboardConfig({ metricRanges: deepCopy(metricRanges) });
+      await refetchConfig();
+      setMessage({ type: 'success', text: 'Saved', section: 'gauges' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+      setSavingSection(null);
+    }
+  }, [metricRanges, refetchConfig, onError]);
+
+  const saveChartsSection = useCallback(async () => {
+    setSaving(true);
+    setSavingSection('charts');
+    try {
+      const normalized = deepCopy(DASHBOARD_DEFAULTS.chartColors);
+      CHART_COLOR_SPEC.forEach(({ id }) => {
+        const fromForm = chartColors[id];
+        if (fromForm) {
+          Object.keys(normalized[id]).forEach((k) => {
+            const v = fromForm[k];
+            normalized[id][k] =
+              v && String(v).trim()
+                ? normalizeHex(v, DASHBOARD_DEFAULTS.chartColors[id][k])
+                : DASHBOARD_DEFAULTS.chartColors[id][k];
+          });
+        }
+      });
+      await patchDashboardConfig({ chartColors: normalized });
+      await refetchConfig();
+      setMessage({ type: 'success', text: 'Saved', section: 'charts' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+      setSavingSection(null);
+    }
+  }, [chartColors, refetchConfig, onError]);
+
+  const saveAccentSection = useCallback(async () => {
+    setSaving(true);
+    setSavingSection('accent');
+    try {
+      await patchDashboardConfig({ accentColor: effectiveAccent });
+      await refetchConfig();
+      setMessage({ type: 'success', text: 'Saved', section: 'accent' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+      setSavingSection(null);
+    }
+  }, [effectiveAccent, refetchConfig, onError]);
+
+  const resetGaugesToDefaults = useCallback(async () => {
+    setSaving(true);
+    try {
+      await patchDashboardConfig({
+        metricRanges: deepCopy(DASHBOARD_DEFAULTS.metricRanges),
+        metricOrder: [...defaultMetricOrder()],
+        gaugeVisible: defaultGaugeVisible(),
+      });
+      await refetchConfig();
+      setMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
+      setMetricOrder(defaultMetricOrder());
+      setGaugeVisibleState(defaultGaugeVisible());
+      setResetConfirmSection(null);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+    }
+  }, [refetchConfig, onError]);
+
+  const resetChartsToDefaults = useCallback(async () => {
+    setSaving(true);
+    try {
+      await patchDashboardConfig({
+        chartOrder: [...defaultChartOrder()],
+        chartVisible: defaultChartVisible(),
+        chartColors: deepCopy(DASHBOARD_DEFAULTS.chartColors),
+      });
+      await refetchConfig();
+      setChartOrder(defaultChartOrder());
+      setChartVisibleState(defaultChartVisible());
+      setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
+      setResetConfirmSection(null);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+    }
+  }, [refetchConfig, onError]);
+
+  const resetAccentToDefaults = useCallback(async () => {
+    setSaving(true);
+    try {
+      await patchDashboardConfig({
+        accentColor: normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor),
+      });
+      await refetchConfig();
+      setAccentColor(DASHBOARD_DEFAULTS.accentColor);
+      setResetConfirmSection(null);
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
       onError?.(err);
@@ -240,12 +372,24 @@ export function useAppearance(config, refetchConfig, onError) {
   }, []);
 
   const setMetricOrderList = useCallback((newOrder) => {
-    setMetricOrder(Array.isArray(newOrder) ? [...newOrder] : newOrder);
-  }, []);
+    const order = Array.isArray(newOrder) ? [...newOrder] : newOrder;
+    setMetricOrder(order);
+    patchDashboardConfig({ metricOrder: order })
+      .then(() => refetchConfig())
+      .catch((err) => {
+        onError?.(err);
+      });
+  }, [refetchConfig, onError]);
 
   const setChartOrderList = useCallback((newOrder) => {
-    setChartOrder(Array.isArray(newOrder) ? [...newOrder] : newOrder);
-  }, []);
+    const order = Array.isArray(newOrder) ? [...newOrder] : newOrder;
+    setChartOrder(order);
+    patchDashboardConfig({ chartOrder: order })
+      .then(() => refetchConfig())
+      .catch((err) => {
+        onError?.(err);
+      });
+  }, [refetchConfig, onError]);
 
   const setChartColorValue = useCallback((chartId, seriesKey, value) => {
     setChartColors((prev) => ({
@@ -258,12 +402,28 @@ export function useAppearance(config, refetchConfig, onError) {
   }, []);
 
   const setGaugeVisible = useCallback((metricId, value) => {
-    setGaugeVisibleState((prev) => ({ ...prev, [metricId]: value }));
-  }, []);
+    setGaugeVisibleState((prev) => {
+      const next = { ...prev, [metricId]: value };
+      patchDashboardConfig({ gaugeVisible: next })
+        .then(() => refetchConfig())
+        .catch((err) => {
+          onError?.(err);
+        });
+      return next;
+    });
+  }, [refetchConfig, onError]);
 
   const setChartVisible = useCallback((chartId, value) => {
-    setChartVisibleState((prev) => ({ ...prev, [chartId]: value }));
-  }, []);
+    setChartVisibleState((prev) => {
+      const next = { ...prev, [chartId]: value };
+      patchDashboardConfig({ chartVisible: next })
+        .then(() => refetchConfig())
+        .catch((err) => {
+          onError?.(err);
+        });
+      return next;
+    });
+  }, [refetchConfig, onError]);
 
   useEffect(() => {
     if (message?.type !== 'success') return;
@@ -295,14 +455,24 @@ export function useAppearance(config, refetchConfig, onError) {
     hasGaugeChanges,
     hasChartChanges,
     hasAccentChanges,
+    hasGaugeDefaultsDiff,
+    hasChartDefaultsDiff,
+    hasAccentDefaultsDiff,
     hasDefaultsDiff,
     revert,
     save,
     saving,
+    savingSection,
     message,
     setMessage,
-    showResetConfirm,
-    setShowResetConfirm,
+    saveGaugesSection,
+    saveChartsSection,
+    saveAccentSection,
+    resetConfirmSection,
+    setResetConfirmSection,
+    resetGaugesToDefaults,
+    resetChartsToDefaults,
+    resetAccentToDefaults,
     resetToDefaults,
   };
 }
