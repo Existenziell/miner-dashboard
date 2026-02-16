@@ -1,6 +1,6 @@
 # Miner Dashboard
 
-A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or similar devices. This document covers setup and general reference; see [Contributing](CONTRIBUTE.md) for development.
+A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or similar devices.
 
 ## Features
 
