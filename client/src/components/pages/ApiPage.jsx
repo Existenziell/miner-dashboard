@@ -102,7 +102,7 @@ export default function ApiPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
-              <tr className="border-b border-default">
+              <tr className="border-b border-edge/60 dark:border-edge-dark/60">
                 <th className="py-2 pr-4 font-medium text-muted">Method</th>
                 <th className="py-2 pr-4 font-medium text-muted">Path</th>
                 <th className="py-2 font-medium text-muted">Description</th>
@@ -150,7 +150,7 @@ export default function ApiPage() {
             <h3 className="card-header-title">Related API settings</h3>
           </div>
         </div>
-        <p className="text-muted text-sm mb-4">Constants and config that affect API polling and requests.</p>
+        <p className="card-subtitle">Constants and config that affect API polling and requests.</p>
         <h4 className="text-sm font-medium text-normal mb-2">Client</h4>
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-sm text-left table-fixed">
@@ -158,7 +158,7 @@ export default function ApiPage() {
               <col className="w-52" />
             </colgroup>
             <thead>
-              <tr className="border-b border-default">
+              <tr className="border-b border-edge/60 dark:border-edge-dark/60">
                 <th className="py-2 pr-4 font-medium text-muted">Name</th>
                 <th className="py-2 pr-4 font-medium text-muted">Source</th>
                 <th className="py-2 pr-4 font-medium text-muted">Value</th>
@@ -184,7 +184,7 @@ export default function ApiPage() {
               <col className="w-52" />
             </colgroup>
             <thead>
-              <tr className="border-b border-default">
+              <tr className="border-b border-edge/60 dark:border-edge-dark/60">
                 <th className="py-2 pr-4 font-medium text-muted">Name</th>
                 <th className="py-2 pr-4 font-medium text-muted">Source</th>
                 <th className="py-2 pr-4 font-medium text-muted">Value</th>
@@ -211,7 +211,7 @@ export default function ApiPage() {
             <h3 className="card-header-title">Query the API with cURL</h3>
           </div>
         </div>
-        <p className="text-muted text-sm mb-4">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
+        <p className="card-subtitle">Copy and run these commands in your terminal. The base URL uses your current origin.</p>
         <div className="rounded-md overflow-hidden bg-terminal-bg border border-terminal-border shadow-inner">
           <div className="flex items-center gap-2 px-3 py-2 bg-terminal-bar border-b border-terminal-border">
             <span className="w-3 h-3 rounded-full bg-terminal-dot-close" />

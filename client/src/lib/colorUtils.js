@@ -1,10 +1,11 @@
+import { isValidHexColor } from 'shared/hexColor.js';
+
 const HEX_3 = /^[0-9A-Fa-f]{3}$/;
 const HEX_6 = /^[0-9A-Fa-f]{6}$/;
 
-/** True if value is a valid 3- or 6-digit hex (with optional #). */
+/** True if value is a valid 3- or 6-digit hex (with optional #). Uses shared validation. */
 export function isValidHex(value) {
-  const s = String(value ?? '').trim().replace(/^#/, '');
-  return HEX_6.test(s) || HEX_3.test(s);
+  return isValidHexColor(String(value ?? '').trim());
 }
 
 /**

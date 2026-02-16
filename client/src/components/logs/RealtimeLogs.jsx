@@ -137,7 +137,7 @@ export default function RealtimeLogs() {
     <div
       className="card"
     >
-      <div className="card-header-wrapper ">
+      <div className="card-header-wrapper">
         <div className="card-header flex flex-wrap items-center justify-between gap-2">
           <h2 className="card-header-title">Realtime Logs</h2>
           <div className="flex items-center gap-2 flex-wrap flex-1 justify-between min-w-0">
@@ -167,7 +167,7 @@ export default function RealtimeLogs() {
                 {paused ? 'Resume' : 'Pause'}
               </button>
               <span
-                className={`text-xs font-medium ${isConnected ? 'text-success dark:text-success-dark' : 'text-muted dark:text-muted-dark'}`}
+                className={`text-xs font-medium ${isConnected ? 'text-success dark:text-success-dark' : 'text-muted'}`}
                 aria-live="polite"
               >
                 {status === 'connecting' && 'Connecting…'}
@@ -175,7 +175,7 @@ export default function RealtimeLogs() {
                 {status === 'closed' && (statusMessage || 'Disconnected')}
                 {status === 'error' && (statusMessage || 'Error')}
               </span>
-              <span className="text-xs font-medium text-muted dark:text-muted-dark">{paused ? '(Paused)' : ''}</span>
+              <span className="text-xs font-medium text-muted">{paused ? '(Paused)' : ''}</span>
             </div>
             <div className="flex items-center gap-2 flex-wrap min-w-0">
               <div className="relative flex items-center min-w-0 w-48 max-w-xs">
@@ -190,7 +190,7 @@ export default function RealtimeLogs() {
                 {filterText !== '' && (
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted dark:text-muted-dark hover:text-fg dark:hover:text-fg-dark focus:outline-none cursor-pointer"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-muted hover:text-fg dark:hover:text-fg-dark focus:outline-none cursor-pointer"
                     onClick={() => setFilterText('')}
                     aria-label="Clear filter"
                   >

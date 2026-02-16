@@ -154,6 +154,115 @@ function ThemePreviewCard({ themeId, isSelected, onSelect, previewClassName, use
   );
 }
 
+function ChartColorCard({
+  chart,
+  chartColors,
+  chartVisible,
+  setChartColorValue,
+  setChartVisible,
+  isDragActive,
+  onToggleVisible,
+  sortable = true,
+}) {
+  const sortableResult = useSortable({ id: chart.id, disabled: !sortable });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = sortableResult;
+
+  const style = sortable
+    ? { transform: CSS.Transform.toString(transform), transition: isDragActive ? transition : 'none' }
+    : undefined;
+
+  const visibleOnDashboard = chartVisible[chart.id] !== false;
+  const seriesColors = chartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
+
+  return (
+    <div
+      ref={sortable ? setNodeRef : undefined}
+      style={style}
+      className={`border border-default rounded-md px-4 py-3 space-y-1 flex flex-col ${visibleOnDashboard ? '' : 'opacity-50'} ${sortable && isDragging ? 'opacity-0 pointer-events-none' : ''}`}
+    >
+      <div className="flex items-center justify-between gap-2 shrink-0">
+        <p className="text-sm font-medium text-normal">{chart.label}</p>
+        <div className="flex items-center gap-3 shrink-0">
+          {onToggleVisible != null && (
+            <label className="cursor-pointer" title="Show on dashboard">
+              <input
+                type="checkbox"
+                checked={visibleOnDashboard}
+                onChange={(e) => setChartVisible(chart.id, e.target.checked)}
+                className="checkbox-input"
+                aria-label={`Show ${chart.label} on dashboard`}
+              />
+              <span className="checkbox-box shrink-0" aria-hidden>
+                <svg
+                  className="checkbox-check"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M5 12l5 5 9-9" />
+                </svg>
+              </span>
+            </label>
+          )}
+          {sortable && (
+            <div
+              className="cursor-grab active:cursor-grabbing touch-none text-muted hover:text-normal p-1 -m-1"
+              aria-label={`Drag to reorder ${chart.label}`}
+              {...attributes}
+              {...listeners}
+            >
+              <span className="select-none text-lg leading-none" aria-hidden="true">⋮⋮</span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-2">
+        {chart.series.map(({ key, label }) => {
+          const value = seriesColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];
+          const effective = normalizeHex(value, DASHBOARD_DEFAULTS.chartColors[chart.id][key]);
+          return (
+            <div key={key} className="flex items-center gap-2 min-w-0">
+              <input
+                type="color"
+                value={effective}
+                onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
+                className="w-8 h-8 rounded border border-default cursor-pointer bg-transparent shrink-0"
+                aria-label={`${chart.label} ${label} color`}
+              />
+              <input
+                id={`chart-${chart.id}-${key}`}
+                type="text"
+                value={seriesColors[key] ?? ''}
+                onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
+                placeholder={DASHBOARD_DEFAULTS.chartColors[chart.id][key]}
+                className="input text-sm max-w-24 min-w-0 font-mono"
+                aria-label={`${chart.label} ${label} hex`}
+              />
+              <label
+                className="text-xs text-muted shrink-0 text-left w-16"
+                htmlFor={`chart-${chart.id}-${key}`}
+              >
+                {label}
+              </label>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function TabAppearance() {
   const { mode, setMode } = useTheme();
   const {
@@ -163,6 +272,10 @@ export function TabAppearance() {
     setMetricRangeValue,
     gaugeVisible,
     setGaugeVisible,
+    chartVisible,
+    setChartVisible,
+    chartOrder,
+    setChartOrder,
     METRIC_LABELS,
     METRIC_KEY_LABELS,
     accentColor,
@@ -178,9 +291,18 @@ export function TabAppearance() {
   const [dropZoneRect, setDropZoneRect] = useState(null);
   const cellRefs = useRef([]);
 
+  const [chartActiveId, setChartActiveId] = useState(null);
+  const [chartOverId, setChartOverId] = useState(null);
+  const [chartDropZoneRect, setChartDropZoneRect] = useState(null);
+  const chartCellRefs = useRef([]);
+
   const order = metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
   const overIndex = overId != null ? order.indexOf(overId) : -1;
   const showDropZone = activeId != null && overId !== activeId && overIndex >= 0;
+
+  const chartOrderList = chartOrder ?? DASHBOARD_DEFAULTS.chartOrder ?? CHART_COLOR_SPEC.map((c) => c.id);
+  const chartOverIndex = chartOverId != null ? chartOrderList.indexOf(chartOverId) : -1;
+  const chartShowDropZone = chartActiveId != null && chartOverId !== chartActiveId && chartOverIndex >= 0;
 
   useLayoutEffect(() => {
     if (!showDropZone || overIndex < 0 || !cellRefs.current[overIndex]) {
@@ -192,6 +314,17 @@ export function TabAppearance() {
     const next = { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
     queueMicrotask(() => setDropZoneRect(next));
   }, [showDropZone, overIndex]);
+
+  useLayoutEffect(() => {
+    if (!chartShowDropZone || chartOverIndex < 0 || !chartCellRefs.current[chartOverIndex]) {
+      queueMicrotask(() => setChartDropZoneRect(null));
+      return;
+    }
+    const el = chartCellRefs.current[chartOverIndex];
+    const rect = el.getBoundingClientRect();
+    const next = { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
+    queueMicrotask(() => setChartDropZoneRect(next));
+  }, [chartShowDropZone, chartOverIndex]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -226,6 +359,34 @@ export function TabAppearance() {
     setDropZoneRect(null);
   };
 
+  const chartHandleDragStart = (event) => {
+    setChartActiveId(event.active.id);
+  };
+
+  const chartHandleDragOver = (event) => {
+    const next = event.over?.id ?? null;
+    setChartOverId((prev) => (next === prev ? prev : next));
+  };
+
+  const chartHandleDragEnd = (event) => {
+    const { active, over } = event;
+    setChartActiveId(null);
+    setChartOverId(null);
+    setChartDropZoneRect(null);
+    if (over == null || active.id === over.id) return;
+    const ids = [...(chartOrder ?? CHART_COLOR_SPEC.map((c) => c.id))];
+    const oldIndex = ids.indexOf(active.id);
+    const newIndex = ids.indexOf(over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    setChartOrder(arrayMove(ids, oldIndex, newIndex));
+  };
+
+  const chartHandleDragCancel = () => {
+    setChartActiveId(null);
+    setChartOverId(null);
+    setChartDropZoneRect(null);
+  };
+
   const themePreviewConfig = (themeId) => {
     if (themeId === 'light') return { previewClassName: 'theme-preview-light', useDarkVariant: false };
     if (themeId === 'dark') return { previewClassName: 'theme-preview-dark', useDarkVariant: true };
@@ -244,7 +405,7 @@ export function TabAppearance() {
           </div>
         </div>
         <div className="space-y-4">
-          <p className="text-normal text-sm mb-6">
+          <p className="card-subtitle">
             Customize display ranges and drag'n'drop to reorder metrics. Order here matches the gauge order on the dashboard.
           </p>
           <DndContext
@@ -314,19 +475,94 @@ export function TabAppearance() {
         </div>
       </div>
 
-      {/* Colors */}
+      {/* Graphs */}
       <div className="card">
         <div className="card-header-wrapper">
-          <div className="card-header mb-4">
-            <h3 className="card-header-title">Colors</h3>
+          <div className="card-header">
+            <h3 className="card-header-title">Charts</h3>
           </div>
         </div>
-        <div className="text-muted text-sm my-6 space-y-1">
-          <div><strong>Accent color:</strong> Main color for buttons, gauges, and highlights. Darker shade is derived automatically.</div>
-          <div><strong>Chart colors:</strong> Line colors for Power, Temperature, and Hashrate charts.</div>
+        <p className="card-subtitle">
+          Customize line colors for Power, Temperature, and Hashrate charts. Drag to reorder; order here matches the dashboard. Toggle visibility; hidden charts appear dimmed.
+        </p>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={chartHandleDragStart}
+          onDragOver={chartHandleDragOver}
+          onDragEnd={chartHandleDragEnd}
+          onDragCancel={chartHandleDragCancel}
+        >
+          <SortableContext items={chartOrderList} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-1 gap-4">
+              {chartOrderList.map((chartId, i) => {
+                const chart = CHART_COLOR_SPEC.find((c) => c.id === chartId);
+                if (!chart) return null;
+                return (
+                  <div
+                    key={chart.id}
+                    ref={(el) => { chartCellRefs.current[i] = el; }}
+                    className="min-h-0"
+                  >
+                    <ChartColorCard
+                      chart={chart}
+                      chartColors={chartColors}
+                      chartVisible={chartVisible}
+                      setChartColorValue={setChartColorValue}
+                      setChartVisible={setChartVisible}
+                      isDragActive={chartActiveId != null}
+                      onToggleVisible={setChartVisible}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </SortableContext>
+          {chartDropZoneRect && (
+            <div
+              className="pointer-events-none fixed z-20 rounded-md box-border drop-zone-indicator"
+              style={{
+                top: chartDropZoneRect.top,
+                left: chartDropZoneRect.left,
+                width: chartDropZoneRect.width,
+                height: chartDropZoneRect.height,
+              }}
+              aria-hidden
+            />
+          )}
+          <DragOverlay dropAnimation={null}>
+            {chartActiveId ? (() => {
+              const chart = CHART_COLOR_SPEC.find((c) => c.id === chartActiveId);
+              return chart ? (
+                <div className="shadow-lg rounded-md cursor-grabbing bg-surface dark:bg-surface-dark">
+                  <ChartColorCard
+                    chart={chart}
+                    chartColors={chartColors}
+                    chartVisible={chartVisible}
+                    setChartColorValue={setChartColorValue}
+                    setChartVisible={setChartVisible}
+                    onToggleVisible={null}
+                    sortable={false}
+                  />
+                </div>
+              ) : null;
+            })() : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
+
+      {/* Accent color */}
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header">
+            <h3 className="card-header-title">Accent color</h3>
+          </div>
         </div>
+        <p className="card-subtitle">
+          Main color for buttons, gauges, and highlights. Darker shade is derived automatically.
+        </p>
         <div className="space-y-4">
-          <Field label="Accent color" hint="Main color for buttons, gauges, and highlights.">
+          <Field label="Accent color">
             <div className="flex items-center gap-2 max-w-96">
               <input
                 type="color"
@@ -345,46 +581,6 @@ export function TabAppearance() {
               />
             </div>
           </Field>
-          <div className="mt-8">
-            <Field label="Chart colors" hint="Line colors for Power, Temperature, and Hashrate charts." />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-              {CHART_COLOR_SPEC.map((chart) => {
-                const seriesColors = chartColors[chart.id] ?? DASHBOARD_DEFAULTS.chartColors[chart.id];
-                return (
-                  <div key={chart.id} className="border border-default rounded-md px-4 py-3 space-y-1">
-                    <p className="text-sm font-medium text-normal">{chart.label}</p>
-                    {chart.series.map(({ key, label }) => {
-                      const value = seriesColors[key] ?? DASHBOARD_DEFAULTS.chartColors[chart.id][key];
-                      const effective = normalizeHex(value, DASHBOARD_DEFAULTS.chartColors[chart.id][key]);
-                      return (
-                        <div key={key} className="flex items-center gap-2">
-                          <input
-                            type="color"
-                            value={effective}
-                            onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
-                            className="w-8 h-8 rounded border border-default cursor-pointer bg-transparent shrink-0"
-                            aria-label={`${chart.label} ${label} color`}
-                          />
-                          <label className="text-xs text-muted shrink-0 min-w-16" htmlFor={`chart-${chart.id}-${key}`}>
-                            {label}
-                          </label>
-                          <input
-                            id={`chart-${chart.id}-${key}`}
-                            type="text"
-                            value={seriesColors[key] ?? ''}
-                            onChange={(e) => setChartColorValue(chart.id, key, e.target.value)}
-                            placeholder={DASHBOARD_DEFAULTS.chartColors[chart.id][key]}
-                            className="input text-sm flex-1 min-w-0 font-mono"
-                            aria-label={`${chart.label} ${label} hex`}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -395,7 +591,7 @@ export function TabAppearance() {
             <h3 className="card-header-title">Theme</h3>
           </div>
         </div>
-        <p className="text-muted text-sm mb-4">
+        <p className="card-subtitle">
           Choose a theme. High contrast uses stronger text contrast. You can also cycle themes from the header.
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

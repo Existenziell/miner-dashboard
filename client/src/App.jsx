@@ -3,9 +3,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { MinerProvider, useMiner } from '@/context/MinerContext';
 import { useNetworkData } from '@/hooks/useNetworkData';
 import { getTabFromUrl, setTabInUrl } from '@/lib/tabUrl';
-import HashrateChart from '@/components/charts/HashrateChart';
-import PowerChart from '@/components/charts/PowerChart';
-import TemperatureChart from '@/components/charts/TemperatureChart';
+import DashboardCharts from '@/components/dashboard/DashboardCharts';
 import MinerSettings from '@/components/dashboard/MinerSettings';
 import MinerShares from '@/components/dashboard/MinerShares';
 import MinerStatus from '@/components/dashboard/MinerStatus';
@@ -79,11 +77,13 @@ function AppContent({ activeTab, onTabChange }) {
                 </Suspense>
 
                 {/* Time series charts */}
-                <div className="grid grid-cols-1 gap-4">
-                  <HashrateChart history={historyHashrate} />
-                  <TemperatureChart history={historyTemperature} />
-                  <PowerChart history={historyPower} />
-                </div>
+                <Suspense fallback={<PageFallback message="Loading charts…" />}>
+                  <DashboardCharts
+                    historyHashrate={historyHashrate}
+                    historyTemperature={historyTemperature}
+                    historyPower={historyPower}
+                  />
+                </Suspense>
               </>
             )}
 

@@ -16,7 +16,7 @@ function SettingRow({ label, value, highlight, truncate, href }) {
         </a>
       ) : (
         <span
-          className={`text-sm text-right ${highlight ? 'text-accent font-medium' : 'text-body'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
+          className={`text-sm text-right ${highlight ? 'text-accent font-medium' : 'text-normal'} ${truncate ? 'truncate max-w-[250px]' : ''}`}
         >
           {value}
         </span>

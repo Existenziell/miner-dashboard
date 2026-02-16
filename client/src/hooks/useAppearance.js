@@ -25,8 +25,11 @@ export const METRIC_KEY_LABELS = {
 };
 
 const defaultMetricOrder = () => DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
+const defaultChartOrder = () =>
+  DASHBOARD_DEFAULTS.chartOrder ?? CHART_COLOR_SPEC.map((c) => c.id);
 
 const defaultGaugeVisible = () => deepCopy(DASHBOARD_DEFAULTS.gaugeVisible);
+const defaultChartVisible = () => deepCopy(DASHBOARD_DEFAULTS.chartVisible);
 
 export function useAppearance(config, refetchConfig, onError) {
   const [metricRanges, setMetricRanges] = useState(() => deepCopy(config.metricRanges));
@@ -35,6 +38,12 @@ export function useAppearance(config, refetchConfig, onError) {
   );
   const [gaugeVisible, setGaugeVisibleState] = useState(() =>
     deepCopy(config.gaugeVisible ?? defaultGaugeVisible())
+  );
+  const [chartVisible, setChartVisibleState] = useState(() =>
+    deepCopy(config.chartVisible ?? defaultChartVisible())
+  );
+  const [chartOrder, setChartOrder] = useState(
+    () => config.chartOrder ?? defaultChartOrder()
   );
   const [accentColor, setAccentColor] = useState(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
   const [chartColors, setChartColors] = useState(() =>
@@ -57,6 +66,14 @@ export function useAppearance(config, refetchConfig, onError) {
   }, [config.gaugeVisible]);
 
   useEffect(() => {
+    setChartVisibleState(deepCopy(config.chartVisible ?? defaultChartVisible()));
+  }, [config.chartVisible]);
+
+  useEffect(() => {
+    setChartOrder(config.chartOrder ?? defaultChartOrder());
+  }, [config.chartOrder]);
+
+  useEffect(() => {
     setAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
     setChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
   }, [config.accentColor, config.chartColors]);
@@ -69,9 +86,14 @@ export function useAppearance(config, refetchConfig, onError) {
   const orderChanged = JSON.stringify(metricOrder) !== JSON.stringify(config.metricOrder ?? defaultMetricOrder());
   const gaugeVisibleChanged =
     JSON.stringify(gaugeVisible) !== JSON.stringify(config.gaugeVisible ?? defaultGaugeVisible());
+  const chartVisibleChanged =
+    JSON.stringify(chartVisible) !== JSON.stringify(config.chartVisible ?? defaultChartVisible());
+  const chartOrderChanged =
+    JSON.stringify(chartOrder) !== JSON.stringify(config.chartOrder ?? defaultChartOrder());
   const hasChartColorsChange =
     JSON.stringify(chartColors) !== JSON.stringify(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors);
-  const dashboardHasChanges = rangesChanged || orderChanged || gaugeVisibleChanged;
+  const dashboardHasChanges =
+    rangesChanged || orderChanged || gaugeVisibleChanged || chartVisibleChanged || chartOrderChanged;
   const colorHasChanges = effectiveAccent !== configAccent || hasChartColorsChange;
   const hasChanges = dashboardHasChanges || colorHasChanges;
 
@@ -79,6 +101,8 @@ export function useAppearance(config, refetchConfig, onError) {
     JSON.stringify(metricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges) ||
     JSON.stringify(metricOrder) !== JSON.stringify(defaultMetricOrder()) ||
     JSON.stringify(gaugeVisible) !== JSON.stringify(defaultGaugeVisible()) ||
+    JSON.stringify(chartVisible) !== JSON.stringify(defaultChartVisible()) ||
+    JSON.stringify(chartOrder) !== JSON.stringify(defaultChartOrder()) ||
     effectiveAccent !== defaultAccent ||
     JSON.stringify(chartColors) !== JSON.stringify(DASHBOARD_DEFAULTS.chartColors);
 
@@ -139,9 +163,11 @@ export function useAppearance(config, refetchConfig, onError) {
     setMetricRanges(deepCopy(config.metricRanges));
     setMetricOrder(config.metricOrder ?? defaultMetricOrder());
     setGaugeVisibleState(deepCopy(config.gaugeVisible ?? defaultGaugeVisible()));
+    setChartVisibleState(deepCopy(config.chartVisible ?? defaultChartVisible()));
+    setChartOrder(config.chartOrder ?? defaultChartOrder());
     setAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
     setChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
-  }, [config.metricRanges, config.metricOrder, config.gaugeVisible, config.accentColor, config.chartColors]);
+  }, [config.metricRanges, config.metricOrder, config.gaugeVisible, config.chartVisible, config.chartOrder, config.accentColor, config.chartColors]);
 
   const save = useCallback(
     async (e) => {
@@ -153,6 +179,8 @@ export function useAppearance(config, refetchConfig, onError) {
           metricRanges: deepCopy(metricRanges),
           metricOrder: [...metricOrder],
           gaugeVisible: deepCopy(gaugeVisible),
+          chartVisible: deepCopy(chartVisible),
+          chartOrder: [...chartOrder],
           accentColor: effectiveAccent,
         };
         if (hasChartColorsChange) {
@@ -185,6 +213,8 @@ export function useAppearance(config, refetchConfig, onError) {
       metricRanges,
       metricOrder,
       gaugeVisible,
+      chartVisible,
+      chartOrder,
       effectiveAccent,
       chartColors,
       hasChartColorsChange,
@@ -201,6 +231,8 @@ export function useAppearance(config, refetchConfig, onError) {
         metricRanges: deepCopy(DASHBOARD_DEFAULTS.metricRanges),
         metricOrder: [...defaultMetricOrder()],
         gaugeVisible: defaultGaugeVisible(),
+        chartVisible: defaultChartVisible(),
+        chartOrder: [...defaultChartOrder()],
         accentColor: normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor),
         chartColors: deepCopy(DASHBOARD_DEFAULTS.chartColors),
       });
@@ -208,6 +240,8 @@ export function useAppearance(config, refetchConfig, onError) {
       setMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
       setMetricOrder(defaultMetricOrder());
       setGaugeVisibleState(defaultGaugeVisible());
+      setChartVisibleState(defaultChartVisible());
+      setChartOrder(defaultChartOrder());
       setAccentColor(DASHBOARD_DEFAULTS.accentColor);
       setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
       setShowResetConfirm(false);
@@ -232,6 +266,10 @@ export function useAppearance(config, refetchConfig, onError) {
 
   const setMetricOrderList = useCallback((newOrder) => {
     setMetricOrder(Array.isArray(newOrder) ? [...newOrder] : newOrder);
+  }, []);
+
+  const setChartOrderList = useCallback((newOrder) => {
+    setChartOrder(Array.isArray(newOrder) ? [...newOrder] : newOrder);
   }, []);
 
   const setChartColorValue = useCallback((chartId, seriesKey, value) => {
@@ -260,6 +298,22 @@ export function useAppearance(config, refetchConfig, onError) {
     [config.gaugeVisible, refetchConfig, onError]
   );
 
+  const setChartVisible = useCallback(
+    (chartId, value) => {
+      setChartVisibleState((prev) => {
+        const next = { ...prev, [chartId]: value };
+        patchDashboardConfig({ chartVisible: next })
+          .then(() => refetchConfig())
+          .catch((err) => {
+            onError?.(err);
+            setChartVisibleState(() => deepCopy(config.chartVisible ?? defaultChartVisible()));
+          });
+        return next;
+      });
+    },
+    [config.chartVisible, refetchConfig, onError]
+  );
+
   useEffect(() => {
     if (message?.type !== 'success') return;
     const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
@@ -276,6 +330,10 @@ export function useAppearance(config, refetchConfig, onError) {
     setMetricRangeValue,
     gaugeVisible,
     setGaugeVisible,
+    chartVisible,
+    setChartVisible,
+    chartOrder,
+    setChartOrder: setChartOrderList,
     accentColor,
     setAccentColor,
     chartColors,

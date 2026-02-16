@@ -98,6 +98,7 @@ describe('useAppearance', () => {
       expect.objectContaining({
         metricRanges: expect.objectContaining({ hashrate: expect.objectContaining({ gaugeMax: 7500 }) }),
         metricOrder: expect.any(Array),
+        chartOrder: expect.any(Array),
         accentColor: expect.any(String),
       })
     );
@@ -118,6 +119,23 @@ describe('useAppearance', () => {
 
     expect(result.current.metricOrder[0]).toBe('hashrate');
     expect(result.current.metricOrder[1]).toBe('power');
+    expect(result.current.hasChanges).toBe(true);
+  });
+
+  it('returns chartOrder from config and setChartOrder updates order', () => {
+    const chartOrder = ['power', 'hashrate', 'temperature'];
+    const config = { metricRanges: {}, metricOrder: [], chartOrder, accentColor: '#6366f1', chartColors: {} };
+    const { result } = renderHook(() => useAppearance(config, refetchConfig, onError));
+
+    expect(result.current.chartOrder).toEqual(chartOrder);
+
+    act(() => {
+      result.current.setChartOrder(['hashrate', 'temperature', 'power']);
+    });
+
+    expect(result.current.chartOrder[0]).toBe('hashrate');
+    expect(result.current.chartOrder[1]).toBe('temperature');
+    expect(result.current.chartOrder[2]).toBe('power');
     expect(result.current.hasChanges).toBe(true);
   });
 });

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getConfig, updateAndSave } from '../config/dashboardConfig.js';
 import { DASHBOARD_DEFAULTS } from '../config/dashboardDefaults.js';
+import { isValidHexColor } from '../../shared/hexColor.js';
 
 const router = Router();
 
@@ -42,12 +43,11 @@ function validateMetricOrder(order) {
   return null;
 }
 
-const HEX_COLOR = /^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
 function validateAccentColor(value) {
   if (value === undefined) return null;
   if (typeof value !== 'string') return 'accentColor must be a string';
   if (value === '') return null;
-  if (!HEX_COLOR.test(value)) return 'accentColor must be a hex color (e.g. #d946ef) or empty';
+  if (!isValidHexColor(value)) return 'accentColor must be a hex color (e.g. #d946ef) or empty';
   return null;
 }
 
@@ -62,7 +62,7 @@ function validateChartColors(value) {
     const knownSeries = Object.keys(DASHBOARD_DEFAULTS.chartColors[chartKey]);
     for (const seriesKey of Object.keys(chart)) {
       if (!knownSeries.includes(seriesKey)) return `chartColors.${chartKey}: unknown series "${seriesKey}"`;
-      if (typeof chart[seriesKey] !== 'string' || !HEX_COLOR.test(chart[seriesKey])) {
+      if (typeof chart[seriesKey] !== 'string' || !isValidHexColor(chart[seriesKey])) {
         return `chartColors.${chartKey}.${seriesKey} must be a hex color`;
       }
     }
@@ -76,6 +76,35 @@ function validateGaugeVisible(value) {
   for (const key of Object.keys(value)) {
     if (!KNOWN_METRICS.has(key)) return `gaugeVisible: unknown metric "${key}"`;
     if (typeof value[key] !== 'boolean') return `gaugeVisible.${key} must be a boolean`;
+  }
+  return null;
+}
+
+const KNOWN_CHARTS = new Set(Object.keys(DASHBOARD_DEFAULTS.chartColors));
+
+function validateChartOrder(order) {
+  if (order === undefined) return null;
+  if (!Array.isArray(order)) return 'chartOrder must be an array';
+  if (order.length !== KNOWN_CHARTS.size) {
+    return `chartOrder must contain exactly ${KNOWN_CHARTS.size} chart ids`;
+  }
+  const seen = new Set();
+  for (let i = 0; i < order.length; i++) {
+    const id = order[i];
+    if (typeof id !== 'string') return `chartOrder[${i}] must be a string`;
+    if (!KNOWN_CHARTS.has(id)) return `chartOrder: unknown chart "${id}"`;
+    if (seen.has(id)) return `chartOrder: duplicate chart "${id}"`;
+    seen.add(id);
+  }
+  return null;
+}
+
+function validateChartVisible(value) {
+  if (value === undefined) return null;
+  if (typeof value !== 'object' || value === null) return 'chartVisible must be an object';
+  for (const key of Object.keys(value)) {
+    if (!KNOWN_CHARTS.has(key)) return `chartVisible: unknown chart "${key}"`;
+    if (typeof value[key] !== 'boolean') return `chartVisible.${key} must be a boolean`;
   }
   return null;
 }
@@ -113,12 +142,16 @@ router.patch('/', (req, res) => {
   if (mrErr) errors.push(mrErr);
   const orderErr = validateMetricOrder(body.metricOrder);
   if (orderErr) errors.push(orderErr);
+  const chartOrderErr = validateChartOrder(body.chartOrder);
+  if (chartOrderErr) errors.push(chartOrderErr);
   const accentErr = validateAccentColor(body.accentColor);
   if (accentErr) errors.push(accentErr);
   const chartErr = validateChartColors(body.chartColors);
   if (chartErr) errors.push(chartErr);
   const gaugeVisibleErr = validateGaugeVisible(body.gaugeVisible);
   if (gaugeVisibleErr) errors.push(gaugeVisibleErr);
+  const chartVisibleErr = validateChartVisible(body.chartVisible);
+  if (chartVisibleErr) errors.push(chartVisibleErr);
 
   if (errors.length > 0) {
     return res.status(400).json({ error: 'Validation failed', details: errors });

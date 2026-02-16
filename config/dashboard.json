@@ -21,6 +21,16 @@
       "hashRate_1d": "#f7931a"
     }
   },
+  "chartOrder": [
+    "hashrate",
+    "temperature",
+    "power"
+  ],
+  "chartVisible": {
+    "power": true,
+    "temperature": true,
+    "hashrate": true
+  },
   "metricRanges": {
     "hashrate": {
       "min": 5900,

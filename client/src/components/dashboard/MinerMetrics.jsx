@@ -53,7 +53,7 @@ function SortableGauge({ id, isDragActive, ...gaugeProps }) {
       className={`group relative ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
     >
       <div
-        className="absolute top-0 right-1 z-10 cursor-grab active:cursor-grabbing touch-none p-1 rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted hover:text-body"
+        className="absolute top-0 right-1 z-10 cursor-grab active:cursor-grabbing touch-none p-1 rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted hover:text-normal"
         aria-label={`Drag to reorder ${gaugeProps.label}`}
         {...attributes}
         {...listeners}

@@ -28,7 +28,7 @@ export default function MinerShares() {
         </div>
         <div>
           <div className="stat-label">Rejected</div>
-          <div className="text-body text-xl font-bold">{formatNumber(rejected)}</div>
+          <div className="text-normal text-xl font-bold">{formatNumber(rejected)}</div>
         </div>
         <div>
           <div className="stat-label">Reject Rate</div>
@@ -36,25 +36,25 @@ export default function MinerShares() {
         </div>
         <div>
           <div className="stat-label">Best Diff (All-time)</div>
-          <div className="text-body text-lg font-bold">{formatBestDiff(data.bestDiff)}</div>
+          <div className="text-normal text-lg font-bold">{formatBestDiff(data.bestDiff)}</div>
         </div>
         <div>
           <div className="stat-label">Best Diff (Session)</div>
-          <div className="text-body text-lg font-bold">{formatBestDiff(data.bestSessionDiff)}</div>
+          <div className="text-normal text-lg font-bold">{formatBestDiff(data.bestSessionDiff)}</div>
         </div>
         <div>
           <div className="stat-label">Pool Difficulty</div>
-          <div className="text-body text-lg font-semibold">{formatNumber(data.poolDifficulty)}</div>
+          <div className="text-normal text-lg font-semibold">{formatNumber(data.poolDifficulty)}</div>
         </div>
         <div>
           <div className="stat-label">Ping RTT</div>
-          <div className="text-body text-lg font-semibold">
+          <div className="text-normal text-lg font-semibold">
             {data.lastpingrtt != null ? `${data.lastpingrtt.toFixed(1)} ms` : '--'}
           </div>
         </div>
         <div>
           <div className="stat-label">Ping Loss</div>
-          <div className="text-body text-lg font-semibold">
+          <div className="text-normal text-lg font-semibold">
             {data.recentpingloss != null ? `${data.recentpingloss}%` : '--'}
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function MinerShares() {
                 <ul className="text-sm space-y-0.5">
                   {reasons.map((r, i) => (
                     <li key={i} className="flex justify-between gap-2">
-                      <span className="text-body">{r.message}</span>
+                      <span className="text-normal">{r.message}</span>
                       <span className="text-warning dark:text-warning-dark font-medium shrink-0">{formatNumber(r.count)}</span>
                     </li>
                   ))}

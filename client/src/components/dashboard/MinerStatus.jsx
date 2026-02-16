@@ -1,7 +1,7 @@
 import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
 import { LOW_HEAP_INT_THRESHOLD_BYTES } from '@/lib/constants';
-import { formatBytes,formatResetReason, formatUptime } from '@/lib/formatters';
+import { formatBytes, formatResetReason, formatUptime } from '@/lib/formatters';
 
 function ConnectionIndicator({ connected }) {
   return (

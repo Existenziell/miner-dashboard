@@ -240,6 +240,10 @@ html.high-contrast a {
   @apply text-sm font-semibold uppercase tracking-wide mb-4 text-muted dark:text-muted-dark;
 }
 
+.card-subtitle {
+  @apply text-muted text-sm mb-6;
+}
+
 /* ==========================================================================
    Buttons
    ========================================================================== */

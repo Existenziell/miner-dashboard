@@ -19,6 +19,12 @@ export const DASHBOARD_DEFAULTS = {
       hashRate_1d: '#f7931a',
     },
   },
+  chartOrder: ['hashrate', 'temperature', 'power'],
+  chartVisible: {
+    hashrate: true,
+    temperature: true,
+    power: true,
+  },
   metricRanges: {
     hashrate: { min: 5900, gaugeMax: 7000 },
     efficiency: { max: 25, gaugeMax: 30 },

@@ -18,7 +18,7 @@ export default function Header({ activeTab, onTabChange }) {
                     <a href="/">
                         <img src="/favicon/favicon.svg" alt="Solo Mining Dashboard Logo" className="w-10 h-10 dark:invert" />
                     </a>
-                    <h1 className="text-xl font-bold text-body">Solo Mining Dashboard</h1>
+                    <h1 className="text-xl font-bold text-normal">Solo Mining Dashboard</h1>
                     <nav className="flex gap-1 ml-4">
                         {TABS.map((tab) => (
                             <button

@@ -70,6 +70,34 @@ function mergeGaugeVisible(fromFile) {
   return defaults;
 }
 
+const KNOWN_CHARTS = new Set(Object.keys(DASHBOARD_DEFAULTS.chartColors));
+const DEFAULT_CHART_ORDER = DASHBOARD_DEFAULTS.chartOrder;
+
+function mergeChartOrder(fromFile) {
+  if (!Array.isArray(fromFile) || fromFile.length !== KNOWN_CHARTS.size) {
+    return [...DEFAULT_CHART_ORDER];
+  }
+  const seen = new Set();
+  for (const id of fromFile) {
+    if (typeof id !== 'string' || !KNOWN_CHARTS.has(id) || seen.has(id)) {
+      return [...DEFAULT_CHART_ORDER];
+    }
+    seen.add(id);
+  }
+  return [...fromFile];
+}
+
+function mergeChartVisible(fromFile) {
+  const defaults = Object.fromEntries([...KNOWN_CHARTS].map((id) => [id, true]));
+  if (!fromFile || typeof fromFile !== 'object') return defaults;
+  for (const id of KNOWN_CHARTS) {
+    if (typeof fromFile[id] === 'boolean') {
+      defaults[id] = fromFile[id];
+    }
+  }
+  return defaults;
+}
+
 function mergeWithDefaults(fileObj) {
   if (!fileObj || typeof fileObj !== 'object') return { ...DASHBOARD_DEFAULTS };
   const metricRanges = deepMergeMetricRanges(
@@ -81,14 +109,18 @@ function mergeWithDefaults(fileObj) {
     fileObj.chartColors
   );
   const metricOrder = mergeMetricOrder(fileObj.metricOrder);
+  const chartOrder = mergeChartOrder(fileObj.chartOrder);
   const gaugeVisible = mergeGaugeVisible(fileObj.gaugeVisible);
+  const chartVisible = mergeChartVisible(fileObj.chartVisible);
   return {
     ...DASHBOARD_DEFAULTS,
     ...fileObj,
     metricRanges,
     chartColors,
     metricOrder,
+    chartOrder,
     gaugeVisible,
+    chartVisible,
   };
 }
 
