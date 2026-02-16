@@ -4,21 +4,13 @@ A real-time monitoring dashboard for the NerdQaxe++ Bitcoin Solo Miner, or simil
 
 ## Features
 
-- **Live miner monitoring**: hashrate, temperature, power, fan speed (10s polling)
-- **Charts**: hashrate and temperature/power history (rolling 1h buffer)
-- **Mining details**: shares accepted/rejected, best difficulty, pool info
-- **Bitcoin network**: block height, difficulty adjustment, BTC price, fee estimates (60s polling)
-- **Settings – Setup**: first-time setup — miner IP/hostname, expected hashrate (GH/s), poll intervals; WiFi (hostname, SSID, password) stored on the miner
-- **Settings – Miner**: configure miner IP/hostname and connection
-- **Settings – Pools**: view and manage pool configuration (URL, worker, password)
-- **Settings – Firmware**: check firmware releases and install updates (via URL or file upload)
-- **Settings – Dashboard**: expected hashrate, poll intervals, and metric ranges (thresholds and gauge max for hashrate, temp, power, efficiency, etc.)
-- **Settings – Colors**: customize accent color and gauge/indicator colors; settings persisted to the server
-
-## Requirements
-
-- **Node.js** 18 or later
-- A NerdQaxe++ miner (or compatible device) on your network (for live monitoring)
+- **Monitoring:** live miner metrics, hashrate, temp, power, fan speed; history graphs; shares and pool info; network difficulty and more
+- **Fully Customizable:** adjust colors for accents, charts, gauges, and drag'n'drop to reorder gauges on the dashboard
+- **Network Context:** observe public network metrics via mempool.space
+- **API Monitoring:** check live API calls and results
+- **Pool Config:** made easy with useful presets and robust validation
+- **Firmware Updates:** with checksum verification to protect hardware
+- **Self-hosted:** runs on your machine; miner and dashboard data stay on your network
 
 ## Compatible devices
 
