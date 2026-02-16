@@ -284,6 +284,10 @@ html.high-contrast a {
   @apply text-muted dark:text-muted-dark hover:text-fg dark:hover:text-fg-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark;
 }
 
+.theme-toggle-btn {
+  @apply flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer bg-surface-light dark:bg-surface-light-dark text-muted dark:text-muted-dark hover:bg-surface-hover dark:hover:bg-surface-hover-dark hover:text-fg dark:hover:text-fg-dark;
+}
+
 .legend-btn {
   @apply flex items-center gap-1.5 text-xs cursor-pointer select-none transition-opacity;
 }
