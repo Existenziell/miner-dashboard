@@ -77,10 +77,6 @@ Then open `http://localhost:8001`.
 - **Setup tab:** Miner IP or hostname, Expected hashrate (GH/s), Miner / Network poll intervals (ms). WiFi (hostname, SSID, password).
 - **Dashboard tab:** Metric ranges — single threshold and gauge max per metric.
 
-**Config API:** `GET /api/config` returns the current config; `PATCH /api/config` updates it. Used by the Settings UI.
-
-The backend listens on port 8001 (see `server/config.js` to change).
-
 ## Troubleshooting
 
 - **Miner not reachable:** Ensure `MINER_IP` (or the value in Settings) is correct and the miner is on the same network. The server log prints the current miner API target on startup.
@@ -100,7 +96,7 @@ The backend listens on port 8001 (see `server/config.js` to change).
 | `npm run test:watch` | Run client tests in watch mode |
 | `npm run all` | Run build, test, and lint concurrently |
 
-## More screenshots
+## Screenshots
 
 | Dashboard | Settings – Miner | Settings – Appearance |
 |-----------|------------------|------------------------|
