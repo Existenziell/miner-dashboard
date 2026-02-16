@@ -70,6 +70,16 @@ function validateChartColors(value) {
   return null;
 }
 
+function validateGaugeVisible(value) {
+  if (value === undefined) return null;
+  if (typeof value !== 'object' || value === null) return 'gaugeVisible must be an object';
+  for (const key of Object.keys(value)) {
+    if (!KNOWN_METRICS.has(key)) return `gaugeVisible: unknown metric "${key}"`;
+    if (typeof value[key] !== 'boolean') return `gaugeVisible.${key} must be a boolean`;
+  }
+  return null;
+}
+
 // GET /api/config
 router.get('/', (_req, res) => {
   res.json(getConfig());
@@ -107,6 +117,8 @@ router.patch('/', (req, res) => {
   if (accentErr) errors.push(accentErr);
   const chartErr = validateChartColors(body.chartColors);
   if (chartErr) errors.push(chartErr);
+  const gaugeVisibleErr = validateGaugeVisible(body.gaugeVisible);
+  if (gaugeVisibleErr) errors.push(gaugeVisibleErr);
 
   if (errors.length > 0) {
     return res.status(400).json({ error: 'Validation failed', details: errors });

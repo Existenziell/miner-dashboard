@@ -30,6 +30,8 @@ function MetricRangeCard({
   METRIC_LABELS,
   METRIC_KEY_LABELS,
   isDragActive,
+  visibleOnDashboard,
+  onToggleVisible,
 }) {
   const {
     attributes,
@@ -52,19 +54,46 @@ function MetricRangeCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`rounded-md px-4 py-3 space-y-2 min-h-[160px] border border-default ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
+      className={`rounded-md px-4 py-3 space-y-2 min-h-[150px] border border-default ${visibleOnDashboard === false ? 'opacity-50' : ''} ${isDragging ? 'opacity-0 pointer-events-none' : ''}`}
     >
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-medium text-normal capitalize min-w-0">
           {METRIC_LABELS[metric] ?? metric}
         </p>
-        <div
-          className="shrink-0 cursor-grab active:cursor-grabbing touch-none text-muted hover:text-normal p-1 -m-1"
-          aria-label={`Drag to reorder ${METRIC_LABELS[metric] ?? metric}`}
-          {...attributes}
-          {...listeners}
-        >
-          <span className="select-none text-lg leading-none" aria-hidden="true">⋮⋮</span>
+        <div className="flex items-center gap-3 shrink-0">
+          {onToggleVisible != null && (
+            <label className="cursor-pointer" title="Show on dashboard">
+              <input
+                type="checkbox"
+                checked={visibleOnDashboard !== false}
+                onChange={(e) => onToggleVisible(metric, e.target.checked)}
+                className="checkbox-input"
+                aria-label={`Show ${METRIC_LABELS[metric] ?? metric} on dashboard`}
+              />
+              <span className="checkbox-box shrink-0" aria-hidden>
+                <svg
+                  className="checkbox-check"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M5 12l5 5 9-9" />
+                </svg>
+              </span>
+            </label>
+          )}
+          <div
+            className="cursor-grab active:cursor-grabbing touch-none text-muted hover:text-normal p-1 -m-1"
+            aria-label={`Drag to reorder ${METRIC_LABELS[metric] ?? metric}`}
+            {...attributes}
+            {...listeners}
+          >
+            <span className="select-none text-lg leading-none" aria-hidden="true">⋮⋮</span>
+          </div>
         </div>
       </div>
       <div className="space-y-2">
@@ -132,6 +161,8 @@ export function TabAppearance() {
     metricOrder,
     setMetricOrder,
     setMetricRangeValue,
+    gaugeVisible,
+    setGaugeVisible,
     METRIC_LABELS,
     METRIC_KEY_LABELS,
     accentColor,
@@ -230,7 +261,7 @@ export function TabAppearance() {
                   <div
                     key={metric}
                     ref={(el) => { cellRefs.current[i] = el; }}
-                    className="w-[240px] min-h-[160px] shrink-0"
+                    className="w-[240px] min-h-[150px] shrink-0"
                   >
                     <MetricRangeCard
                       metric={metric}
@@ -239,6 +270,8 @@ export function TabAppearance() {
                       METRIC_LABELS={METRIC_LABELS}
                       METRIC_KEY_LABELS={METRIC_KEY_LABELS}
                       isDragActive={activeId != null}
+                      visibleOnDashboard={gaugeVisible[metric] !== false}
+                      onToggleVisible={setGaugeVisible}
                     />
                   </div>
                 ))}
@@ -265,6 +298,8 @@ export function TabAppearance() {
                     setMetricRangeValue={setMetricRangeValue}
                     METRIC_LABELS={METRIC_LABELS}
                     METRIC_KEY_LABELS={METRIC_KEY_LABELS}
+                    visibleOnDashboard={gaugeVisible[activeId] !== false}
+                    onToggleVisible={null}
                   />
                 </div>
               ) : null}

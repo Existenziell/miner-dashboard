@@ -39,4 +39,14 @@ export const DASHBOARD_DEFAULTS = {
     'current',
     'power',
   ],
+  gaugeVisible: {
+    hashrate: true,
+    temp: true,
+    fanRpm: true,
+    efficiency: true,
+    frequency: true,
+    voltage: true,
+    current: true,
+    power: true,
+  },
 };

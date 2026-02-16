@@ -76,7 +76,11 @@ export default function MinerMetrics() {
   const cellRefs = useRef([]);
 
   const orderedIds = useMemo(() => getOrderedMetricIds(config), [config]);
-  const overIndex = overId != null ? orderedIds.indexOf(overId) : -1;
+  const visibleOrderedIds = useMemo(
+    () => orderedIds.filter((id) => config?.gaugeVisible?.[id] !== false),
+    [orderedIds, config?.gaugeVisible]
+  );
+  const overIndex = overId != null ? visibleOrderedIds.indexOf(overId) : -1;
   const showDropZone = activeId != null && overId !== activeId && overIndex >= 0;
 
   useLayoutEffect(() => {
@@ -176,13 +180,16 @@ export default function MinerMetrics() {
     setOverId(null);
     setDropZoneRect(null);
     if (over == null || active.id === over.id) return;
-    const order = [...orderedIds];
-    const oldIndex = order.indexOf(active.id);
-    const newIndex = order.indexOf(over.id);
+    const oldIndex = visibleOrderedIds.indexOf(active.id);
+    const newIndex = visibleOrderedIds.indexOf(over.id);
     if (oldIndex === -1 || newIndex === -1) return;
-    const newOrder = arrayMove(order, oldIndex, newIndex);
+    const newVisibleOrder = arrayMove([...visibleOrderedIds], oldIndex, newIndex);
+    let j = 0;
+    const newFullOrder = orderedIds.map((id) =>
+      config?.gaugeVisible?.[id] === false ? id : newVisibleOrder[j++]
+    );
     try {
-      await patchDashboardConfig({ metricOrder: newOrder });
+      await patchDashboardConfig({ metricOrder: newFullOrder });
       await refetch();
     } catch {
       // leave order unchanged on error
@@ -204,9 +211,9 @@ export default function MinerMetrics() {
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
-      <SortableContext items={orderedIds} strategy={rectSortingStrategy}>
+      <SortableContext items={visibleOrderedIds} strategy={rectSortingStrategy}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {orderedIds.map((id, i) => {
+          {visibleOrderedIds.map((id, i) => {
             const p = gaugeProps[id];
             if (!p) return null;
             return (
@@ -234,7 +241,7 @@ export default function MinerMetrics() {
         />
       )}
       <DragOverlay dropAnimation={null}>
-        {activeId && gaugeProps[activeId] ? (
+        {activeId && gaugeProps[activeId] != null ? (
           <div className="shadow-xl rounded-md cursor-grabbing">
             <Gauge {...gaugeProps[activeId]} />
           </div>

@@ -59,6 +59,17 @@ function mergeMetricOrder(fromFile) {
   return [...fromFile];
 }
 
+function mergeGaugeVisible(fromFile) {
+  const defaults = Object.fromEntries([...KNOWN_METRICS].map((id) => [id, true]));
+  if (!fromFile || typeof fromFile !== 'object') return defaults;
+  for (const id of KNOWN_METRICS) {
+    if (typeof fromFile[id] === 'boolean') {
+      defaults[id] = fromFile[id];
+    }
+  }
+  return defaults;
+}
+
 function mergeWithDefaults(fileObj) {
   if (!fileObj || typeof fileObj !== 'object') return { ...DASHBOARD_DEFAULTS };
   const metricRanges = deepMergeMetricRanges(
@@ -70,12 +81,14 @@ function mergeWithDefaults(fileObj) {
     fileObj.chartColors
   );
   const metricOrder = mergeMetricOrder(fileObj.metricOrder);
+  const gaugeVisible = mergeGaugeVisible(fileObj.gaugeVisible);
   return {
     ...DASHBOARD_DEFAULTS,
     ...fileObj,
     metricRanges,
     chartColors,
     metricOrder,
+    gaugeVisible,
   };
 }
 
