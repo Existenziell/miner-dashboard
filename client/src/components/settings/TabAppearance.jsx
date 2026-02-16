@@ -287,11 +287,11 @@ export function TabAppearance() {
           </div>
         </div>
         <div className="text-muted text-sm my-6 space-y-1">
-          <div><strong>Accent color:</strong> Buttons, links, and highlights. Darker shade is derived automatically.</div>
+          <div><strong>Accent color:</strong> Main color for buttons, gauges, and highlights. Darker shade is derived automatically.</div>
           <div><strong>Chart colors:</strong> Line colors for Power, Temperature, and Hashrate charts.</div>
         </div>
         <div className="space-y-4">
-          <Field label="Accent color" hint="Buttons, links, and highlights. Darker shade is derived automatically.">
+          <Field label="Accent color" hint="Main color for buttons, gauges, and highlights.">
             <div className="flex items-center gap-2 max-w-96">
               <input
                 type="color"
