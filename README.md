@@ -100,15 +100,6 @@ The backend listens on port 8001 (see `server/config.js` to change).
 | `npm run test:watch` | Run client tests in watch mode |
 | `npm run all` | Run build, test, and lint concurrently |
 
-## Architecture
-
-```
-Browser --> Express (port 8001) --> NerdQaxe++ Miner (192.168.1.3)
-                                --> mempool.space API
-```
-
-The Express backend proxies requests to the miner (avoiding CORS issues) and aggregates Bitcoin network data from mempool.space with 30s caching.
-
 ## More screenshots
 
 | Dashboard | Settings – Miner | Settings – Appearance |
