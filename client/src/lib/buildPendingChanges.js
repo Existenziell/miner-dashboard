@@ -3,7 +3,7 @@
  */
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { isValidHex, normalizeHex } from '@/lib/colorUtils';
-import { CHART_COLOR_SPEC } from '@/lib/constants';
+import { CHART_COLOR_SPEC, METRIC_LABELS, METRIC_KEY_LABELS } from '@/lib/constants';
 
 /**
  * Build a single change entry for the list. Use for consistent from/to formatting.
@@ -22,24 +22,6 @@ export function changeEntry(label, from, to) {
 export function simpleChange(label) {
   return changeEntry(label, 'saved', 'changed');
 }
-
-const METRIC_LABELS = {
-  hashrate: 'Hashrate (GH/s)',
-  efficiency: 'Efficiency (J/TH)',
-  temp: 'Temp (°C)',
-  fanRpm: 'Fan RPM (%)',
-  current: 'Current (A)',
-  frequency: 'Frequency (MHz)',
-  voltage: 'Voltage (mV)',
-  power: 'Power (W)',
-};
-const METRIC_KEY_LABELS = {
-  min: 'Min',
-  max: 'Max',
-  gaugeMax: 'Gauge max',
-  maxPct: 'Max %',
-  maxMv: 'Max (mV)',
-};
 
 const defaultMetricOrder = () =>
   DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);

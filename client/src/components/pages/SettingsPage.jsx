@@ -138,18 +138,17 @@ export default function SettingsPage({ onError }) {
       )}
 
       {(settingsSubTab === 'miner' || settingsSubTab === 'pools') && (() => {
-        const minerTabShowError = deviceForm.hasChanges && !deviceForm.isFormValid;
-        const poolsTabShowError = poolsForm.hasChanges && !poolsForm.isFormValid;
+        const minerTabShowError = deviceForm.status.hasChanges && !deviceForm.validation.isFormValid;
+        const poolsTabShowError = poolsForm.status.hasChanges && !poolsForm.validation.isFormValid;
         const minerTabSaveDisabled =
-          deviceForm.saving || !deviceForm.hasChanges || !deviceForm.isFormValid;
+          deviceForm.status.saving || !deviceForm.status.hasChanges || !deviceForm.validation.isFormValid;
         const poolsTabSaveDisabled =
-          poolsForm.saving || !poolsForm.hasChanges || !poolsForm.isFormValid;
-        const activeForm = settingsSubTab === 'miner' ? deviceForm : poolsForm;
+          poolsForm.status.saving || !poolsForm.status.hasChanges || !poolsForm.validation.isFormValid;
         return (
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            settingsSubTab === 'miner' ? deviceForm.save() : poolsForm.save();
+            settingsSubTab === 'miner' ? deviceForm.actions.save() : poolsForm.actions.save();
           }}
           className="space-y-4"
         >
@@ -162,8 +161,8 @@ export default function SettingsPage({ onError }) {
             )}
 
             <PendingChanges
-              changes={settingsSubTab === 'miner' ? deviceForm.changes : poolsForm.changes}
-              onReset={settingsSubTab === 'miner' ? deviceForm.revert : poolsForm.revert}
+              changes={settingsSubTab === 'miner' ? deviceForm.status.changes : poolsForm.status.changes}
+              onReset={settingsSubTab === 'miner' ? deviceForm.actions.revert : poolsForm.actions.revert}
               title="Pending changes"
             />
 
@@ -188,16 +187,16 @@ export default function SettingsPage({ onError }) {
                     }
                     className="btn-primary"
                   >
-                    {activeForm.saving ? 'Saving…' : 'Save settings'}
+                    {settingsSubTab === 'miner' ? (deviceForm.status.saving ? 'Saving…' : 'Save settings') : (poolsForm.status.saving ? 'Saving…' : 'Save settings')}
                   </button>
-                  {activeForm.message?.type === 'success' && (
+                  {(settingsSubTab === 'miner' ? deviceForm.status.message : poolsForm.status.message)?.type === 'success' && (
                     <span role="status" className="message-success">
                       <span>Saved successfully</span>
                     </span>
                   )}
-                  {activeForm.message?.type === 'error' && (
+                  {(settingsSubTab === 'miner' ? deviceForm.status.message : poolsForm.status.message)?.type === 'error' && (
                     <span role="alert" className="message-warning">
-                      {activeForm.message.text}
+                      {(settingsSubTab === 'miner' ? deviceForm.status.message : poolsForm.status.message).text}
                     </span>
                   )}
                 </div>
@@ -206,18 +205,18 @@ export default function SettingsPage({ onError }) {
                     <button
                       type="button"
                       onClick={() => setShowRestartConfirm(true)}
-                      disabled={deviceForm.restarting || deviceForm.shuttingDown}
+                      disabled={deviceForm.status.restarting || deviceForm.status.shuttingDown}
                       className="btn-ghost-accent"
                     >
-                      {deviceForm.restarting ? 'Restarting…' : 'Restart miner'}
+                      {deviceForm.status.restarting ? 'Restarting…' : 'Restart miner'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowShutdownConfirm(true)}
-                      disabled={deviceForm.restarting || deviceForm.shuttingDown}
+                      disabled={deviceForm.status.restarting || deviceForm.status.shuttingDown}
                       className="btn-ghost-accent"
                     >
-                      {deviceForm.shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
+                      {deviceForm.status.shuttingDown ? 'Shutting down…' : 'Shutdown miner'}
                     </button>
                   </div>
                 )}
@@ -232,10 +231,10 @@ export default function SettingsPage({ onError }) {
                 description="Really restart the miner? It will disconnect briefly."
                 confirmLabel="Restart"
                 onConfirm={async () => {
-                  await deviceForm.handleRestart();
+                  await deviceForm.actions.handleRestart();
                   setShowRestartConfirm(false);
                 }}
-                confirmDisabled={deviceForm.restarting}
+                confirmDisabled={deviceForm.status.restarting}
               />
               <ConfirmModal
                 open={showShutdownConfirm}
@@ -244,10 +243,10 @@ export default function SettingsPage({ onError }) {
                 description="Shutdown the miner? It will stop hashing and disconnect. You will need to power it back on manually."
                 confirmLabel="Shutdown"
                 onConfirm={async () => {
-                  await deviceForm.handleShutdown();
+                  await deviceForm.actions.handleShutdown();
                   setShowShutdownConfirm(false);
                 }}
-                confirmDisabled={deviceForm.shuttingDown}
+                confirmDisabled={deviceForm.status.shuttingDown}
               />
           </>
         </form>

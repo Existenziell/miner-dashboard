@@ -29,13 +29,13 @@ describe('useSetup', () => {
     };
     const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
-    expect(result.current.minerIp).toBe('192.168.1.1');
-    expect(result.current.expectedHashrateGh).toBe(1000);
-    expect(result.current.pollMinerMs).toBe(5000);
-    expect(result.current.pollNetworkMs).toBe(30000);
-    expect(result.current.changes).toEqual([]);
-    expect(result.current.hasChanges).toBe(false);
-    expect(result.current.saving).toBe(false);
+    expect(result.current.connection.minerIp).toBe('192.168.1.1');
+    expect(result.current.connection.expectedHashrateGh).toBe(1000);
+    expect(result.current.connection.pollMinerMs).toBe(5000);
+    expect(result.current.connection.pollNetworkMs).toBe(30000);
+    expect(result.current.status.changes).toEqual([]);
+    expect(result.current.status.hasChanges).toBe(false);
+    expect(result.current.status.saving).toBe(false);
   });
 
   it('computes changes when miner IP is edited', () => {
@@ -48,13 +48,13 @@ describe('useSetup', () => {
     const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     act(() => {
-      result.current.setMinerIp('10.0.0.5');
+      result.current.connection.setMinerIp('10.0.0.5');
     });
 
-    expect(result.current.hasChanges).toBe(true);
-    expect(result.current.changes).toHaveLength(1);
-    expect(result.current.changes[0].label).toBe('Miner IP');
-    expect(result.current.changes[0].to).toBe('10.0.0.5');
+    expect(result.current.status.hasChanges).toBe(true);
+    expect(result.current.status.changes).toHaveLength(1);
+    expect(result.current.status.changes[0].label).toBe('Miner IP');
+    expect(result.current.status.changes[0].to).toBe('10.0.0.5');
   });
 
   it('revert() restores state to config', () => {
@@ -67,18 +67,18 @@ describe('useSetup', () => {
     const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     act(() => {
-      result.current.setMinerIp('10.0.0.5');
-      result.current.setExpectedHashrateGh(2000);
+      result.current.connection.setMinerIp('10.0.0.5');
+      result.current.connection.setExpectedHashrateGh(2000);
     });
-    expect(result.current.hasChanges).toBe(true);
+    expect(result.current.status.hasChanges).toBe(true);
 
     act(() => {
-      result.current.revert();
+      result.current.actions.revert();
     });
 
-    expect(result.current.minerIp).toBe('192.168.1.1');
-    expect(result.current.expectedHashrateGh).toBe(1000);
-    expect(result.current.hasChanges).toBe(false);
+    expect(result.current.connection.minerIp).toBe('192.168.1.1');
+    expect(result.current.connection.expectedHashrateGh).toBe(1000);
+    expect(result.current.status.hasChanges).toBe(false);
   });
 
   it('save() calls patchDashboardConfig and refetchConfig', async () => {
@@ -92,11 +92,11 @@ describe('useSetup', () => {
     const { result } = renderHook(() => useSetup(config, refetchConfig, onError));
 
     act(() => {
-      result.current.setMinerIp('10.0.0.5');
+      result.current.connection.setMinerIp('10.0.0.5');
     });
 
     await act(async () => {
-      await result.current.save();
+      await result.current.actions.save();
     });
 
     expect(mockPatchDashboardConfig).toHaveBeenCalledWith({
@@ -106,6 +106,6 @@ describe('useSetup', () => {
       pollNetworkIntervalMs: 30000,
     });
     expect(refetchConfig).toHaveBeenCalled();
-    expect(result.current.message).toEqual({ type: 'success', text: 'Settings saved.' });
+    expect(result.current.status.message).toEqual({ type: 'success', text: 'Settings saved.' });
   });
 });

@@ -30,20 +30,20 @@ describe('useMinerDevice', () => {
   it('returns device state with defaults when miner is null', () => {
     const { result } = renderHook(() => useMinerDevice(null, refetch, onError));
 
-    expect(result.current.frequency).toBe(600);
-    expect(result.current.coreVoltage).toBe(1150);
-    expect(result.current.overheatTemp).toBe(70);
-    expect(result.current.fanAuto).toBe(false);
-    expect(result.current.pidTargetTemp).toBe(55);
-    expect(result.current.manualFanSpeed).toBe(100);
-    expect(result.current.autoScreenOff).toBe(false);
-    expect(result.current.flipScreen).toBe(false);
-    expect(result.current.baseline).toBe(null);
-    expect(result.current.changes).toEqual([]);
-    expect(result.current.hasChanges).toBe(false);
-    expect(result.current.saving).toBe(false);
-    expect(result.current.message).toBe(null);
-    expect(result.current.isFormValid).toBe(true);
+    expect(result.current.asic.frequency).toBe(600);
+    expect(result.current.asic.coreVoltage).toBe(1150);
+    expect(result.current.tempFan.overheatTemp).toBe(70);
+    expect(result.current.tempFan.fanAuto).toBe(false);
+    expect(result.current.tempFan.pidTargetTemp).toBe(55);
+    expect(result.current.tempFan.manualFanSpeed).toBe(100);
+    expect(result.current.display.autoScreenOff).toBe(false);
+    expect(result.current.display.flipScreen).toBe(false);
+    expect(result.current.display.baseline).toBe(null);
+    expect(result.current.status.changes).toEqual([]);
+    expect(result.current.status.hasChanges).toBe(false);
+    expect(result.current.status.saving).toBe(false);
+    expect(result.current.status.message).toBe(null);
+    expect(result.current.validation.isFormValid).toBe(true);
   });
 
   it('syncs state from miner when miner is provided', () => {
@@ -59,16 +59,16 @@ describe('useMinerDevice', () => {
     };
     const { result } = renderHook(() => useMinerDevice(miner, refetch, onError));
 
-    expect(result.current.frequency).toBe(700);
-    expect(result.current.coreVoltage).toBe(1200);
-    expect(result.current.overheatTemp).toBe(65);
-    expect(result.current.fanAuto).toBe(true);
-    expect(result.current.pidTargetTemp).toBe(58);
-    expect(result.current.manualFanSpeed).toBe(80);
-    expect(result.current.autoScreenOff).toBe(true);
-    expect(result.current.flipScreen).toBe(true);
-    expect(result.current.baseline).not.toBe(null);
-    expect(result.current.baseline.frequency).toBe(700);
+    expect(result.current.asic.frequency).toBe(700);
+    expect(result.current.asic.coreVoltage).toBe(1200);
+    expect(result.current.tempFan.overheatTemp).toBe(65);
+    expect(result.current.tempFan.fanAuto).toBe(true);
+    expect(result.current.tempFan.pidTargetTemp).toBe(58);
+    expect(result.current.tempFan.manualFanSpeed).toBe(80);
+    expect(result.current.display.autoScreenOff).toBe(true);
+    expect(result.current.display.flipScreen).toBe(true);
+    expect(result.current.display.baseline).not.toBe(null);
+    expect(result.current.display.baseline.frequency).toBe(700);
   });
 
   it('computes changes when frequency is edited', async () => {
@@ -78,15 +78,15 @@ describe('useMinerDevice', () => {
       await Promise.resolve();
     });
 
-    expect(result.current.hasChanges).toBe(false);
+    expect(result.current.status.hasChanges).toBe(false);
 
     act(() => {
-      result.current.setFrequency(750);
+      result.current.asic.setFrequency(750);
     });
 
-    expect(result.current.hasChanges).toBe(true);
-    expect(result.current.changes).toHaveLength(1);
-    expect(result.current.changes[0]).toEqual({
+    expect(result.current.status.hasChanges).toBe(true);
+    expect(result.current.status.changes).toHaveLength(1);
+    expect(result.current.status.changes[0]).toEqual({
       label: 'Frequency',
       from: '700 MHz',
       to: '750 MHz',
@@ -101,18 +101,18 @@ describe('useMinerDevice', () => {
     });
 
     act(() => {
-      result.current.setFrequency(750);
-      result.current.setOverheatTemp(65);
+      result.current.asic.setFrequency(750);
+      result.current.tempFan.setOverheatTemp(65);
     });
-    expect(result.current.hasChanges).toBe(true);
+    expect(result.current.status.hasChanges).toBe(true);
 
     act(() => {
-      result.current.revert();
+      result.current.actions.revert();
     });
 
-    expect(result.current.frequency).toBe(700);
-    expect(result.current.overheatTemp).toBe(70);
-    expect(result.current.hasChanges).toBe(false);
+    expect(result.current.asic.frequency).toBe(700);
+    expect(result.current.tempFan.overheatTemp).toBe(70);
+    expect(result.current.status.hasChanges).toBe(false);
   });
 
   it('save() calls patchMinerSettings with device payload and refetch', async () => {
@@ -130,11 +130,11 @@ describe('useMinerDevice', () => {
     const { result } = renderHook(() => useMinerDevice(miner, refetch, onError));
 
     act(() => {
-      result.current.setFrequency(725);
+      result.current.asic.setFrequency(725);
     });
 
     await act(async () => {
-      await result.current.save();
+      await result.current.actions.save();
     });
 
     expect(mockPatchMinerSettings).toHaveBeenCalledWith({
@@ -147,7 +147,7 @@ describe('useMinerDevice', () => {
       flipscreen: false,
     });
     expect(refetch).toHaveBeenCalled();
-    expect(result.current.message).toEqual({ type: 'success', text: 'Device settings saved.' });
+    expect(result.current.status.message).toEqual({ type: 'success', text: 'Device settings saved.' });
   });
 
   it('reports validation errors for out-of-range overheat and PID temp', async () => {
@@ -158,13 +158,13 @@ describe('useMinerDevice', () => {
     });
 
     act(() => {
-      result.current.setOverheatTemp(30);
-      result.current.setPidTargetTemp(90);
+      result.current.tempFan.setOverheatTemp(30);
+      result.current.tempFan.setPidTargetTemp(90);
     });
 
-    expect(result.current.isFormValid).toBe(false);
-    expect(result.current.validationErrors.some((e) => e.id === 'overheatTemp')).toBe(true);
-    expect(result.current.validationErrors.some((e) => e.id === 'pidTargetTemp')).toBe(true);
+    expect(result.current.validation.isFormValid).toBe(false);
+    expect(result.current.validation.validationErrors.some((e) => e.id === 'overheatTemp')).toBe(true);
+    expect(result.current.validation.validationErrors.some((e) => e.id === 'pidTargetTemp')).toBe(true);
   });
 
   it('handleRestart calls restartMiner and refetch', async () => {
@@ -173,12 +173,12 @@ describe('useMinerDevice', () => {
     const { result } = renderHook(() => useMinerDevice(miner, refetch, onError));
 
     await act(async () => {
-      await result.current.handleRestart();
+      await result.current.actions.handleRestart();
     });
 
     expect(mockRestartMiner).toHaveBeenCalled();
     expect(refetch).toHaveBeenCalled();
-    expect(result.current.message).toEqual({ type: 'success', text: 'Miner restarting…' });
+    expect(result.current.status.message).toEqual({ type: 'success', text: 'Miner restarting…' });
   });
 
   it('handleShutdown calls shutdownMiner and refetch', async () => {
@@ -187,12 +187,12 @@ describe('useMinerDevice', () => {
     const { result } = renderHook(() => useMinerDevice(miner, refetch, onError));
 
     await act(async () => {
-      await result.current.handleShutdown();
+      await result.current.actions.handleShutdown();
     });
 
     expect(mockShutdownMiner).toHaveBeenCalled();
     expect(refetch).toHaveBeenCalled();
-    expect(result.current.message).toEqual({ type: 'success', text: 'Miner shutting down…' });
+    expect(result.current.status.message).toEqual({ type: 'success', text: 'Miner shutting down…' });
   });
 
   it('save() does not call patchMinerSettings when device validation fails', async () => {
@@ -200,14 +200,14 @@ describe('useMinerDevice', () => {
     const { result } = renderHook(() => useMinerDevice(miner, refetch, onError));
 
     act(() => {
-      result.current.setOverheatTemp(30);
+      result.current.tempFan.setOverheatTemp(30);
     });
 
     await act(async () => {
-      await result.current.save();
+      await result.current.actions.save();
     });
 
     expect(mockPatchMinerSettings).not.toHaveBeenCalled();
-    expect(result.current.message?.type).toBe('error');
+    expect(result.current.status.message?.type).toBe('error');
   });
 });

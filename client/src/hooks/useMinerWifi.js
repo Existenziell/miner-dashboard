@@ -113,21 +113,29 @@ export function useMinerWifi(miner, refetch, onError) {
   };
 
   return {
-    hostname,
-    setHostname,
-    wifiSsid,
-    setWifiSsid,
-    wifiPassword,
-    setWifiPassword,
-    saving,
-    message,
-    setMessage,
-    changes,
-    hasChanges,
-    revert,
-    save,
-    validationErrors,
-    isFormValid,
-    validation,
+    wifi: {
+      hostname,
+      setHostname,
+      wifiSsid,
+      setWifiSsid,
+      wifiPassword,
+      setWifiPassword,
+    },
+    status: {
+      saving,
+      message,
+      setMessage,
+      changes,
+      hasChanges,
+    },
+    validation: {
+      validationErrors,
+      isFormValid,
+      validation,
+    },
+    actions: {
+      revert,
+      save,
+    },
   };
 }

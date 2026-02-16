@@ -12,6 +12,7 @@ import { useAppearanceContext } from '@/context/AppearanceContext';
 import { useTheme } from '@/context/ThemeContext';
 import { THEME_MODES } from '@/context/ThemeContext';
 import { useOrderDnd } from '@/hooks/useOrderDnd';
+import { CHART_COLOR_SPEC, METRIC_LABELS, METRIC_KEY_LABELS } from '@/lib/constants';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { ChartColors } from '@/components/settings/ChartColors';
 import { Field } from '@/components/settings/Field';
@@ -20,48 +21,13 @@ import { ThemePreviews } from '@/components/settings/ThemePreviews';
 
 export function TabAppearance() {
   const { mode, setMode } = useTheme();
-  const {
-    metricRanges,
-    metricOrder,
-    setMetricOrder,
-    setMetricRangeValue,
-    gaugeVisible,
-    setGaugeVisible,
-    chartVisible,
-    setChartVisible,
-    chartOrder,
-    setChartOrder,
-    METRIC_LABELS,
-    METRIC_KEY_LABELS,
-    accentColor,
-    setAccentColor,
-    chartColors,
-    setChartColorValue,
-    effectiveAccent,
-    CHART_COLOR_SPEC,
-    hasGaugeChanges,
-    hasChartChanges,
-    hasAccentChanges,
-    hasGaugeDefaultsDiff,
-    hasChartDefaultsDiff,
-    hasAccentDefaultsDiff,
-    saving,
-    message,
-    saveGaugesSection,
-    saveChartsSection,
-    saveAccentSection,
-    resetConfirmSection,
-    setResetConfirmSection,
-    resetGaugesToDefaults,
-    resetChartsToDefaults,
-    resetAccentToDefaults,
-  } = useAppearanceContext();
+  const { gauges, charts, accent, status } = useAppearanceContext();
 
-  const order = metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
-  const metricDnd = useOrderDnd(order, setMetricOrder);
+  const order = gauges.metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
+  const metricDnd = useOrderDnd(order, gauges.setMetricOrder);
 
-  const chartOrderList = chartOrder ?? DASHBOARD_DEFAULTS.chartOrder ?? CHART_COLOR_SPEC.map((c) => c.id);
-  const chartDnd = useOrderDnd(chartOrderList, setChartOrder);
+  const chartOrderList = charts.chartOrder ?? DASHBOARD_DEFAULTS.chartOrder ?? CHART_COLOR_SPEC.map((c) => c.id);
+  const chartDnd = useOrderDnd(chartOrderList, charts.setChartOrder);
 
   const themePreviewConfig = (themeId) => {
     if (themeId === 'light') return { previewClassName: 'theme-preview-light', useDarkVariant: false };
@@ -73,9 +39,9 @@ export function TabAppearance() {
 
   return (
     <div className="space-y-4">
-      {message?.type === 'error' && message?.text && (
+      {status.message?.type === 'error' && status.message?.text && (
         <div role="alert" className="message-warning">
-          {message.text}
+          {status.message.text}
         </div>
       )}
       {/* Metric ranges */}
@@ -84,26 +50,26 @@ export function TabAppearance() {
           <div className="card-header mb-4 flex flex-wrap items-center justify-between gap-2">
             <h3 className="card-header-title">Gauges</h3>
             <div className="flex items-center gap-3 ml-auto">
-              {message?.type === 'success' && message?.section === 'gauges' && (
+              {status.message?.type === 'success' && status.message?.section === 'gauges' && (
                 <span role="status" className="message-success text-sm">
                   Saved successfully
                 </span>
               )}
               <button
                 type="button"
-                onClick={() => setResetConfirmSection('gauges')}
-                disabled={!hasGaugeDefaultsDiff}
+                onClick={() => status.setResetConfirmSection('gauges')}
+                disabled={!gauges.hasGaugeDefaultsDiff}
                 className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
-                aria-disabled={!hasGaugeDefaultsDiff}
+                aria-disabled={!gauges.hasGaugeDefaultsDiff}
               >
                 Reset
               </button>
               <button
                 type="button"
-                onClick={saveGaugesSection}
-                disabled={!hasGaugeChanges || saving || (message?.type === 'success' && message?.section === 'gauges')}
+                onClick={gauges.saveGaugesSection}
+                disabled={!gauges.hasGaugeChanges || status.saving || (status.message?.type === 'success' && status.message?.section === 'gauges')}
                 className="btn-ghost-sm min-w-[5.5rem]"
-                aria-disabled={!hasGaugeChanges || saving}
+                aria-disabled={!gauges.hasGaugeChanges || status.saving}
               >
                 Save
               </button>
@@ -132,13 +98,13 @@ export function TabAppearance() {
                   >
                     <MetricRanges
                       metric={metric}
-                      metricRanges={metricRanges}
-                      setMetricRangeValue={setMetricRangeValue}
+                      metricRanges={gauges.metricRanges}
+                      setMetricRangeValue={gauges.setMetricRangeValue}
                       METRIC_LABELS={METRIC_LABELS}
                       METRIC_KEY_LABELS={METRIC_KEY_LABELS}
                       isDragActive={metricDnd.activeId != null}
-                      visibleOnDashboard={gaugeVisible[metric] !== false}
-                      onToggleVisible={setGaugeVisible}
+                      visibleOnDashboard={gauges.gaugeVisible[metric] !== false}
+                      onToggleVisible={gauges.setGaugeVisible}
                     />
                   </div>
                 ))}
@@ -161,11 +127,11 @@ export function TabAppearance() {
                 <div className="shadow-lg rounded-md cursor-grabbing">
                   <MetricRanges
                     metric={metricDnd.activeId}
-                    metricRanges={metricRanges}
-                    setMetricRangeValue={setMetricRangeValue}
+                    metricRanges={gauges.metricRanges}
+                    setMetricRangeValue={gauges.setMetricRangeValue}
                     METRIC_LABELS={METRIC_LABELS}
                     METRIC_KEY_LABELS={METRIC_KEY_LABELS}
-                    visibleOnDashboard={gaugeVisible[metricDnd.activeId] !== false}
+                    visibleOnDashboard={gauges.gaugeVisible[metricDnd.activeId] !== false}
                     onToggleVisible={null}
                   />
                 </div>
@@ -187,26 +153,26 @@ export function TabAppearance() {
           <div className="card-header flex flex-wrap items-center justify-between gap-2">
             <h3 className="card-header-title">Charts</h3>
             <div className="flex items-center gap-3 ml-auto">
-              {message?.type === 'success' && message?.section === 'charts' && (
+              {status.message?.type === 'success' && status.message?.section === 'charts' && (
                 <span role="status" className="message-success text-sm">
                   Saved successfully
                 </span>
               )}
               <button
                 type="button"
-                onClick={() => setResetConfirmSection('charts')}
-                disabled={!hasChartDefaultsDiff}
+                onClick={() => status.setResetConfirmSection('charts')}
+                disabled={!charts.hasChartDefaultsDiff}
                 className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
-                aria-disabled={!hasChartDefaultsDiff}
+                aria-disabled={!charts.hasChartDefaultsDiff}
               >
                 Reset
               </button>
               <button
                 type="button"
-                onClick={saveChartsSection}
-                disabled={!hasChartChanges || saving || (message?.type === 'success' && message?.section === 'charts')}
+                onClick={charts.saveChartsSection}
+                disabled={!charts.hasChartChanges || status.saving || (status.message?.type === 'success' && status.message?.section === 'charts')}
                 className="btn-ghost-sm min-w-[5.5rem]"
-                aria-disabled={!hasChartChanges || saving}
+                aria-disabled={!charts.hasChartChanges || status.saving}
               >
                 Save
               </button>
@@ -237,12 +203,12 @@ export function TabAppearance() {
                   >
                     <ChartColors
                       chart={chart}
-                      chartColors={chartColors}
-                      chartVisible={chartVisible}
-                      setChartColorValue={setChartColorValue}
-                      setChartVisible={setChartVisible}
+                      chartColors={charts.chartColors}
+                      chartVisible={charts.chartVisible}
+                      setChartColorValue={charts.setChartColorValue}
+                      setChartVisible={charts.setChartVisible}
                       isDragActive={chartDnd.activeId != null}
-                      onToggleVisible={setChartVisible}
+                      onToggleVisible={charts.setChartVisible}
                     />
                   </div>
                 );
@@ -268,10 +234,10 @@ export function TabAppearance() {
                 <div className="shadow-lg rounded-md cursor-grabbing bg-surface dark:bg-surface-dark">
                   <ChartColors
                     chart={chart}
-                    chartColors={chartColors}
-                    chartVisible={chartVisible}
-                    setChartColorValue={setChartColorValue}
-                    setChartVisible={setChartVisible}
+                    chartColors={charts.chartColors}
+                    chartVisible={charts.chartVisible}
+                    setChartColorValue={charts.setChartColorValue}
+                    setChartVisible={charts.setChartVisible}
                     onToggleVisible={null}
                     sortable={false}
                   />
@@ -288,26 +254,26 @@ export function TabAppearance() {
           <div className="card-header flex flex-wrap items-center justify-between gap-2">
             <h3 className="card-header-title">Accent color</h3>
             <div className="flex items-center gap-3 ml-auto">
-              {message?.type === 'success' && message?.section === 'accent' && (
+              {status.message?.type === 'success' && status.message?.section === 'accent' && (
                 <span role="status" className="message-success text-sm">
                   Saved successfully
                 </span>
               )}
               <button
                 type="button"
-                onClick={() => setResetConfirmSection('accent')}
-                disabled={!hasAccentDefaultsDiff}
+                onClick={() => status.setResetConfirmSection('accent')}
+                disabled={!accent.hasAccentDefaultsDiff}
                 className="text-link text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
-                aria-disabled={!hasAccentDefaultsDiff}
+                aria-disabled={!accent.hasAccentDefaultsDiff}
               >
                 Reset
               </button>
               <button
                 type="button"
-                onClick={saveAccentSection}
-                disabled={!hasAccentChanges || saving || (message?.type === 'success' && message?.section === 'accent')}
+                onClick={accent.saveAccentSection}
+                disabled={!accent.hasAccentChanges || status.saving || (status.message?.type === 'success' && status.message?.section === 'accent')}
                 className="btn-ghost-sm min-w-[5.5rem]"
-                aria-disabled={!hasAccentChanges || saving}
+                aria-disabled={!accent.hasAccentChanges || status.saving}
               >
                 Save
               </button>
@@ -322,15 +288,15 @@ export function TabAppearance() {
             <div className="flex items-center gap-2 max-w-96">
               <input
                 type="color"
-                value={effectiveAccent}
-                onChange={(e) => setAccentColor(e.target.value)}
+                value={accent.effectiveAccent}
+                onChange={(e) => accent.setAccentColor(e.target.value)}
                 className="w-10 h-10 rounded border border-default cursor-pointer bg-transparent"
                 aria-label="Accent color picker"
               />
               <input
                 type="text"
-                value={accentColor}
-                onChange={(e) => setAccentColor(e.target.value)}
+                value={accent.accentColor}
+                onChange={(e) => accent.setAccentColor(e.target.value)}
                 placeholder={DASHBOARD_DEFAULTS.accentColor}
                 className="input flex-1 min-w-0 font-mono text-sm"
                 aria-label="Accent color hex"
@@ -368,31 +334,31 @@ export function TabAppearance() {
       </div>
 
       <ConfirmModal
-        open={resetConfirmSection === 'gauges'}
-        onClose={() => setResetConfirmSection(null)}
+        open={status.resetConfirmSection === 'gauges'}
+        onClose={() => status.setResetConfirmSection(null)}
         title="Reset gauge settings to defaults?"
         description="Gauge ranges, order, and visibility will be reset to default values and saved."
         confirmLabel="Reset"
-        onConfirm={resetGaugesToDefaults}
-        confirmDisabled={saving}
+        onConfirm={gauges.resetGaugesToDefaults}
+        confirmDisabled={status.saving}
       />
       <ConfirmModal
-        open={resetConfirmSection === 'charts'}
-        onClose={() => setResetConfirmSection(null)}
+        open={status.resetConfirmSection === 'charts'}
+        onClose={() => status.setResetConfirmSection(null)}
         title="Reset chart settings to defaults?"
         description="Chart order, visibility, and colors will be reset to default values and saved."
         confirmLabel="Reset"
-        onConfirm={resetChartsToDefaults}
-        confirmDisabled={saving}
+        onConfirm={charts.resetChartsToDefaults}
+        confirmDisabled={status.saving}
       />
       <ConfirmModal
-        open={resetConfirmSection === 'accent'}
-        onClose={() => setResetConfirmSection(null)}
+        open={status.resetConfirmSection === 'accent'}
+        onClose={() => status.setResetConfirmSection(null)}
         title="Reset accent color to default?"
         description="Accent color will be reset to the default and saved."
         confirmLabel="Reset"
-        onConfirm={resetAccentToDefaults}
-        confirmDisabled={saving}
+        onConfirm={accent.resetAccentToDefaults}
+        confirmDisabled={status.saving}
       />
     </div>
   );

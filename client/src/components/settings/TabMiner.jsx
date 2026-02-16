@@ -3,64 +3,35 @@ import { Field } from '@/components/settings/Field';
 import { PendingIndicator } from '@/components/settings/PendingChanges';
 
 export function TabMiner() {
-  const { device: form } = useMinerSettingsContext();
-  const {
-    frequency,
-    setFrequency,
-    coreVoltage,
-    setCoreVoltage,
-    overheatTemp,
-    setOverheatTemp,
-    fanAuto,
-    setFanAuto,
-    pidTargetTemp,
-    setPidTargetTemp,
-    manualFanSpeed,
-    setManualFanSpeed,
-    autoScreenOff,
-    setAutoScreenOff,
-    flipScreen,
-    setFlipScreen,
-    frequencyOptions,
-    voltageOptions,
-    getFreqTag,
-    getVoltTag,
-    frequencyVoltageWarning,
-    selectedFreqRef,
-    absMaxFreq,
-    absMaxVolt,
-    validation,
-    hasAsicChanges,
-    hasTempFanChanges,
-    hasDisplayChanges,
-  } = form;
+  const { device } = useMinerSettingsContext();
+  const { asic, tempFan, display, status, validation } = device;
   const {
     overheatTempError,
     pidTargetTempError,
     manualFanSpeedError,
-  } = validation;
+  } = validation.validation;
 
   return (
     <>
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">ASIC<PendingIndicator hasPending={hasAsicChanges} /></h3>
+            <h3 className="card-header-title">ASIC<PendingIndicator hasPending={status.hasAsicChanges} /></h3>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field
             label="Frequency (MHz)"
-            hint={absMaxFreq != null ? `Max: ${absMaxFreq} MHz` : undefined}
+            hint={asic.absMaxFreq != null ? `Max: ${asic.absMaxFreq} MHz` : undefined}
           >
             <div className="option-list" role="radiogroup" aria-label="Frequency (MHz)">
-              {frequencyOptions.map((f) => {
-                const tag = getFreqTag(f);
-                const isSelected = frequency === f;
+              {asic.frequencyOptions.map((f) => {
+                const tag = asic.getFreqTag(f);
+                const isSelected = asic.frequency === f;
                 return (
                   <label
                     key={f}
-                    ref={isSelected ? selectedFreqRef : undefined}
+                    ref={isSelected ? asic.selectedFreqRef : undefined}
                     className={`option-row ${isSelected ? 'option-row-selected' : ''}`}
                   >
                     <input
@@ -68,7 +39,7 @@ export function TabMiner() {
                       name="frequency"
                       value={f}
                       checked={isSelected}
-                      onChange={() => setFrequency(f)}
+                      onChange={() => asic.setFrequency(f)}
                       className="option-radio-input"
                     />
                     <span className="option-radio-dot" aria-hidden />
@@ -81,11 +52,11 @@ export function TabMiner() {
               })}
             </div>
           </Field>
-          <Field label="Core voltage (mV)" hint={`Max: ${absMaxVolt} mV`}>
+          <Field label="Core voltage (mV)" hint={`Max: ${asic.absMaxVolt} mV`}>
             <div className="option-list" role="radiogroup" aria-label="Core voltage (mV)">
-              {voltageOptions.map((v) => {
-                const tag = getVoltTag(v);
-                const isSelected = coreVoltage === v;
+              {asic.voltageOptions.map((v) => {
+                const tag = asic.getVoltTag(v);
+                const isSelected = asic.coreVoltage === v;
                 return (
                   <label
                     key={v}
@@ -96,7 +67,7 @@ export function TabMiner() {
                       name="coreVoltage"
                       value={v}
                       checked={isSelected}
-                      onChange={() => setCoreVoltage(v)}
+                      onChange={() => asic.setCoreVoltage(v)}
                       className="option-radio-input"
                     />
                     <span className="option-radio-dot" aria-hidden />
@@ -110,9 +81,9 @@ export function TabMiner() {
             </div>
           </Field>
         </div>
-        {frequencyVoltageWarning && (
+        {asic.frequencyVoltageWarning && (
           <p className="mt-3 text-warning dark:text-warning-dark text-sm" role="alert">
-            {frequencyVoltageWarning}
+            {asic.frequencyVoltageWarning}
           </p>
         )}
       </div>
@@ -121,19 +92,19 @@ export function TabMiner() {
         <div className="card">
           <div className="card-header-wrapper">
             <div className="card-header">
-              <h3 className="card-header-title">Temperature & Fan<PendingIndicator hasPending={hasTempFanChanges} /></h3>
+              <h3 className="card-header-title">Temperature & Fan<PendingIndicator hasPending={status.hasTempFanChanges} /></h3>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-4">
-              {fanAuto ? (
+              {tempFan.fanAuto ? (
                 <Field label="PID target temperature (°C)" hint="Fan aims to keep ASIC at this temp.">
                   <input
                     type="number"
                     min={40}
                     max={75}
-                    value={pidTargetTemp}
-                    onChange={(e) => setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
+                    value={tempFan.pidTargetTemp}
+                    onChange={(e) => tempFan.setPidTargetTemp(Math.min(75, Math.max(40, Number(e.target.value) || 40)))}
                     className={`input ${pidTargetTempError ? 'input-danger' : ''}`}
                     aria-invalid={!!pidTargetTempError}
                     aria-describedby={pidTargetTempError ? 'pid-target-temp-error' : undefined}
@@ -150,13 +121,13 @@ export function TabMiner() {
                     type="range"
                     min={0}
                     max={100}
-                    value={manualFanSpeed}
-                    onChange={(e) => setManualFanSpeed(Number(e.target.value))}
+                    value={tempFan.manualFanSpeed}
+                    onChange={(e) => tempFan.setManualFanSpeed(Number(e.target.value))}
                     className={`input-range ${manualFanSpeedError ? 'input-danger' : ''}`}
                     aria-invalid={!!manualFanSpeedError}
                     aria-describedby={manualFanSpeedError ? 'manual-fan-speed-error' : undefined}
                   />
-                  <span className="text-sm text-normal">{manualFanSpeed}%</span>
+                  <span className="text-sm text-normal">{tempFan.manualFanSpeed}%</span>
                   {manualFanSpeedError && (
                     <p id="manual-fan-speed-error" className="text-danger text-xs mt-1" role="alert">
                       {manualFanSpeedError}
@@ -169,14 +140,14 @@ export function TabMiner() {
                   <button
                     type="button"
                     role="switch"
-                    aria-checked={fanAuto}
+                    aria-checked={tempFan.fanAuto}
                     aria-label="Fan mode: Manual / Auto (PID)"
-                    onClick={() => setFanAuto((v) => !v)}
-                    className={`switch ${fanAuto ? 'switch-on' : 'switch-off'}`}
+                    onClick={() => tempFan.setFanAuto((v) => !v)}
+                    className={`switch ${tempFan.fanAuto ? 'switch-on' : 'switch-off'}`}
                   >
-                    <span className={`switch-thumb ${fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                    <span className={`switch-thumb ${tempFan.fanAuto ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                   </button>
-                  <span className="text-sm text-normal">{fanAuto ? 'Auto (PID)' : 'Manual'}</span>
+                  <span className="text-sm text-normal">{tempFan.fanAuto ? 'Auto (PID)' : 'Manual'}</span>
                 </div>
               </Field>
             </div>
@@ -185,8 +156,8 @@ export function TabMiner() {
                 type="number"
                 min={50}
                 max={80}
-                value={overheatTemp}
-                onChange={(e) => setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
+                value={tempFan.overheatTemp}
+                onChange={(e) => tempFan.setOverheatTemp(Math.min(80, Math.max(50, Number(e.target.value) || 50)))}
                 className={`input ${overheatTempError ? 'input-danger' : ''}`}
                 aria-invalid={!!overheatTempError}
                 aria-describedby={overheatTempError ? 'overheat-temp-error' : undefined}
@@ -203,7 +174,7 @@ export function TabMiner() {
         <div className="card">
           <div className="card-header-wrapper">
             <div className="card-header">
-              <h3 className="card-header-title">Display<PendingIndicator hasPending={hasDisplayChanges} /></h3>
+              <h3 className="card-header-title">Display<PendingIndicator hasPending={status.hasDisplayChanges} /></h3>
             </div>
           </div>
           <div className="flex flex-col gap-4">
@@ -212,14 +183,14 @@ export function TabMiner() {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={autoScreenOff}
+                  aria-checked={display.autoScreenOff}
                   aria-label="Automatic screen shutdown"
-                  onClick={() => setAutoScreenOff((v) => !v)}
-                  className={`switch ${autoScreenOff ? 'switch-on' : 'switch-off'}`}
+                  onClick={() => display.setAutoScreenOff((v) => !v)}
+                  className={`switch ${display.autoScreenOff ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${display.autoScreenOff ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{autoScreenOff ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{display.autoScreenOff ? 'On' : 'Off'}</span>
               </div>
             </Field>
             <Field label="Flip screen" hint="Rotate display 180°.">
@@ -227,14 +198,14 @@ export function TabMiner() {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={flipScreen}
+                  aria-checked={display.flipScreen}
                   aria-label="Flip screen"
-                  onClick={() => setFlipScreen((v) => !v)}
-                  className={`switch ${flipScreen ? 'switch-on' : 'switch-off'}`}
+                  onClick={() => display.setFlipScreen((v) => !v)}
+                  className={`switch ${display.flipScreen ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${display.flipScreen ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{flipScreen ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{display.flipScreen ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>

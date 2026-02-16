@@ -11,58 +11,28 @@ import { Field } from '@/components/settings/Field';
 import { PendingChanges, PendingIndicator } from '@/components/settings/PendingChanges';
 
 export function TabSetup({ minerReachable }) {
-  const setupForm = useSetupContext();
-  const {
-    minerIp,
-    setMinerIp,
-    expectedHashrateGh,
-    setExpectedHashrateGh,
-    pollMinerMs,
-    setPollMinerMs,
-    pollNetworkMs,
-    setPollNetworkMs,
-    changes: connectionChanges,
-    hasChanges: hasConnectionChanges,
-    revert,
-    save: saveConnection,
-    saving: savingConnection,
-    message: configMessage,
-  } = setupForm;
+  const setup = useSetupContext();
+  const { connection, status, actions } = setup;
 
-  const { wifi: wifiForm } = useMinerSettingsContext();
-  const {
-    hostname,
-    setHostname,
-    wifiSsid,
-    setWifiSsid,
-    wifiPassword,
-    setWifiPassword,
-    validation,
-    saving,
-    isFormValid: minerFormValid,
-    message: minerMessage,
-    changes: wifiChanges,
-    hasChanges: minerHasChanges,
-    revert: wifiRevert,
-    save: wifiSave,
-  } = wifiForm;
-  const { hostnameError, wifiSsidError, wifiPasswordError } = validation;
+  const { wifi: wifiSettings } = useMinerSettingsContext();
+  const { wifi, status: wifiStatus, validation: wifiValidation, actions: wifiActions } = wifiSettings;
+  const { hostnameError, wifiSsidError, wifiPasswordError } = wifiValidation.validation;
 
   return (
     <>
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Miner Settings<PendingIndicator hasPending={connectionChanges?.length > 0} /></h3>
+            <h3 className="card-header-title">Miner Settings<PendingIndicator hasPending={status.changes?.length > 0} /></h3>
           </div>
         </div>
-        <form onSubmit={saveConnection} className="space-y-4">
+        <form onSubmit={actions.save} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Miner IP" hint="Miner IP. Leave empty to use .env MINER_IP.">
               <input
                 type="text"
-                value={minerIp}
-                onChange={(e) => setMinerIp(e.target.value)}
+                value={connection.minerIp}
+                onChange={(e) => connection.setMinerIp(e.target.value)}
                 placeholder="192.168.1.3"
                 className="input"
                 aria-label="Miner IP"
@@ -71,14 +41,14 @@ export function TabSetup({ minerReachable }) {
             <Field
               label="Expected hashrate (GH/s)"
               hint="Used for gauge and display."
-              suffix={`(= ${(expectedHashrateGh / 1000).toFixed(2)} TH/s)`}
+              suffix={`(= ${(connection.expectedHashrateGh / 1000).toFixed(2)} TH/s)`}
             >
               <input
                 type="number"
                 min={1}
                 max={100000}
-                value={expectedHashrateGh}
-                onChange={(e) => setExpectedHashrateGh(Number(e.target.value) || DASHBOARD_DEFAULTS.defaultExpectedHashrateGh)}
+                value={connection.expectedHashrateGh}
+                onChange={(e) => connection.setExpectedHashrateGh(Number(e.target.value) || DASHBOARD_DEFAULTS.defaultExpectedHashrateGh)}
                 className="input"
                 aria-label="Expected hashrate (GH/s)"
               />
@@ -86,14 +56,14 @@ export function TabSetup({ minerReachable }) {
             <Field
               label="Miner poll interval (ms)"
               hint="How often the dashboard fetches miner status."
-              suffix={`(= ${(pollMinerMs / 1000).toFixed(1)} sec)`}
+              suffix={`(= ${(connection.pollMinerMs / 1000).toFixed(1)} sec)`}
             >
               <input
                 type="number"
                 min={1000}
                 max={300000}
-                value={pollMinerMs}
-                onChange={(e) => setPollMinerMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollMinerIntervalMs)}
+                value={connection.pollMinerMs}
+                onChange={(e) => connection.setPollMinerMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollMinerIntervalMs)}
                 className="input"
                 aria-label="Miner poll interval (ms)"
               />
@@ -101,40 +71,40 @@ export function TabSetup({ minerReachable }) {
             <Field
               label="Network poll interval (ms)"
               hint="How often to fetch network stats from mempool.space."
-              suffix={`(= ${(pollNetworkMs / 1000).toFixed(1)} sec)`}
+              suffix={`(= ${(connection.pollNetworkMs / 1000).toFixed(1)} sec)`}
             >
               <input
                 type="number"
                 min={5000}
                 max={600000}
-                value={pollNetworkMs}
-                onChange={(e) => setPollNetworkMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollNetworkIntervalMs)}
+                value={connection.pollNetworkMs}
+                onChange={(e) => connection.setPollNetworkMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollNetworkIntervalMs)}
                 className="input"
                 aria-label="Network poll interval (ms)"
               />
             </Field>
           </div>
           <PendingChanges
-            changes={connectionChanges}
-            onReset={revert}
+            changes={status.changes}
+            onReset={actions.revert}
             title="Pending changes"
           />
           <div className="flex flex-wrap items-center gap-4 mt-4">
             <button
               type="submit"
-              disabled={savingConnection || !hasConnectionChanges}
+              disabled={status.saving || !status.hasChanges}
               className="btn-primary"
             >
-              {savingConnection ? 'Saving…' : 'Save settings'}
+              {status.saving ? 'Saving…' : 'Save settings'}
             </button>
-            {configMessage?.type === 'success' && (
+            {status.message?.type === 'success' && (
               <span role="status" className="message-success">
-                <span>{configMessage.text}</span>
+                <span>{status.message.text}</span>
               </span>
             )}
-            {configMessage?.type === 'error' && (
+            {status.message?.type === 'error' && (
               <span role="alert" className="message-warning">
-                {configMessage.text}
+                {status.message.text}
               </span>
             )}
           </div>
@@ -144,7 +114,7 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">WiFi Settings<PendingIndicator hasPending={wifiChanges?.length > 0} /></h3>
+            <h3 className="card-header-title">WiFi Settings<PendingIndicator hasPending={wifiStatus.changes?.length > 0} /></h3>
           </div>
         </div>
         {!minerReachable ? (
@@ -153,13 +123,13 @@ export function TabSetup({ minerReachable }) {
           </p>
         ) : (
           <>
-        <form onSubmit={(e) => { e.preventDefault(); wifiSave(); }} className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); wifiActions.save(); }} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
               <input
                 type="text"
-                value={hostname}
-                onChange={(e) => setHostname(e.target.value.toLowerCase())}
+                value={wifi.hostname}
+                onChange={(e) => wifi.setHostname(e.target.value.toLowerCase())}
                 placeholder="bitaxe"
                 maxLength={MAX_HOSTNAME_LENGTH}
                 className={`input ${hostnameError ? 'input-danger' : ''}`}
@@ -176,8 +146,8 @@ export function TabSetup({ minerReachable }) {
             <Field label="WiFi Network (SSID)" hint="Network name to connect to.">
               <input
                 type="text"
-                value={wifiSsid}
-                onChange={(e) => setWifiSsid(e.target.value)}
+                value={wifi.wifiSsid}
+                onChange={(e) => wifi.setWifiSsid(e.target.value)}
                 placeholder="WiFi Network (SSID)"
                 maxLength={MAX_WIFI_SSID_LENGTH}
                 className={`input ${wifiSsidError ? 'input-danger' : ''}`}
@@ -194,8 +164,8 @@ export function TabSetup({ minerReachable }) {
             <Field label="WiFi Password" hint={`Leave blank to keep current password. When set, ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters.`}>
               <input
                 type="password"
-                value={wifiPassword}
-                onChange={(e) => setWifiPassword(e.target.value)}
+                value={wifi.wifiPassword}
+                onChange={(e) => wifi.setWifiPassword(e.target.value)}
                 placeholder="WiFi Password"
                 maxLength={MAX_WIFI_PASSWORD_LENGTH}
                 className={`input ${wifiPasswordError ? 'input-danger' : ''}`}
@@ -214,31 +184,31 @@ export function TabSetup({ minerReachable }) {
             Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
           </p>
           <PendingChanges
-            changes={wifiChanges}
-            onReset={wifiRevert}
+            changes={wifiStatus.changes}
+            onReset={wifiActions.revert}
             title="Pending changes"
           />
           <div className="flex flex-wrap items-center gap-4 mt-4">
-            {minerHasChanges && !minerFormValid && (
+            {wifiStatus.hasChanges && !wifiValidation.isFormValid && (
               <span className="text-danger text-sm" role="alert">
                 Fix the errors above to save.
               </span>
             )}
             <button
               type="submit"
-              disabled={saving || !minerHasChanges || !minerFormValid}
+              disabled={wifiStatus.saving || !wifiStatus.hasChanges || !wifiValidation.isFormValid}
               className="btn-primary"
             >
-              {saving ? 'Saving…' : 'Save settings'}
+              {wifiStatus.saving ? 'Saving…' : 'Save settings'}
             </button>
-            {minerMessage?.type === 'success' && (
+            {wifiStatus.message?.type === 'success' && (
               <span role="status" className="message-success">
                 <span>Saved successfully</span>
               </span>
             )}
-            {minerMessage?.type === 'error' && (
+            {wifiStatus.message?.type === 'error' && (
               <span role="alert" className="message-warning">
-                {minerMessage.text}
+                {wifiStatus.message.text}
               </span>
             )}
           </div>

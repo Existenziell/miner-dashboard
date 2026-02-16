@@ -43,8 +43,32 @@ export const SETTINGS_SECTION_KEY = 'md.settings.section';
 export const GAUGE_RADIUS = 48; // Gauge arc radius (viewBox units)
 export const METRIC_RANGES = DASHBOARD_DEFAULTS.metricRanges;
 
+export const METRIC_LABELS = {
+  hashrate: 'Hashrate (GH/s)',
+  efficiency: 'Efficiency (J/TH)',
+  temp: 'Temp (°C)',
+  fanRpm: 'Fan RPM (%)',
+  current: 'Current (A)',
+  frequency: 'Frequency (MHz)',
+  voltage: 'Voltage (mV)',
+  power: 'Power (W)',
+};
+
+export const METRIC_KEY_LABELS = {
+  min: 'Min',
+  max: 'Max',
+  gaugeMax: 'Gauge max',
+  maxPct: 'Max %',
+  maxMv: 'Max (mV)',
+};
+
 // —— Stratum / pools ——————————————————————————————————————————————————————————
 export const DEFAULT_STRATUM_PORT = 3333;
+
+export const POOL_MODE_OPTIONS = [
+  { value: 'failover', label: 'Failover (Primary/Fallback)' },
+  { value: 'dual', label: 'Dual Pool' },
+];
 
 export const SOLO_POOLS = [
   {

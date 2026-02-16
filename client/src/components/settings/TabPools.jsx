@@ -7,6 +7,7 @@ import {
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import {
   DEFAULT_STRATUM_PORT,
+  POOL_MODE_OPTIONS,
   SOLO_POOLS,
 } from '@/lib/constants';
 import { IconSwap } from '@/components/Icons';
@@ -14,47 +15,8 @@ import { Field } from '@/components/settings/Field';
 import { PendingIndicator } from '@/components/settings/PendingChanges';
 
 export function TabPools({ miner }) {
-  const { pools: form } = useMinerSettingsContext();
-  const {
-    POOL_MODE_OPTIONS,
-    poolMode,
-    setPoolMode,
-    stratumTcpKeepalive,
-    setStratumTcpKeepalive,
-    primaryPoolKey,
-    setPrimaryPoolKey,
-    primaryCustomURL,
-    setPrimaryCustomURL,
-    primaryStratumPort,
-    setPrimaryStratumPort,
-    primaryStratumUser,
-    setPrimaryStratumUser,
-    primaryPassword,
-    setPrimaryPassword,
-    primaryTLS,
-    setPrimaryTLS,
-    primaryExtranonceSubscribe,
-    setPrimaryExtranonceSubscribe,
-    fallbackPoolKey,
-    setFallbackPoolKey,
-    fallbackCustomURL,
-    setFallbackCustomURL,
-    fallbackStratumPort,
-    setFallbackStratumPort,
-    fallbackStratumUser,
-    setFallbackStratumUser,
-    fallbackPassword,
-    setFallbackPassword,
-    fallbackTLS,
-    setFallbackTLS,
-    fallbackExtranonceSubscribe,
-    setFallbackExtranonceSubscribe,
-    swapPools,
-    validation,
-    hasConfigurationChanges,
-    hasPrimaryPoolChanges,
-    hasFallbackPoolChanges,
-  } = form;
+  const { pools } = useMinerSettingsContext();
+  const { mode, primary, fallback, status, validation, actions } = pools;
   const {
     primaryStratumUserError,
     fallbackStratumUserError,
@@ -64,22 +26,22 @@ export function TabPools({ miner }) {
     fallbackCustomURLError,
     primaryPasswordError,
     fallbackPasswordError,
-  } = validation;
+  } = validation.validation;
 
   return (
     <>
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">Configuration<PendingIndicator hasPending={hasConfigurationChanges} /></h3>
+            <h3 className="card-header-title">Configuration<PendingIndicator hasPending={status.hasConfigurationChanges} /></h3>
           </div>
         </div>
         <div>
           <div className="flex flex-col gap-4 md:max-w-[33%]">
             <Field label="Pool mode" hint="Failover uses fallback when primary is down; Dual uses both pools.">
               <select
-                value={poolMode}
-                onChange={(e) => setPoolMode(e.target.value)}
+                value={mode.poolMode}
+                onChange={(e) => mode.setPoolMode(e.target.value)}
                 className="input"
                 aria-label="Pool mode"
               >
@@ -95,14 +57,14 @@ export function TabPools({ miner }) {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={stratumTcpKeepalive}
+                  aria-checked={mode.stratumTcpKeepalive}
                   aria-label="Enable Stratum TCP Keepalive"
-                  onClick={() => setStratumTcpKeepalive((v) => !v)}
-                  className={`switch ${stratumTcpKeepalive ? 'switch-on' : 'switch-off'}`}
+                  onClick={() => mode.setStratumTcpKeepalive((v) => !v)}
+                  className={`switch ${mode.stratumTcpKeepalive ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${stratumTcpKeepalive ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${mode.stratumTcpKeepalive ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{stratumTcpKeepalive ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{mode.stratumTcpKeepalive ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>
@@ -114,23 +76,23 @@ export function TabPools({ miner }) {
           <div className="card-header-wrapper">
             <div className="card-header">
               <h3 className="card-header-title flex items-center gap-2">
-                {poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
+                {mode.poolMode === 'dual' ? 'Pool 1' : 'Pool 1 (Primary)'}
                 {!(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.stratumURL || '').trim() ? (
                   <span className="status-active">ACTIVE</span>
                 ) : null}
-                <PendingIndicator hasPending={hasPrimaryPoolChanges} />
+                <PendingIndicator hasPending={status.hasPrimaryPoolChanges} />
               </h3>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <Field label="Pool" hint="Solo mining pool for block templates. See Docs for full list.">
               <select
-                value={primaryPoolKey}
+                value={primary.primaryPoolKey}
                 onChange={(e) => {
                   const v = e.target.value;
-                  setPrimaryPoolKey(v);
+                  primary.setPrimaryPoolKey(v);
                   const opt = v && v !== 'other' ? SOLO_POOLS.find((o) => o.identifier === v) : null;
-                  if (opt) setPrimaryStratumPort(primaryTLS && opt.tlsPort != null ? opt.tlsPort : opt.port);
+                  if (opt) primary.setPrimaryStratumPort(primary.primaryTLS && opt.tlsPort != null ? opt.tlsPort : opt.port);
                 }}
                 className="input"
                 aria-label="Primary pool"
@@ -143,12 +105,12 @@ export function TabPools({ miner }) {
                 <option value="other">Other</option>
               </select>
             </Field>
-            {primaryPoolKey === 'other' && (
+            {primary.primaryPoolKey === 'other' && (
               <Field label="Pool URL" hint="Do not include 'stratum+tcp://' or port.">
                 <input
                   type="text"
-                  value={primaryCustomURL}
-                  onChange={(e) => setPrimaryCustomURL(e.target.value)}
+                  value={primary.primaryCustomURL}
+                  onChange={(e) => primary.setPrimaryCustomURL(e.target.value)}
                   placeholder="stratum.example.com"
                   className={`input ${primaryCustomURLError ? 'input-danger' : ''}`}
                   aria-label="Primary pool URL"
@@ -167,8 +129,8 @@ export function TabPools({ miner }) {
                 type="number"
                 min={MIN_STRATUM_PORT}
                 max={MAX_STRATUM_PORT}
-                value={primaryStratumPort}
-                onChange={(e) => setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
+                value={primary.primaryStratumPort}
+                onChange={(e) => primary.setPrimaryStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
                 className={`input ${!primaryPortValid ? 'input-danger' : ''}`}
                 aria-label="Primary pool Stratum port"
                 aria-invalid={!primaryPortValid}
@@ -177,8 +139,8 @@ export function TabPools({ miner }) {
             <Field label="Worker / payout address" hint="Bitcoin address or pool username.">
               <input
                 type="text"
-                value={primaryStratumUser}
-                onChange={(e) => setPrimaryStratumUser(e.target.value)}
+                value={primary.primaryStratumUser}
+                onChange={(e) => primary.setPrimaryStratumUser(e.target.value)}
                 placeholder="bc1q..."
                 maxLength={MAX_STRATUM_USER_LENGTH}
                 className={`input ${primaryStratumUserError ? 'input-danger' : ''}`}
@@ -195,8 +157,8 @@ export function TabPools({ miner }) {
             <Field label="Password" hint="Some devices do not return it. Leave blank to keep the current password.">
               <input
                 type="text"
-                value={primaryPassword}
-                onChange={(e) => setPrimaryPassword(e.target.value)}
+                value={primary.primaryPassword}
+                onChange={(e) => primary.setPrimaryPassword(e.target.value)}
                 maxLength={MAX_STRATUM_PASSWORD_LENGTH}
                 className={`input ${primaryPasswordError ? 'input-danger' : ''}`}
                 placeholder="Pool Password"
@@ -215,14 +177,14 @@ export function TabPools({ miner }) {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={primaryExtranonceSubscribe}
+                  aria-checked={primary.primaryExtranonceSubscribe}
                   aria-label="Primary pool Enable Extranonce Subscribe"
-                  onClick={() => setPrimaryExtranonceSubscribe((v) => !v)}
-                  className={`switch ${primaryExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
+                  onClick={() => primary.setPrimaryExtranonceSubscribe((v) => !v)}
+                  className={`switch ${primary.primaryExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${primary.primaryExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{primary.primaryExtranonceSubscribe ? 'On' : 'Off'}</span>
               </div>
             </Field>
             <Field label="Encrypted connection (TLS)" hint="Improves security by encrypting the connection to the pool.">
@@ -230,19 +192,19 @@ export function TabPools({ miner }) {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={primaryTLS}
+                  aria-checked={primary.primaryTLS}
                   aria-label="Primary pool Encrypted connection TLS"
                   onClick={() => {
-                    const nextTLS = !primaryTLS;
-                    setPrimaryTLS(nextTLS);
-                    const opt = primaryPoolKey && primaryPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === primaryPoolKey) : null;
-                    if (opt?.tlsPort != null) setPrimaryStratumPort(nextTLS ? opt.tlsPort : opt.port);
+                    const nextTLS = !primary.primaryTLS;
+                    primary.setPrimaryTLS(nextTLS);
+                    const opt = primary.primaryPoolKey && primary.primaryPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === primary.primaryPoolKey) : null;
+                    if (opt?.tlsPort != null) primary.setPrimaryStratumPort(nextTLS ? opt.tlsPort : opt.port);
                   }}
-                  className={`switch ${primaryTLS ? 'switch-on' : 'switch-off'}`}
+                  className={`switch ${primary.primaryTLS ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${primary.primaryTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{primaryTLS ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{primary.primaryTLS ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>
@@ -251,7 +213,7 @@ export function TabPools({ miner }) {
         <div className="flex items-center justify-center -mx-2">
           <button
             type="button"
-            onClick={swapPools}
+            onClick={actions.swapPools}
             className="swap-pool-btn"
             aria-label="Swap Pool 1 and Pool 2 settings"
             title="Swap pools"
@@ -264,23 +226,23 @@ export function TabPools({ miner }) {
           <div className="card-header-wrapper">
             <div className="card-header">
               <h3 className="card-header-title flex items-center gap-2">
-                {poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
+                {mode.poolMode === 'dual' ? 'Pool 2' : 'Pool 2 (Fallback)'}
                 {(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.fallbackStratumURL || '').trim() ? (
                   <span className="status-active">ACTIVE</span>
                 ) : null}
-                <PendingIndicator hasPending={hasFallbackPoolChanges} />
+                <PendingIndicator hasPending={status.hasFallbackPoolChanges} />
               </h3>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <Field label="Pool" hint="Used when primary is unreachable.">
               <select
-                value={fallbackPoolKey}
+                value={fallback.fallbackPoolKey}
                 onChange={(e) => {
                   const v = e.target.value;
-                  setFallbackPoolKey(v);
+                  fallback.setFallbackPoolKey(v);
                   const opt = v && v !== 'other' ? SOLO_POOLS.find((o) => o.identifier === v) : null;
-                  if (opt) setFallbackStratumPort(fallbackTLS && opt.tlsPort != null ? opt.tlsPort : opt.port);
+                  if (opt) fallback.setFallbackStratumPort(fallback.fallbackTLS && opt.tlsPort != null ? opt.tlsPort : opt.port);
                 }}
                 className="input"
                 aria-label="Fallback pool"
@@ -294,12 +256,12 @@ export function TabPools({ miner }) {
                 <option value="other">Other</option>
               </select>
             </Field>
-            {fallbackPoolKey === 'other' && (
+            {fallback.fallbackPoolKey === 'other' && (
               <Field label="Pool URL" hint="Do not include 'stratum+tcp://' or port.">
                 <input
                   type="text"
-                  value={fallbackCustomURL}
-                  onChange={(e) => setFallbackCustomURL(e.target.value)}
+                  value={fallback.fallbackCustomURL}
+                  onChange={(e) => fallback.setFallbackCustomURL(e.target.value)}
                   placeholder="stratum.example.com"
                   className={`input ${fallbackCustomURLError ? 'input-danger' : ''}`}
                   aria-label="Fallback pool URL"
@@ -318,8 +280,8 @@ export function TabPools({ miner }) {
                 type="number"
                 min={MIN_STRATUM_PORT}
                 max={MAX_STRATUM_PORT}
-                value={fallbackStratumPort}
-                onChange={(e) => setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
+                value={fallback.fallbackStratumPort}
+                onChange={(e) => fallback.setFallbackStratumPort(Math.min(MAX_STRATUM_PORT, Math.max(MIN_STRATUM_PORT, Number(e.target.value) || DEFAULT_STRATUM_PORT)))}
                 className={`input ${!fallbackPortValid ? 'input-danger' : ''}`}
                 aria-label="Fallback pool Stratum port"
                 aria-invalid={!fallbackPortValid}
@@ -328,8 +290,8 @@ export function TabPools({ miner }) {
             <Field label="Worker / payout address" hint="Bitcoin address or pool username.">
               <input
                 type="text"
-                value={fallbackStratumUser}
-                onChange={(e) => setFallbackStratumUser(e.target.value)}
+                value={fallback.fallbackStratumUser}
+                onChange={(e) => fallback.setFallbackStratumUser(e.target.value)}
                 placeholder="bc1q..."
                 maxLength={MAX_STRATUM_USER_LENGTH}
                 className={`input ${fallbackStratumUserError ? 'input-danger' : ''}`}
@@ -346,8 +308,8 @@ export function TabPools({ miner }) {
             <Field label="Password" hint="Some devices do not return it. Leave blank to keep the current password.">
               <input
                 type="text"
-                value={fallbackPassword}
-                onChange={(e) => setFallbackPassword(e.target.value)}
+                value={fallback.fallbackPassword}
+                onChange={(e) => fallback.setFallbackPassword(e.target.value)}
                 maxLength={MAX_STRATUM_PASSWORD_LENGTH}
                 className={`input ${fallbackPasswordError ? 'input-danger' : ''}`}
                 placeholder="Pool Password"
@@ -366,14 +328,14 @@ export function TabPools({ miner }) {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={fallbackExtranonceSubscribe}
+                  aria-checked={fallback.fallbackExtranonceSubscribe}
                   aria-label="Fallback pool Enable Extranonce Subscribe"
-                  onClick={() => setFallbackExtranonceSubscribe((v) => !v)}
-                  className={`switch ${fallbackExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
+                  onClick={() => fallback.setFallbackExtranonceSubscribe((v) => !v)}
+                  className={`switch ${fallback.fallbackExtranonceSubscribe ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${fallback.fallbackExtranonceSubscribe ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{fallback.fallbackExtranonceSubscribe ? 'On' : 'Off'}</span>
               </div>
             </Field>
             <Field label="Encrypted connection (TLS)" hint="Improves security by encrypting the connection to the pool.">
@@ -381,19 +343,19 @@ export function TabPools({ miner }) {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={fallbackTLS}
+                  aria-checked={fallback.fallbackTLS}
                   aria-label="Fallback pool Encrypted connection TLS"
                   onClick={() => {
-                    const nextTLS = !fallbackTLS;
-                    setFallbackTLS(nextTLS);
-                    const opt = fallbackPoolKey && fallbackPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === fallbackPoolKey) : null;
-                    if (opt?.tlsPort != null) setFallbackStratumPort(nextTLS ? opt.tlsPort : opt.port);
+                    const nextTLS = !fallback.fallbackTLS;
+                    fallback.setFallbackTLS(nextTLS);
+                    const opt = fallback.fallbackPoolKey && fallback.fallbackPoolKey !== 'other' ? SOLO_POOLS.find((o) => o.identifier === fallback.fallbackPoolKey) : null;
+                    if (opt?.tlsPort != null) fallback.setFallbackStratumPort(nextTLS ? opt.tlsPort : opt.port);
                   }}
-                  className={`switch ${fallbackTLS ? 'switch-on' : 'switch-off'}`}
+                  className={`switch ${fallback.fallbackTLS ? 'switch-on' : 'switch-off'}`}
                 >
-                  <span className={`switch-thumb ${fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
+                  <span className={`switch-thumb ${fallback.fallbackTLS ? 'switch-thumb-on' : 'switch-thumb-off'}`} />
                 </button>
-                <span className="text-sm text-normal">{fallbackTLS ? 'On' : 'Off'}</span>
+                <span className="text-sm text-normal">{fallback.fallbackTLS ? 'On' : 'Off'}</span>
               </div>
             </Field>
           </div>

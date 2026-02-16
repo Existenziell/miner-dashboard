@@ -5,7 +5,7 @@ import { act } from 'react';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useMinerPools } from '@/hooks/useMinerPools';
-import { DEFAULT_STRATUM_PORT } from '@/lib/constants';
+import { DEFAULT_STRATUM_PORT, POOL_MODE_OPTIONS } from '@/lib/constants';
 
 const mockPatchMinerSettings = vi.fn();
 
@@ -24,13 +24,13 @@ describe('useMinerPools', () => {
   it('returns pool state with defaults when miner is null', () => {
     const { result } = renderHook(() => useMinerPools(null, refetch, onError));
 
-    expect(result.current.primaryStratumPort).toBe(DEFAULT_STRATUM_PORT);
-    expect(result.current.fallbackStratumPort).toBe(DEFAULT_STRATUM_PORT);
-    expect(result.current.poolMode).toBe('failover');
-    expect(result.current.changes).toEqual([]);
-    expect(result.current.hasChanges).toBe(false);
-    expect(result.current.saving).toBe(false);
-    expect(result.current.POOL_MODE_OPTIONS).toHaveLength(2);
+    expect(result.current.primary.primaryStratumPort).toBe(DEFAULT_STRATUM_PORT);
+    expect(result.current.fallback.fallbackStratumPort).toBe(DEFAULT_STRATUM_PORT);
+    expect(result.current.mode.poolMode).toBe('failover');
+    expect(result.current.status.changes).toEqual([]);
+    expect(result.current.status.hasChanges).toBe(false);
+    expect(result.current.status.saving).toBe(false);
+    expect(POOL_MODE_OPTIONS).toHaveLength(2);
   });
 
   it('syncs state from miner when miner has pool config', () => {
@@ -52,9 +52,9 @@ describe('useMinerPools', () => {
     };
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
-    expect(result.current.primaryStratumPort).toBe(3333);
-    expect(result.current.primaryStratumUser).toBe('bc1q...');
-    expect(result.current.poolMode).toBe('failover');
+    expect(result.current.primary.primaryStratumPort).toBe(3333);
+    expect(result.current.primary.primaryStratumUser).toBe('bc1q...');
+    expect(result.current.mode.poolMode).toBe('failover');
   });
 
   it('computes changes when pool mode or stratum keepalive is edited', () => {
@@ -72,19 +72,19 @@ describe('useMinerPools', () => {
     };
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
-    expect(result.current.hasChanges).toBe(false);
+    expect(result.current.status.hasChanges).toBe(false);
 
     act(() => {
-      result.current.setPoolMode('dual');
+      result.current.mode.setPoolMode('dual');
     });
-    expect(result.current.hasChanges).toBe(true);
-    expect(result.current.changes.some((c) => c.label === 'Pool mode')).toBe(true);
+    expect(result.current.status.hasChanges).toBe(true);
+    expect(result.current.status.changes.some((c) => c.label === 'Pool mode')).toBe(true);
 
     act(() => {
-      result.current.setPoolMode('failover');
-      result.current.setStratumTcpKeepalive(true);
+      result.current.mode.setPoolMode('failover');
+      result.current.mode.setStratumTcpKeepalive(true);
     });
-    expect(result.current.changes.some((c) => c.label === 'Stratum TCP Keepalive')).toBe(true);
+    expect(result.current.status.changes.some((c) => c.label === 'Stratum TCP Keepalive')).toBe(true);
   });
 
   it('revert() restores state to baseline', () => {
@@ -103,18 +103,18 @@ describe('useMinerPools', () => {
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
     act(() => {
-      result.current.setPoolMode('dual');
-      result.current.setPrimaryStratumUser('other');
+      result.current.mode.setPoolMode('dual');
+      result.current.primary.setPrimaryStratumUser('other');
     });
-    expect(result.current.hasChanges).toBe(true);
+    expect(result.current.status.hasChanges).toBe(true);
 
     act(() => {
-      result.current.revert();
+      result.current.actions.revert();
     });
 
-    expect(result.current.poolMode).toBe('failover');
-    expect(result.current.primaryStratumUser).toBe('user');
-    expect(result.current.hasChanges).toBe(false);
+    expect(result.current.mode.poolMode).toBe('failover');
+    expect(result.current.primary.primaryStratumUser).toBe('user');
+    expect(result.current.status.hasChanges).toBe(false);
   });
 
   it('save() calls patchMinerSettings with pool payload and refetch', async () => {
@@ -134,18 +134,18 @@ describe('useMinerPools', () => {
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
     act(() => {
-      result.current.setStratumTcpKeepalive(false);
+      result.current.mode.setStratumTcpKeepalive(false);
     });
 
     await act(async () => {
-      await result.current.save();
+      await result.current.actions.save();
     });
 
     expect(mockPatchMinerSettings).toHaveBeenCalled();
     const call = mockPatchMinerSettings.mock.calls[0][0];
     expect(call.stratum_keep).toBe(false);
     expect(refetch).toHaveBeenCalled();
-    expect(result.current.message).toEqual({ type: 'success', text: 'Pools saved.' });
+    expect(result.current.status.message).toEqual({ type: 'success', text: 'Pools saved.' });
   });
 
   it('reports validation error when primary pool is "other" and URL is empty', () => {
@@ -164,12 +164,12 @@ describe('useMinerPools', () => {
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
     act(() => {
-      result.current.setPrimaryPoolKey('other');
-      result.current.setPrimaryCustomURL('');
+      result.current.primary.setPrimaryPoolKey('other');
+      result.current.primary.setPrimaryCustomURL('');
     });
 
-    expect(result.current.isFormValid).toBe(false);
-    expect(result.current.validationErrors.some((e) => e.id === 'primaryCustomURL')).toBe(true);
+    expect(result.current.validation.isFormValid).toBe(false);
+    expect(result.current.validation.validationErrors.some((e) => e.id === 'primaryCustomURL')).toBe(true);
   });
 
   it('calls onError when save() fails', async () => {
@@ -189,11 +189,11 @@ describe('useMinerPools', () => {
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
     await act(async () => {
-      await result.current.save();
+      await result.current.actions.save();
     });
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
-    expect(result.current.message).toEqual({ type: 'error', text: 'Network error' });
+    expect(result.current.status.message).toEqual({ type: 'error', text: 'Network error' });
   });
 
   it('save() does not call patchMinerSettings when pool form is invalid', async () => {
@@ -212,15 +212,15 @@ describe('useMinerPools', () => {
     const { result } = renderHook(() => useMinerPools(miner, refetch, onError));
 
     act(() => {
-      result.current.setPrimaryPoolKey('other');
-      result.current.setPrimaryCustomURL('');
+      result.current.primary.setPrimaryPoolKey('other');
+      result.current.primary.setPrimaryCustomURL('');
     });
 
     await act(async () => {
-      await result.current.save();
+      await result.current.actions.save();
     });
 
     expect(mockPatchMinerSettings).not.toHaveBeenCalled();
-    expect(result.current.message?.type).toBe('error');
+    expect(result.current.status.message?.type).toBe('error');
   });
 });
