@@ -233,7 +233,7 @@ html.high-contrast a {
 }
 
 .card-subtitle {
-  @apply text-muted text-sm mb-6;
+  @apply text-muted dark:text-muted-dark text-sm mb-6;
 }
 
 .card--collapsed {

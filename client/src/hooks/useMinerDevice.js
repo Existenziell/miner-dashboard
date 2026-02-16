@@ -153,6 +153,19 @@ export function useMinerDevice(miner, refetch, onError) {
 
   const hasChanges = changes.length > 0;
 
+  const hasAsicChanges =
+    baseline != null &&
+    (frequency !== baseline.frequency || coreVoltage !== baseline.coreVoltage);
+  const hasTempFanChanges =
+    baseline != null &&
+    (overheatTemp !== baseline.overheatTemp ||
+      fanAuto !== baseline.fanAuto ||
+      (fanAuto && pidTargetTemp !== baseline.pidTargetTemp) ||
+      (!fanAuto && manualFanSpeed !== baseline.manualFanSpeed));
+  const hasDisplayChanges =
+    baseline != null &&
+    (autoScreenOff !== baseline.autoScreenOff || flipScreen !== baseline.flipScreen);
+
   const revert = useCallback(() => {
     if (!baseline) return;
     setFrequency(baseline.frequency);
@@ -278,6 +291,9 @@ export function useMinerDevice(miner, refetch, onError) {
     baseline,
     changes,
     hasChanges,
+    hasAsicChanges,
+    hasTempFanChanges,
+    hasDisplayChanges,
     revert,
     validationErrors,
     isFormValid,

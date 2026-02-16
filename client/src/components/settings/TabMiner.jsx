@@ -1,5 +1,6 @@
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import { Field } from '@/components/settings/Field';
+import { PendingIndicator } from '@/components/settings/PendingChanges';
 
 export function TabMiner() {
   const { device: form } = useMinerSettingsContext();
@@ -29,6 +30,9 @@ export function TabMiner() {
     absMaxFreq,
     absMaxVolt,
     validation,
+    hasAsicChanges,
+    hasTempFanChanges,
+    hasDisplayChanges,
   } = form;
   const {
     overheatTempError,
@@ -41,7 +45,7 @@ export function TabMiner() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">ASIC</h3>
+            <h3 className="card-header-title">ASIC<PendingIndicator hasPending={hasAsicChanges} /></h3>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -117,7 +121,7 @@ export function TabMiner() {
         <div className="card">
           <div className="card-header-wrapper">
             <div className="card-header">
-              <h3 className="card-header-title">Temperature & Fan</h3>
+              <h3 className="card-header-title">Temperature & Fan<PendingIndicator hasPending={hasTempFanChanges} /></h3>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -199,7 +203,7 @@ export function TabMiner() {
         <div className="card">
           <div className="card-header-wrapper">
             <div className="card-header">
-              <h3 className="card-header-title">Display</h3>
+              <h3 className="card-header-title">Display<PendingIndicator hasPending={hasDisplayChanges} /></h3>
             </div>
           </div>
           <div className="flex flex-col gap-4">

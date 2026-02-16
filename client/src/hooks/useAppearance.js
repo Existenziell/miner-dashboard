@@ -97,6 +97,10 @@ export function useAppearance(config, refetchConfig, onError) {
   const colorHasChanges = effectiveAccent !== configAccent || hasChartColorsChange;
   const hasChanges = dashboardHasChanges || colorHasChanges;
 
+  const hasGaugeChanges = rangesChanged || orderChanged || gaugeVisibleChanged;
+  const hasChartChanges = chartVisibleChanged || chartOrderChanged || hasChartColorsChange;
+  const hasAccentChanges = effectiveAccent !== configAccent;
+
   const hasDefaultsDiff =
     JSON.stringify(metricRanges) !== JSON.stringify(DASHBOARD_DEFAULTS.metricRanges) ||
     JSON.stringify(metricOrder) !== JSON.stringify(defaultMetricOrder()) ||
@@ -282,37 +286,13 @@ export function useAppearance(config, refetchConfig, onError) {
     }));
   }, []);
 
-  const setGaugeVisible = useCallback(
-    (metricId, value) => {
-      setGaugeVisibleState((prev) => {
-        const next = { ...prev, [metricId]: value };
-        patchDashboardConfig({ gaugeVisible: next })
-          .then(() => refetchConfig())
-          .catch((err) => {
-            onError?.(err);
-            setGaugeVisibleState(() => deepCopy(config.gaugeVisible ?? defaultGaugeVisible()));
-          });
-        return next;
-      });
-    },
-    [config.gaugeVisible, refetchConfig, onError]
-  );
+  const setGaugeVisible = useCallback((metricId, value) => {
+    setGaugeVisibleState((prev) => ({ ...prev, [metricId]: value }));
+  }, []);
 
-  const setChartVisible = useCallback(
-    (chartId, value) => {
-      setChartVisibleState((prev) => {
-        const next = { ...prev, [chartId]: value };
-        patchDashboardConfig({ chartVisible: next })
-          .then(() => refetchConfig())
-          .catch((err) => {
-            onError?.(err);
-            setChartVisibleState(() => deepCopy(config.chartVisible ?? defaultChartVisible()));
-          });
-        return next;
-      });
-    },
-    [config.chartVisible, refetchConfig, onError]
-  );
+  const setChartVisible = useCallback((chartId, value) => {
+    setChartVisibleState((prev) => ({ ...prev, [chartId]: value }));
+  }, []);
 
   useEffect(() => {
     if (message?.type !== 'success') return;
@@ -341,6 +321,9 @@ export function useAppearance(config, refetchConfig, onError) {
     setChartColorValue,
     changes,
     hasChanges,
+    hasGaugeChanges,
+    hasChartChanges,
+    hasAccentChanges,
     hasDefaultsDiff,
     revert,
     save,

@@ -173,6 +173,28 @@ export function useMinerPools(miner, refetch, onError) {
 
   const hasChanges = changes.length > 0;
 
+  const hasConfigurationChanges =
+    baseline != null &&
+    (poolMode !== baseline.poolMode || stratumTcpKeepalive !== baseline.stratumTcpKeepalive);
+  const hasPrimaryPoolChanges =
+    baseline != null &&
+    (primaryPoolKey !== baseline.primaryPoolKey ||
+      primaryCustomURL !== baseline.primaryCustomURL ||
+      primaryStratumPort !== baseline.primaryStratumPort ||
+      primaryPassword !== baseline.primaryPassword ||
+      primaryStratumUser !== baseline.primaryStratumUser ||
+      primaryTLS !== baseline.primaryTLS ||
+      primaryExtranonceSubscribe !== baseline.primaryExtranonceSubscribe);
+  const hasFallbackPoolChanges =
+    baseline != null &&
+    (fallbackPoolKey !== baseline.fallbackPoolKey ||
+      fallbackCustomURL !== baseline.fallbackCustomURL ||
+      fallbackStratumPort !== baseline.fallbackStratumPort ||
+      fallbackPassword !== baseline.fallbackPassword ||
+      fallbackStratumUser !== baseline.fallbackStratumUser ||
+      fallbackTLS !== baseline.fallbackTLS ||
+      fallbackExtranonceSubscribe !== baseline.fallbackExtranonceSubscribe);
+
   const revert = useCallback(() => {
     if (!baseline) return;
     setPrimaryPoolKey(baseline.primaryPoolKey);
@@ -367,6 +389,9 @@ export function useMinerPools(miner, refetch, onError) {
     setFallbackExtranonceSubscribe,
     changes,
     hasChanges,
+    hasConfigurationChanges,
+    hasPrimaryPoolChanges,
+    hasFallbackPoolChanges,
     revert,
     swapPools,
     save,

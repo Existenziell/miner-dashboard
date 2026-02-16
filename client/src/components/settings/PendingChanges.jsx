@@ -1,4 +1,16 @@
 /**
+ * Asterisk in accent color next to a section title when it has unsaved changes.
+ */
+export function PendingIndicator({ hasPending }) {
+  if (!hasPending) return null;
+  return (
+    <span className="text-accent" aria-label="Unsaved changes" title="Unsaved changes">
+      {' *'}
+    </span>
+  );
+}
+
+/**
  * Reusable "Pending changes" block: list of from → to changes and a Reset button.
  */
 export function PendingChanges({ changes, onReset, title = 'Pending changes' }) {

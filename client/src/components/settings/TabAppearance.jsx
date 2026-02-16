@@ -22,6 +22,7 @@ import { THEME_MODES } from '@/context/ThemeContext';
 import { normalizeHex } from '@/lib/colorUtils';
 import { ThemeIcon } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';
+import { PendingIndicator } from '@/components/settings/PendingChanges';
 
 function MetricRangeCard({
   metric,
@@ -284,6 +285,9 @@ export function TabAppearance() {
     setChartColorValue,
     effectiveAccent,
     CHART_COLOR_SPEC,
+    hasGaugeChanges,
+    hasChartChanges,
+    hasAccentChanges,
   } = useAppearanceContext();
 
   const [activeId, setActiveId] = useState(null);
@@ -401,7 +405,7 @@ export function TabAppearance() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Gauges</h3>
+            <h3 className="card-header-title">Gauges<PendingIndicator hasPending={hasGaugeChanges} /></h3>
           </div>
         </div>
         <div className="space-y-4">
@@ -479,7 +483,7 @@ export function TabAppearance() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">Charts</h3>
+            <h3 className="card-header-title">Charts<PendingIndicator hasPending={hasChartChanges} /></h3>
           </div>
         </div>
         <p className="card-subtitle">
@@ -555,7 +559,7 @@ export function TabAppearance() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">Accent color</h3>
+            <h3 className="card-header-title">Accent color<PendingIndicator hasPending={hasAccentChanges} /></h3>
           </div>
         </div>
         <p className="card-subtitle">

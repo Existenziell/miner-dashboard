@@ -11,6 +11,7 @@ import {
 } from '@/lib/constants';
 import { IconSwap } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';
+import { PendingIndicator } from '@/components/settings/PendingChanges';
 
 export function TabPools({ miner }) {
   const { pools: form } = useMinerSettingsContext();
@@ -50,6 +51,9 @@ export function TabPools({ miner }) {
     setFallbackExtranonceSubscribe,
     swapPools,
     validation,
+    hasConfigurationChanges,
+    hasPrimaryPoolChanges,
+    hasFallbackPoolChanges,
   } = form;
   const {
     primaryStratumUserError,
@@ -67,7 +71,7 @@ export function TabPools({ miner }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">Configuration</h3>
+            <h3 className="card-header-title">Configuration<PendingIndicator hasPending={hasConfigurationChanges} /></h3>
           </div>
         </div>
         <div>
@@ -114,6 +118,7 @@ export function TabPools({ miner }) {
                 {!(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.stratumURL || '').trim() ? (
                   <span className="status-active">ACTIVE</span>
                 ) : null}
+                <PendingIndicator hasPending={hasPrimaryPoolChanges} />
               </h3>
             </div>
           </div>
@@ -263,6 +268,7 @@ export function TabPools({ miner }) {
                 {(miner?.stratum?.usingFallback ?? miner?.isUsingFallbackStratum === 1) && (miner?.fallbackStratumURL || '').trim() ? (
                   <span className="status-active">ACTIVE</span>
                 ) : null}
+                <PendingIndicator hasPending={hasFallbackPoolChanges} />
               </h3>
             </div>
           </div>

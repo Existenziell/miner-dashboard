@@ -8,7 +8,7 @@ import {
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import { useSetupContext } from '@/context/SetupContext';
 import { Field } from '@/components/settings/Field';
-import { PendingChanges } from '@/components/settings/PendingChanges';
+import { PendingChanges, PendingIndicator } from '@/components/settings/PendingChanges';
 
 export function TabSetup({ minerReachable }) {
   const setupForm = useSetupContext();
@@ -53,7 +53,7 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Miner Settings</h3>
+            <h3 className="card-header-title">Miner Settings<PendingIndicator hasPending={connectionChanges?.length > 0} /></h3>
           </div>
         </div>
         <form onSubmit={saveConnection} className="space-y-4">
@@ -144,7 +144,7 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header">
-            <h3 className="card-header-title">WiFi Settings</h3>
+            <h3 className="card-header-title">WiFi Settings<PendingIndicator hasPending={wifiChanges?.length > 0} /></h3>
           </div>
         </div>
         {!minerReachable ? (
