@@ -14,8 +14,8 @@
       "vrTemp": "#06b6d4"
     },
     "hashrate": {
-      "hashRate": "#d946ef",
-      "hashRate_1m": "#06b6d4",
+      "hashRate": "#06b6d4",
+      "hashRate_1m": "#9300d4",
       "hashRate_10m": "#eff2bd",
       "hashRate_1h": "#16a34a",
       "hashRate_1d": "#f7931a"
