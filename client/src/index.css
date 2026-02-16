@@ -204,6 +204,10 @@ html.high-contrast a {
   text-decoration-style: solid;
 }
 
+.api-pre {
+  @apply text-xs text-fg dark:text-fg-dark overflow-auto max-h-96 p-4 rounded-md bg-surface-light dark:bg-surface-light-dark border border-edge dark:border-edge-dark whitespace-pre-wrap break-all;
+}
+
 /* ==========================================================================
    Cards
    ========================================================================== */
@@ -220,20 +224,8 @@ html.high-contrast a {
   @apply w-full text-left bg-surface-light dark:bg-surface-light-dark px-5 py-3 rounded-t-md flex items-center justify-between gap-2;
 }
 
-.card--collapsed {
-  @apply pb-0;
-}
-
-.card--collapsed .card-header-wrapper {
-  @apply mb-0;
-}
-
 .card-header-title {
   @apply text-lg font-semibold text-fg dark:text-fg-dark m-0;
-}
-
-.gauge-card {
-  @apply rounded-md px-4 py-3 border overflow-visible bg-surface-card dark:bg-surface-card-dark border-edge dark:border-edge-dark;
 }
 
 .card-title {
@@ -242,6 +234,18 @@ html.high-contrast a {
 
 .card-subtitle {
   @apply text-muted text-sm mb-6;
+}
+
+.card--collapsed {
+  @apply pb-0;
+}
+
+.card--collapsed .card-header-wrapper {
+  @apply mb-0;
+}
+
+.gauge-card {
+  @apply rounded-md px-4 py-3 border overflow-visible bg-surface-card dark:bg-surface-card-dark border-edge dark:border-edge-dark;
 }
 
 /* ==========================================================================
@@ -347,7 +351,9 @@ input[type="number"] {
   @apply opacity-100 visible;
 }
 
-/* --- Switch --- */
+/* ==========================================================================
+  Switch
+  ========================================================================== */
 
 .switch {
   @apply relative inline-flex items-center h-6 w-11 shrink-0 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-surface dark:focus:ring-offset-surface-dark;
@@ -373,7 +379,9 @@ input[type="number"] {
   @apply translate-x-0.5;
 }
 
-/* --- Option list (exclusive radio) --- */
+/* ==========================================================================
+  Option list (exclusive radio)
+  ========================================================================== */
 
 .option-list {
   @apply flex flex-col rounded-md border border-edge dark:border-edge-dark overflow-hidden bg-surface-light dark:bg-surface-light-dark max-h-72 overflow-y-auto;
@@ -408,7 +416,9 @@ input[type="number"] {
   @apply ml-1.5 text-xs text-muted dark:text-muted-dark font-normal;
 }
 
-/* --- Checkbox --- */
+/* ==========================================================================
+  Checkbox
+  ========================================================================== */
 
 .checkbox-input {
   @apply sr-only;
@@ -581,9 +591,4 @@ input[type="number"] {
 
 .doc-page table.doc-pools-table .code-inline {
   @apply text-xs;
-}
-
-/* --- Code block (pre) --- */
-.api-pre {
-  @apply text-xs text-fg dark:text-fg-dark overflow-auto max-h-96 p-4 rounded-md bg-surface-light dark:bg-surface-light-dark border border-edge dark:border-edge-dark whitespace-pre-wrap break-all;
 }
