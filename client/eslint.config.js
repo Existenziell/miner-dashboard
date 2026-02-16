@@ -1,8 +1,10 @@
 import js from '@eslint/js';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
+import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 
 /** Import order: React → context → hooks → lib → components → other @/ → relative */
@@ -43,9 +45,19 @@ export default defineConfig([
     },
     plugins: {
       import: importPlugin,
+      react,
+      'unused-imports': unusedImports,
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      /* Mark React and JSX identifiers as used so unused-imports doesn't false-positive */
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
+      'no-unused-vars': 'error',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      ],
       'import/order': importOrder,
       /* Stricter style & safety */
       eqeqeq: ['error', 'always', { null: 'ignore' }],
