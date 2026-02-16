@@ -7,7 +7,7 @@ import {
   flashFirmwareFile,
 } from '@/lib/api';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import { IconCloudDownload } from '@/components/Icons';
+import { IconDownload } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';
 
 function formatPublished(iso) {
@@ -305,7 +305,7 @@ export function TabFirmware() {
               disabled={disabled || downloading || !downloadUrl || loadingReleases || isSameVersionAsInstalled}
               className="btn-primary inline-flex items-center gap-2"
             >
-              <IconCloudDownload className="w-4 h-4 shrink-0" />
+              <IconDownload className="w-4 h-4 shrink-0" />
               {downloading ? 'Downloading…' : 'Download from GitHub'}
             </button>
             <button

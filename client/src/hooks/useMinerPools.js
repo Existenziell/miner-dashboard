@@ -193,6 +193,23 @@ export function useMinerPools(miner, refetch, onError) {
     setFallbackExtranonceSubscribe(baseline.fallbackExtranonceSubscribe);
   }, [baseline]);
 
+  const swapPools = useCallback(() => {
+    setPrimaryPoolKey(fallbackPoolKey);
+    setFallbackPoolKey(primaryPoolKey);
+    setPrimaryCustomURL(fallbackCustomURL);
+    setFallbackCustomURL(primaryCustomURL);
+    setPrimaryStratumPort(fallbackStratumPort);
+    setFallbackStratumPort(primaryStratumPort);
+    setPrimaryPassword(fallbackPassword);
+    setFallbackPassword(primaryPassword);
+    setPrimaryStratumUser(fallbackStratumUser);
+    setFallbackStratumUser(primaryStratumUser);
+    setPrimaryTLS(fallbackTLS);
+    setFallbackTLS(primaryTLS);
+    setPrimaryExtranonceSubscribe(fallbackExtranonceSubscribe);
+    setFallbackExtranonceSubscribe(primaryExtranonceSubscribe);
+  }, [primaryPoolKey, fallbackPoolKey, primaryCustomURL, fallbackCustomURL, primaryStratumPort, fallbackStratumPort, primaryPassword, fallbackPassword, primaryStratumUser, fallbackStratumUser, primaryTLS, fallbackTLS, primaryExtranonceSubscribe, fallbackExtranonceSubscribe]);
+
   useEffect(() => {
     if (message?.type !== 'success') return;
     const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
@@ -351,6 +368,7 @@ export function useMinerPools(miner, refetch, onError) {
     changes,
     hasChanges,
     revert,
+    swapPools,
     save,
     validationErrors,
     isFormValid,

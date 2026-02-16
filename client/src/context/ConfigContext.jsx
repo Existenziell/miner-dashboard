@@ -23,6 +23,7 @@ function buildAccentOverrideCSS(accent) {
 .drop-zone-indicator{border-color:${a60} !important}
 .bg-accent{background-color:${accent} !important}
 .text-accent{color:${accent} !important}
+@media (hover: hover){.hover\\:text-accent:hover{color:${accent} !important}}
 .btn-primary{background-color:${accent} !important;color:${contrastFg} !important}
 @media (hover: hover){.btn-primary:hover{background-color:color-mix(in srgb,${accent} 78%,black) !important}}
 .btn-ghost-accent{background-color:${a10} !important;border-color:${accent} !important}

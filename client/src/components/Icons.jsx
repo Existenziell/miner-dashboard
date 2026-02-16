@@ -11,7 +11,6 @@ const svgProps = {
   strokeLinejoin: 'round',
 };
 
-/** Info circle for hints/tooltips */
 export function IconInfo({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg className={className} {...svgProps} {...rest}>
@@ -21,7 +20,6 @@ export function IconInfo({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
-/** Success icon: circle with checkmark */
 export function IconSuccess({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg className={className} {...svgProps} {...rest}>
@@ -31,7 +29,6 @@ export function IconSuccess({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
-/** Warning icon */
 export function IconWarning({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg className={className} {...svgProps} {...rest}>
@@ -42,7 +39,6 @@ export function IconWarning({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
-/** Sun icon for light theme – circle with clear ray lines */
 export function IconSun({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg className={className} {...svgProps} {...rest}>
@@ -52,7 +48,6 @@ export function IconSun({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
-/** Moon/crescent for dark theme */
 export function IconMoon({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg className={className} {...svgProps} {...rest}>
@@ -61,8 +56,24 @@ export function IconMoon({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
-/** Cloud with down arrow – e.g. Install from GitHub */
-export function IconCloudDownload({ className = 'w-4 h-4', ...rest }) {
+export function IconSwap({ className = 'w-4 h-4', ...rest }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 512 512"
+      fill="currentColor"
+      aria-hidden
+      {...rest}
+    >
+      <g transform="translate(0,512) scale(0.1,-0.1)">
+        <path d="M3620 4271 l0 -430 -1167 -4 -1168 -3 -85 -22 c-505 -133 -859 -500 -967 -1002 -22 -106 -25 -392 -4 -485 16 -70 60 -195 70 -195 3 0 88 68 188 150 l182 150 -11 31 c-17 50 -4 251 22 334 93 294 310 503 609 588 75 22 84 22 1204 25 l1127 3 0 -426 c0 -234 4 -425 8 -425 11 0 1282 1060 1281 1068 0 7 -1227 1031 -1269 1061 -20 13 -20 9 -20 -418z" />
+        <path d="M4634 2841 l-181 -150 8 -48 c65 -398 -194 -791 -606 -920 l-90 -28 -1132 -3 -1133 -3 0 436 c0 239 -4 435 -8 435 -11 0 -1282 -1060 -1281 -1068 0 -4 289 -247 642 -541 l642 -534 3 431 2 431 1168 4 1167 3 85 22 c505 133 859 500 967 1002 22 106 25 392 4 485 -16 70 -60 195 -70 195 -3 0 -88 -67 -187 -149z" />
+      </g>
+    </svg>
+  );
+}
+
+export function IconDownload({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +88,6 @@ export function IconCloudDownload({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
-/** Theme icon picker */
 const themeIcons = {
   light: IconSun,
   dark: IconMoon,
@@ -85,7 +95,6 @@ const themeIcons = {
   'dark-high-contrast': IconMoon,
 };
 
-/** Single component that picks the icon by mode (avoids creating components during render). */
 export function ThemeIcon({ mode, className = 'w-4 h-4', ...rest }) {
   const Icon = themeIcons[mode] ?? IconSun;
   return <Icon className={className} {...rest} />;
