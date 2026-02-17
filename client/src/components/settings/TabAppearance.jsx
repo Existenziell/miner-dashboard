@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -9,11 +10,14 @@ import {
 } from '@dnd-kit/sortable';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { useAppearanceContext } from '@/context/AppearanceContext';
+import { useConfig } from '@/context/ConfigContext';
 import { useTheme } from '@/context/ThemeContext';
 import { THEME_MODES } from '@/context/ThemeContext';
 import { useOrderDnd } from '@/hooks/useOrderDnd';
+import { uploadMinerImage } from '@/lib/api';
 import { CHART_COLOR_SPEC, METRIC_LABELS, METRIC_KEY_LABELS } from '@/lib/constants';
 import { ConfirmModal } from '@/components/ConfirmModal';
+import { IconCheckmark } from '@/components/Icons';
 import { ChartColors } from '@/components/settings/ChartColors';
 import { Field } from '@/components/settings/Field';
 import { MetricRanges } from '@/components/settings/MetricRanges';
@@ -21,7 +25,8 @@ import { ThemePreviews } from '@/components/settings/ThemePreviews';
 
 export function TabAppearance() {
   const { mode, setMode } = useTheme();
-  const { gauges, charts, accent, status } = useAppearanceContext();
+  const { refetch: refetchConfig } = useConfig();
+  const { gauges, charts, accent, minerImage, status } = useAppearanceContext();
 
   const order = gauges.metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
   const metricDnd = useOrderDnd(order, gauges.setMetricOrder);
@@ -36,6 +41,25 @@ export function TabAppearance() {
     if (themeId === 'dark-high-contrast') return { previewClassName: 'theme-preview-dark-hc', useDarkVariant: true };
     return { previewClassName: 'theme-preview-light', useDarkVariant: false };
   };
+
+  const handleMinerImageFileChange = useCallback(
+    async (e) => {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file || !file.type.startsWith('image/')) return;
+      status.setMessage?.(null);
+      try {
+        await uploadMinerImage(file, file.name);
+        await refetchConfig();
+        status.setMessage?.({ type: 'success', text: 'Saved', section: 'minerImage' });
+      } catch (err) {
+        status.setMessage?.({ type: 'error', text: err.message });
+      }
+    },
+    [status, refetchConfig]
+  );
+
+  const minerImageInfoText = (minerImage.minerImageFile && minerImage.minerImageFilename) ? minerImage.minerImageFilename.trim() : null;
 
   return (
     <div className="space-y-4">
@@ -330,6 +354,90 @@ export function TabAppearance() {
               />
             );
           })}
+        </div>
+      </div>
+
+      {/* Miner image */}
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header flex flex-wrap items-center justify-between gap-2">
+            <h3 className="card-header-title">Miner image</h3>
+            {status.message?.type === 'success' && status.message?.section === 'minerImage' && (
+              <span role="status" className="message-success text-sm">
+                Saved
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="card-subtitle">
+          Upload an image of your miner to show on the dashboard.
+        </p>
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-start gap-6">
+            <div className="flex flex-col gap-6">
+              <label
+                htmlFor="miner-image-file"
+                className="input max-w-xs cursor-pointer inline-flex items-center justify-center px-4 py-2 border border-edge dark:border-edge-dark rounded-md bg-surface dark:bg-surface-dark hover:bg-surface-light dark:hover:bg-surface-light-dark text-sm font-medium text-normal transition-colors"
+              >
+                Choose image
+              </label>
+              <input
+                id="miner-image-file"
+                type="file"
+                accept="image/*"
+                onChange={handleMinerImageFileChange}
+                className="sr-only"
+                aria-label="Choose miner image file"
+              />
+              <Field label="Show on dashboard" hint="When enabled, the image appears in the Miner Status section on the dashboard.">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={minerImage.minerImageVisible}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      minerImage.setMinerImageVisible(checked);
+                      minerImage.saveMinerImageSection({ minerImageVisible: checked });
+                    }}
+                    className="checkbox-input"
+                    aria-describedby="miner-image-visibility-desc"
+                  />
+                  <span className="checkbox-box" aria-hidden>
+                    <IconCheckmark className="checkbox-check" />
+                  </span>
+                  <span id="miner-image-visibility-desc" className="text-sm">Show image on dashboard</span>
+                </label>
+              </Field>
+            </div>
+              {(minerImage.minerImageFile || '').length > 0 && (
+                <div className="flex flex-row gap-2">
+                  <img
+                    key={minerImage.minerImageFile}
+                    src="/api/config/miner-image"
+                    alt="Miner preview"
+                    className="h-auto max-h-32 max-w-[200px] rounded object-contain"
+                  />
+                  <div>
+                  {minerImageInfoText && (
+                    <p className="text-xs text-muted max-w-[200px] truncate" title={minerImageInfoText}>
+                      {minerImageInfoText}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      minerImage.setMinerImageFile('');
+                      minerImage.setMinerImageFilename('');
+                      minerImage.saveMinerImageSection({ minerImageFile: '', minerImageFilename: '' });
+                    }}
+                    className="text-link text-sm"
+                  >
+                    Remove image
+                  </button>
+                  </div>
+                </div>
+              )}
+          </div>
         </div>
       </div>
 

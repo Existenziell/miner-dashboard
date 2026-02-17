@@ -29,6 +29,24 @@ export function IconSuccess({ className = 'w-4 h-4', ...rest }) {
   );
 }
 
+export function IconCheckmark({ className = 'w-3 h-3', ...rest }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      {...rest}
+    >
+      <path d="M5 12l5 5 9-9" />
+    </svg>
+  );
+}
+
 export function IconWarning({ className = 'w-4 h-4', ...rest }) {
   return (
     <svg className={className} {...svgProps} {...rest}>

@@ -31,10 +31,19 @@ export function useAppearance(config, refetchConfig, onError) {
   const [chartColors, setChartColors] = useState(() =>
     deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors)
   );
+  const [minerImageVisible, setMinerImageVisible] = useState(
+    () => config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible
+  );
+  const [minerImageFile, setMinerImageFile] = useState(
+    () => config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? ''
+  );
+  const [minerImageFilename, setMinerImageFilename] = useState(
+    () => config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? ''
+  );
   const [saving, setSaving] = useState(false);
-  const [savingSection, setSavingSection] = useState(null); // 'gauges' | 'charts' | 'accent' | null
+  const [savingSection, setSavingSection] = useState(null); // 'gauges' | 'charts' | 'accent' | 'minerImage' | null
   const [message, setMessage] = useState(null);
-  const [resetConfirmSection, setResetConfirmSection] = useState(null); // 'gauges' | 'charts' | 'accent' | null
+  const [resetConfirmSection, setResetConfirmSection] = useState(null); // 'gauges' | 'charts' | 'accent' | 'minerImage' | null
 
   useEffect(() => {
     setMetricRanges(deepCopy(config.metricRanges));
@@ -61,6 +70,12 @@ export function useAppearance(config, refetchConfig, onError) {
     setChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
   }, [config.accentColor, config.chartColors]);
 
+  useEffect(() => {
+    setMinerImageVisible(config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible);
+    setMinerImageFile(config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? '');
+    setMinerImageFilename(config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? '');
+  }, [config.minerImageVisible, config.minerImageFile, config.minerImageFilename]);
+
   const effectiveAccent = normalizeHex(accentColor, DASHBOARD_DEFAULTS.accentColor);
   const configAccent = normalizeHex(config.accentColor ?? '', DASHBOARD_DEFAULTS.accentColor);
   const defaultAccent = normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor);
@@ -75,12 +90,19 @@ export function useAppearance(config, refetchConfig, onError) {
     JSON.stringify(chartOrder) !== JSON.stringify(config.chartOrder ?? defaultChartOrder());
   const hasChartColorsChange =
     JSON.stringify(chartColors) !== JSON.stringify(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors);
+  const configMinerImageVisible = config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible;
+  const configMinerImageFile = config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? '';
+  const configMinerImageFilename = config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? '';
+  const minerImageVisibleChanged = minerImageVisible !== configMinerImageVisible;
+  const minerImageFileChanged = minerImageFile !== configMinerImageFile;
+  const minerImageFilenameChanged = minerImageFilename !== configMinerImageFilename;
+  const hasMinerImageChanges = minerImageVisibleChanged || minerImageFileChanged || minerImageFilenameChanged;
   const dashboardHasChanges =
     rangesChanged || orderChanged || gaugeVisibleChanged || chartVisibleChanged || chartOrderChanged;
   const colorHasChanges = effectiveAccent !== configAccent || hasChartColorsChange;
-  const hasChanges = dashboardHasChanges || colorHasChanges;
+  const hasChanges = dashboardHasChanges || colorHasChanges || hasMinerImageChanges;
 
-  // Section dirty: only ranges/colors/accent (order/visibility save immediately)
+  // Section dirty: only ranges/colors/accent/minerImage (order/visibility save immediately)
   const hasGaugeChanges = rangesChanged;
   const hasChartChanges = hasChartColorsChange;
   const hasAccentChanges = effectiveAccent !== configAccent;
@@ -94,6 +116,10 @@ export function useAppearance(config, refetchConfig, onError) {
     sortedStringify(chartVisible) !== sortedStringify(defaultChartVisible()) ||
     sortedStringify(chartColors) !== sortedStringify(DASHBOARD_DEFAULTS.chartColors);
   const hasAccentDefaultsDiff = effectiveAccent !== defaultAccent;
+  const hasMinerImageDefaultsDiff =
+    minerImageVisible !== (DASHBOARD_DEFAULTS.minerImageVisible ?? false) ||
+    (minerImageFile || '') !== (DASHBOARD_DEFAULTS.minerImageFile ?? '') ||
+    (minerImageFilename || '') !== (DASHBOARD_DEFAULTS.minerImageFilename ?? '');
 
   const hasDefaultsDiff =
     sortedStringify(metricRanges) !== sortedStringify(DASHBOARD_DEFAULTS.metricRanges) ||
@@ -102,7 +128,8 @@ export function useAppearance(config, refetchConfig, onError) {
     sortedStringify(chartVisible) !== sortedStringify(defaultChartVisible()) ||
     JSON.stringify(chartOrder) !== JSON.stringify(defaultChartOrder()) ||
     effectiveAccent !== defaultAccent ||
-    sortedStringify(chartColors) !== sortedStringify(DASHBOARD_DEFAULTS.chartColors);
+    sortedStringify(chartColors) !== sortedStringify(DASHBOARD_DEFAULTS.chartColors) ||
+    hasMinerImageDefaultsDiff;
 
   const changes = useMemo(
     () =>
@@ -114,6 +141,9 @@ export function useAppearance(config, refetchConfig, onError) {
         chartVisible,
         chartColors,
         effectiveAccent,
+        minerImageVisible,
+        minerImageFile,
+        minerImageFilename,
       }),
     [
       config,
@@ -124,6 +154,9 @@ export function useAppearance(config, refetchConfig, onError) {
       chartVisible,
       chartColors,
       effectiveAccent,
+      minerImageVisible,
+      minerImageFile,
+      minerImageFilename,
     ]
   );
 
@@ -135,7 +168,10 @@ export function useAppearance(config, refetchConfig, onError) {
     setChartOrder(config.chartOrder ?? defaultChartOrder());
     setAccentColor(config.accentColor ?? DASHBOARD_DEFAULTS.accentColor);
     setChartColors(deepCopy(config.chartColors ?? DASHBOARD_DEFAULTS.chartColors));
-  }, [config.metricRanges, config.metricOrder, config.gaugeVisible, config.chartVisible, config.chartOrder, config.accentColor, config.chartColors]);
+    setMinerImageVisible(config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible);
+    setMinerImageFile(config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? '');
+    setMinerImageFilename(config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? '');
+  }, [config.metricRanges, config.metricOrder, config.gaugeVisible, config.chartVisible, config.chartOrder, config.accentColor, config.chartColors, config.minerImageVisible, config.minerImageFile, config.minerImageFilename]);
 
   const save = useCallback(
     async (e) => {
@@ -203,6 +239,8 @@ export function useAppearance(config, refetchConfig, onError) {
         chartOrder: [...defaultChartOrder()],
         accentColor: normalizeHex(DASHBOARD_DEFAULTS.accentColor, DASHBOARD_DEFAULTS.accentColor),
         chartColors: deepCopy(DASHBOARD_DEFAULTS.chartColors),
+        minerImageVisible: DASHBOARD_DEFAULTS.minerImageVisible ?? false,
+        minerImageFile: DASHBOARD_DEFAULTS.minerImageFile ?? '',
       });
       await refetchConfig();
       setMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
@@ -212,6 +250,8 @@ export function useAppearance(config, refetchConfig, onError) {
       setChartOrder(defaultChartOrder());
       setAccentColor(DASHBOARD_DEFAULTS.accentColor);
       setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
+      setMinerImageVisible(DASHBOARD_DEFAULTS.minerImageVisible ?? false);
+      setMinerImageFile(DASHBOARD_DEFAULTS.minerImageFile ?? '');
       setResetConfirmSection(null);
       setMessage({ type: 'success', text: 'Appearance reset to default values.' });
     } catch (err) {
@@ -342,6 +382,48 @@ export function useAppearance(config, refetchConfig, onError) {
     }
   }, [refetchConfig, onError]);
 
+  const saveMinerImageSection = useCallback(async (overrides = {}) => {
+    setSaving(true);
+    setSavingSection('minerImage');
+    try {
+      const payload = {
+        minerImageVisible: overrides.minerImageVisible ?? minerImageVisible,
+        minerImageFile: (overrides.minerImageFile !== undefined ? overrides.minerImageFile : minerImageFile) || '',
+        minerImageFilename: (overrides.minerImageFilename !== undefined ? overrides.minerImageFilename : minerImageFilename) || '',
+      };
+      await patchDashboardConfig(payload);
+      await refetchConfig();
+      setMessage({ type: 'success', text: 'Saved', section: 'minerImage' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+      setSavingSection(null);
+    }
+  }, [minerImageVisible, minerImageFile, minerImageFilename, refetchConfig, onError]);
+
+  const resetMinerImageToDefaults = useCallback(async () => {
+    setSaving(true);
+    try {
+      await patchDashboardConfig({
+        minerImageVisible: DASHBOARD_DEFAULTS.minerImageVisible ?? false,
+        minerImageFile: DASHBOARD_DEFAULTS.minerImageFile ?? '',
+        minerImageFilename: DASHBOARD_DEFAULTS.minerImageFilename ?? '',
+      });
+      await refetchConfig();
+      setMinerImageVisible(DASHBOARD_DEFAULTS.minerImageVisible ?? false);
+      setMinerImageFile(DASHBOARD_DEFAULTS.minerImageFile ?? '');
+      setMinerImageFilename(DASHBOARD_DEFAULTS.minerImageFilename ?? '');
+      setResetConfirmSection(null);
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+      onError?.(err);
+    } finally {
+      setSaving(false);
+    }
+  }, [refetchConfig, onError]);
+
   const setMetricRangeValue = useCallback((metric, key, value) => {
     setMetricRanges((prev) => ({
       ...prev,
@@ -446,6 +528,18 @@ export function useAppearance(config, refetchConfig, onError) {
       hasAccentDefaultsDiff,
       saveAccentSection,
       resetAccentToDefaults,
+    },
+    minerImage: {
+      minerImageVisible,
+      minerImageFile,
+      minerImageFilename,
+      setMinerImageVisible,
+      setMinerImageFile,
+      setMinerImageFilename,
+      hasMinerImageChanges,
+      hasMinerImageDefaultsDiff,
+      saveMinerImageSection,
+      resetMinerImageToDefaults,
     },
     status: {
       changes,

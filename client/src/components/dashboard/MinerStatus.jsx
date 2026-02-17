@@ -2,6 +2,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
 import { LOW_HEAP_INT_THRESHOLD_BYTES } from '@/lib/constants';
 import { formatBytes, formatResetReason, formatUptime } from '@/lib/formatters';
+import Image from '@/components/Image';
 
 function ConnectionIndicator({ connected }) {
   return (
@@ -73,6 +74,31 @@ export default function MinerStatus() {
     { label: 'Poll interval', value: `${(config.pollMinerIntervalMs / 1000).toFixed(0)} s` },
   ];
 
+  const showMinerImage = config.minerImageVisible && (config.minerImageFile || '').trim().length > 0;
+
+  const statusContent = (
+    <>
+      <section className="mb-5">
+        <ItemGrid items={deviceItems} />
+      </section>
+
+      <hr className="border-default my-6" />
+
+      <section className={hasHeap ? 'mb-5' : ''}>
+        <ItemGrid items={networkItems} />
+      </section>
+
+      {hasHeap && (
+        <>
+          <hr className="border-default my-6" />
+          <section>
+            <ItemGrid items={heapItems} />
+          </section>
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="card">
       <div className="card-header-wrapper">
@@ -96,23 +122,17 @@ export default function MinerStatus() {
         </div>
       </div>
 
-      <section className="mb-5">
-        <ItemGrid items={deviceItems} />
-      </section>
-
-      <hr className="border-default my-6" />
-
-      <section className={hasHeap ? 'mb-5' : ''}>
-        <ItemGrid items={networkItems} />
-      </section>
-
-      {hasHeap && (
-        <>
-          <hr className="border-default my-6" />
-          <section>
-            <ItemGrid items={heapItems} />
-          </section>
-        </>
+      {showMinerImage ? (
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-start">
+          <div className="min-w-0">
+            {statusContent}
+          </div>
+          <div className="lg:pt-0 flex justify-center lg:justify-end">
+            <Image src="/api/config/miner-image" />
+          </div>
+        </div>
+      ) : (
+        statusContent
       )}
     </div>
   );

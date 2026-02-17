@@ -55,4 +55,7 @@ export const DASHBOARD_DEFAULTS = {
     current: true,
     power: true,
   },
+  minerImageVisible: true,
+  minerImageFile: '',
+  minerImageFilename: '',
 };

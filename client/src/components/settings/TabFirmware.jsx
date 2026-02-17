@@ -8,7 +8,7 @@ import {
 } from '@/lib/api';
 import { formatPublished, pickFirmwareAsset } from '@/lib/firmwareUtils';
 import { ConfirmModal } from '@/components/ConfirmModal';
-import { IconDownload } from '@/components/Icons';
+import { IconCheckmark, IconDownload } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';
 
 export function TabFirmware() {
@@ -250,18 +250,7 @@ export function TabFirmware() {
                   className="checkbox-input"
                 />
                 <span className="checkbox-box" aria-hidden>
-                  <svg
-                    className="checkbox-check"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <path d="M5 12l5 5 9-9" />
-                  </svg>
+                  <IconCheckmark className="checkbox-check" />
                 </span>
                 Show pre-releases
               </label>
@@ -273,10 +262,19 @@ export function TabFirmware() {
           <Field label="Filename" hint="The name of the firmware file.">
             <span className="text-normal text-sm font-mono break-all">{filename}</span>
           </Field>
+          <Field label="Changelog" hint="Release notes for the selected version.">
+            {selectedRelease?.body?.trim() ? (
+              <div className="rounded-md border border-default bg-surface-subtle px-3 py-2 text-xs font-mono overflow-auto max-h-64 whitespace-pre-wrap wrap-break-word">
+                {selectedRelease.body}
+              </div>
+            ) : (
+              <span className="text-muted text-sm">No release notes.</span>
+            )}
+          </Field>
           {selectedRelease?.html_url && (
             <p>
               <a href={selectedRelease.html_url} target="_blank" rel="noopener noreferrer" className="text-accent text-sm">
-                View Changelog
+                View complete changelog
               </a>
             </p>
           )}

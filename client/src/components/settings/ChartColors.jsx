@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { normalizeHex } from '@/lib/colorUtils';
+import { IconCheckmark } from '@/components/Icons';
 
 export function ChartColors({
   chart,
@@ -49,18 +50,7 @@ export function ChartColors({
                 aria-label={`Show ${chart.label} on dashboard`}
               />
               <span className="checkbox-box shrink-0" aria-hidden>
-                <svg
-                  className="checkbox-check"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M5 12l5 5 9-9" />
-                </svg>
+                <IconCheckmark className="checkbox-check" />
               </span>
             </label>
           )}

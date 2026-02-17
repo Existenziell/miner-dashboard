@@ -29,6 +29,31 @@ export async function patchDashboardConfig(partial) {
   return res.json();
 }
 
+/** Upload miner image (multipart). Returns updated config. */
+export async function uploadMinerImage(file, displayFilename) {
+  const form = new FormData();
+  form.append('file', file);
+  if (displayFilename != null && String(displayFilename).trim()) {
+    form.append('filename', String(displayFilename).trim());
+  }
+  const res = await fetch(`${BASE}/api/config/miner-image`, {
+    method: 'POST',
+    body: form,
+  });
+  if (!res.ok) {
+    let msg = 'Miner image upload failed';
+    try {
+      const data = await res.json();
+      if (data.detail) msg += ` — ${data.detail}`;
+      else if (data.error) msg += ` — ${data.error}`;
+    } catch {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
 export async function fetchMinerInfo(opts = {}) {
   const { ts, cur } = opts;
   const url = new URL(`${BASE}/api/miner/info`, window.location.origin);

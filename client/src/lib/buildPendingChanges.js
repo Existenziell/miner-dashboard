@@ -32,18 +32,6 @@ const defaultChartVisible = () => ({ ...DASHBOARD_DEFAULTS.chartVisible });
 
 /**
  * Builds the pending changes list for the Appearance settings form.
- * Pure function: given server config and current form state, returns change entries.
- *
- * @param {object} config - Current dashboard config (from server)
- * @param {object} state - Current form state
- * @param {object} state.metricRanges
- * @param {string[]} state.metricOrder
- * @param {string[]} state.chartOrder
- * @param {object} state.gaugeVisible
- * @param {object} state.chartVisible
- * @param {object} state.chartColors
- * @param {string} state.effectiveAccent
- * @returns {{ label: string, from: string, to: string }[]}
  */
 export function buildPendingChanges(config, state) {
   const {
@@ -54,6 +42,8 @@ export function buildPendingChanges(config, state) {
     chartVisible,
     chartColors,
     effectiveAccent,
+    minerImageVisible,
+    minerImageFile,
   } = state;
 
   const configAccent = normalizeHex(
@@ -122,6 +112,23 @@ export function buildPendingChanges(config, state) {
       );
     }
   });
+
+  // Miner image
+  if (minerImageVisible !== undefined || minerImageFile !== undefined) {
+    const savedVisible = config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible ?? false;
+    const savedHasImage = (config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? '').length > 0;
+    const toVisible = minerImageVisible ?? savedVisible;
+    const toHasImage = (minerImageFile ?? '').length > 0;
+    if (savedVisible !== toVisible || savedHasImage !== toHasImage) {
+      list.push(
+        changeEntry(
+          'Miner image',
+          savedHasImage ? (savedVisible ? 'visible' : 'hidden') : 'none',
+          toHasImage ? (toVisible ? 'visible' : 'hidden') : 'none'
+        )
+      );
+    }
+  }
 
   // Accent and chart colors
   if (effectiveAccent !== configAccent) {

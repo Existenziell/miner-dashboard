@@ -1,5 +1,6 @@
 import { SOLO_POOLS } from '@/lib/constants';
 import AppLink from '@/components/AppLink';
+import Image from '@/components/Image';
 
 export default function DocsPage() {
   return (
@@ -31,6 +32,7 @@ export default function DocsPage() {
           <p className="doc-body">
             The pool gives you work (block templates) and validates your shares, but it does not merge your hashrate with others. You are still competing for the next block; the pool just handles the Stratum protocol and block template distribution. Configure your miner with the pool's Stratum URL and your payout address to start solo mining.
           </p>
+          <Image src="/images/miner.jpg" alt="NerdQaxe++ miner" className="my-4" />
         </div>
         <div className="overflow-x-auto doc-table-wrap">
           <p className="doc-lead-in">Known solo mining pools:</p>
@@ -94,6 +96,7 @@ export default function DocsPage() {
             <a href="https://github.com/shufps/qaxe" target="_blank" rel="noopener noreferrer" className="link">NerdQ Hardware Repository</a>
           </p>
         </div>
+        <Image src="/images/asic.jpg" alt="BM1370 ASIC" className="my-4" />
       </section>
 
       <section className="doc-section">

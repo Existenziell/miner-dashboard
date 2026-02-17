@@ -83,5 +83,8 @@
     "frequency": true,
     "voltage": true,
     "power": true
-  }
+  },
+  "minerImageVisible": true,
+  "minerImageFile": "",
+  "minerImageFilename": ""
 }

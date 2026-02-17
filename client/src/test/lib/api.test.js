@@ -13,6 +13,7 @@ import {
   patchMinerSettings,
   restartMiner,
   shutdownMiner,
+  uploadMinerImage,
 } from '@/lib/api.js';
 
 describe('api', () => {
@@ -332,6 +333,30 @@ describe('api', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+    });
+  });
+
+  describe('uploadMinerImage', () => {
+    it('POSTs /api/config/miner-image with FormData and returns config', async () => {
+      const file = new Blob(['image'], { type: 'image/jpeg' });
+      const response = { minerImageFile: 'miner-image.jpg', minerImageFilename: 'photo.jpg' };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(response) });
+      const result = await uploadMinerImage(file, 'photo.jpg');
+      expect(result).toEqual(response);
+      expect(fetchStub).toHaveBeenCalledWith(
+        '/api/config/miner-image',
+        expect.objectContaining({ method: 'POST' })
+      );
+      const call = fetchStub.mock.calls[0][1];
+      expect(call.body).toBeInstanceOf(FormData);
+    });
+
+    it('throws when not ok and parses error body', async () => {
+      fetchStub.mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ error: 'Invalid file', detail: 'File must be an image.' }),
+      });
+      await expect(uploadMinerImage(new Blob(), 'x')).rejects.toThrow(/Miner image upload failed.*File must be an image/);
     });
   });
 });

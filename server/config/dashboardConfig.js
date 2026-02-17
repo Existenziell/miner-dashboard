@@ -12,6 +12,11 @@ function getConfigPath() {
   return DEFAULT_PATH;
 }
 
+/** Directory containing dashboard.json (and miner image file). */
+export function getConfigDir() {
+  return path.dirname(DEFAULT_PATH);
+}
+
 function deepMergeMetricRanges(defaults, fromFile) {
   if (!fromFile || typeof fromFile !== 'object') return { ...defaults };
   const out = { ...defaults };
