@@ -34,6 +34,8 @@ export const CHART_LEGEND_PW = 'md.chart.pw.legend';
 export const CHART_COLLAPSED_HR = 'md.chart.hr.collapsed';
 export const CHART_COLLAPSED_TMP = 'md.chart.tmp.collapsed';
 export const CHART_COLLAPSED_PW = 'md.chart.pw.collapsed';
+export const ODDS_COLLAPSED_KEY = 'md.odds.collapsed';
+export const NETWORK_COLLAPSED_KEY = 'md.network.collapsed';
 export const CHART_HISTORY_HR = 'md.chart.hr.data';
 export const CHART_HISTORY_TMP = 'md.chart.tmp.data';
 export const CHART_HISTORY_PW = 'md.chart.pw.data';
@@ -74,7 +76,7 @@ export const METRIC_RANGES = DASHBOARD_DEFAULTS.metricRanges;
 export const METRIC_LABELS = {
   hashrate: 'Hashrate (GH/s)',
   efficiency: 'Efficiency (J/TH)',
-  temp: 'Temp (°C)',
+  temp: 'ASIC Temp (°C)',
   fanRpm: 'Fan RPM (%)',
   current: 'Current (A)',
   frequency: 'Frequency (MHz)',

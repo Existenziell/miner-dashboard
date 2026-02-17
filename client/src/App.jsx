@@ -3,6 +3,7 @@ import { useConfig } from '@/context/ConfigContext';
 import { MinerProvider, useMiner } from '@/context/MinerContext';
 import { useLeaveSettingsGuard } from '@/hooks/useLeaveSettingsGuard';
 import { useNetworkData } from '@/hooks/useNetworkData';
+import { NETWORK_COLLAPSED_KEY } from '@/lib/constants';
 import { getTabFromUrl, setTabInUrl } from '@/lib/tabUrl';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import Charts from '@/components/dashboard/Charts';
@@ -10,6 +11,7 @@ import MinerSettings from '@/components/dashboard/MinerSettings';
 import MinerShares from '@/components/dashboard/MinerShares';
 import MinerStatus from '@/components/dashboard/MinerStatus';
 import NetworkStatus from '@/components/dashboard/NetworkStatus';
+import SoloMiningOdds from '@/components/dashboard/SoloMiningOdds';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import Notifications from '@/components/notifications/Notifications';
@@ -53,6 +55,18 @@ function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPend
   const { config } = useConfig();
   const { data: minerData, error: minerError, historyHashrate, historyTemperature, historyPower } = useMiner();
   const { data: network, error: networkError } = useNetworkData(config.pollNetworkIntervalMs);
+  const [networkCollapsed, setNetworkCollapsed] = useState(() =>
+    typeof localStorage !== 'undefined' && localStorage.getItem(NETWORK_COLLAPSED_KEY) === 'true'
+  );
+  const toggleNetworkCollapsed = useCallback(() => {
+    setNetworkCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(NETWORK_COLLAPSED_KEY, String(next));
+      } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
   const { onTabChange: guardedTabChange, showLeaveConfirm, confirmLeave, cancelLeave } = useLeaveSettingsGuard(
     activeTab,
     onTabChange,
@@ -107,14 +121,24 @@ function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPend
             </div>
 
             {/* Network status */}
-            <div className="card">
+            <div className={`card${networkCollapsed ? ' card--collapsed' : ''}`}>
               <div className="card-header-wrapper">
-                <div className="card-header">
+                <button
+                  type="button"
+                  onClick={toggleNetworkCollapsed}
+                  className={`card-header cursor-pointer border-0 focus:outline-none w-full flex items-center justify-between gap-2${networkCollapsed ? ' rounded-b-md' : ''}`}
+                  aria-expanded={!networkCollapsed}
+                  aria-label={`Bitcoin Network, ${networkCollapsed ? 'Expand' : 'Collapse'}`}
+                >
                   <h3 className="card-header-title">Bitcoin Network</h3>
-                </div>
+                  <span className="text-muted text-sm shrink-0">{networkCollapsed ? 'Expand' : 'Collapse'}</span>
+                </button>
               </div>
-              <NetworkStatus data={network} />
+              {!networkCollapsed && <NetworkStatus data={network} />}
             </div>
+
+            {/* Solo mining odds */}
+            <SoloMiningOdds network={network} />
           </>
         )}
       </main>
