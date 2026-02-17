@@ -1,7 +1,7 @@
 {
   "minerIp": "",
   "defaultExpectedHashrateGh": 6000,
-  "pollMinerIntervalMs": 10000,
+  "pollMinerIntervalMs": 20000,
   "pollNetworkIntervalMs": 60000,
   "accentColor": "#06b6d4",
   "chartColors": {
@@ -85,6 +85,6 @@
     "power": true
   },
   "minerImageVisible": true,
-  "minerImageFile": "",
-  "minerImageFilename": ""
+  "minerImageFile": "miner-image.jpg",
+  "minerImageFilename": "NerdQaxe.jpg"
 }

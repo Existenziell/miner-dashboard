@@ -1,9 +1,74 @@
-import { formatDifficulty, formatNumber, formatPrice } from '@/lib/formatters';
+import {
+  formatBytes,
+  formatDifficulty,
+  formatNumber,
+  formatPrice,
+  formatTimeAgo,
+  formatWeight,
+} from '@/lib/formatters';
+
+const MEMPOOL_BLOCK_URL = 'https://mempool.space/block/';
+
+function BlockCard({ label, block }) {
+  if (!block) return null;
+  const { id, height, timestamp, tx_count, size, weight, extras } = block;
+  const poolName = extras?.pool?.name;
+  const reward = extras?.reward;
+  return (
+    <div className="card">
+      <div className="stat-label mb-1">{label}</div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-lg font-bold text-normal">{formatNumber(height)}</div>
+        {id && (
+          <a
+            href={`${MEMPOOL_BLOCK_URL}${id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-accent hover:underline shrink-0 truncate max-w-[50%]"
+            title={id}
+          >
+            {id.slice(0, 12)}…
+          </a>
+        )}
+      </div>
+      <div className="mt-1.5 space-y-0.5 text-sm">
+        <div className="flex justify-between text-muted">
+          <span>Time</span>
+          <span>{formatTimeAgo(timestamp)}</span>
+        </div>
+        <div className="flex justify-between text-muted">
+          <span>Transactions</span>
+          <span>{formatNumber(tx_count)}</span>
+        </div>
+        <div className="flex justify-between text-muted">
+          <span>Size</span>
+          <span>{formatBytes(size)}</span>
+        </div>
+        <div className="flex justify-between text-muted">
+          <span>Weight</span>
+          <span>{formatWeight(weight)}</span>
+        </div>
+        {poolName && (
+          <div className="flex justify-between text-muted">
+            <span>Pool</span>
+            <span className="truncate max-w-[60%]" title={poolName}>{poolName}</span>
+          </div>
+        )}
+        {reward != null && (
+          <div className="flex justify-between text-muted">
+            <span>Reward</span>
+            <span>{formatNumber(reward)} sat</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function NetworkStatus({ data }) {
   if (!data) return null;
 
-  const { blockHeight, difficulty, fees, prices, networkDifficulty } = data;
+  const { blockHeight, difficulty, fees, prices, networkDifficulty, mempool, previousBlock, previousBlock2, previousBlock3 } = data;
 
   const diffChange = difficulty?.difficultyChange;
   const diffChangeStr = diffChange != null
@@ -102,6 +167,31 @@ export default function NetworkStatus({ data }) {
           </div>
         </div>
       </div>
+
+      {/* Second row: Current block (mempool), Previous blocks */}
+      {blockHeight != null && (
+        <div className="card">
+          <div className="stat-label mb-1">Current block</div>
+          <div className="text-lg font-bold text-normal">{formatNumber(blockHeight + 1)}</div>
+          <div className="mt-1.5 space-y-0.5 text-sm">
+            <div className="flex justify-between text-muted">
+              <span>Pending transactions</span>
+              <span>{mempool?.count != null ? formatNumber(mempool.count) : '--'}</span>
+            </div>
+            <div className="flex justify-between text-muted">
+              <span>Mempool size</span>
+              <span>{mempool?.vsize != null ? `${(mempool.vsize / 1e6).toFixed(2)} MB (vB)` : '--'}</span>
+            </div>
+            <div className="flex justify-between text-muted">
+              <span>Total fee</span>
+              <span>{mempool?.total_fee != null ? `${formatNumber(mempool.total_fee)} sat` : '--'}</span>
+            </div>
+          </div>
+        </div>
+      )}
+      <BlockCard label="Previous block" block={previousBlock} />
+      <BlockCard label="2 blocks ago" block={previousBlock2} />
+      <BlockCard label="3 blocks ago" block={previousBlock3} />
     </div>
   );
 }

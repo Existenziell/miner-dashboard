@@ -15,6 +15,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { THEME_MODES } from '@/context/ThemeContext';
 import { useOrderDnd } from '@/hooks/useOrderDnd';
 import { uploadMinerImage } from '@/lib/api';
+import { requestBlockFoundPreview } from '@/lib/blockFoundPreview';
 import { CHART_COLOR_SPEC, METRIC_LABELS, METRIC_KEY_LABELS } from '@/lib/constants';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { IconCheckmark } from '@/components/Icons';
@@ -276,7 +277,7 @@ export function TabAppearance() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header flex flex-wrap items-center justify-between gap-2">
-            <h3 className="card-header-title">Accent color</h3>
+            <h3 className="card-header-title">Accent Color</h3>
             <div className="flex items-center gap-3 ml-auto">
               {status.message?.type === 'success' && status.message?.section === 'accent' && (
                 <span role="status" className="message-success text-sm">
@@ -361,7 +362,7 @@ export function TabAppearance() {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header flex flex-wrap items-center justify-between gap-2">
-            <h3 className="card-header-title">Miner image</h3>
+            <h3 className="card-header-title">Miner Image</h3>
             {status.message?.type === 'success' && status.message?.section === 'minerImage' && (
               <span role="status" className="message-success text-sm">
                 Saved
@@ -438,6 +439,27 @@ export function TabAppearance() {
                 </div>
               )}
           </div>
+        </div>
+      </div>
+
+      {/* Block found preview */}
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header flex flex-wrap items-center justify-between gap-2">
+          <h3 className="card-header-title">Block Found Preview</h3>
+          </div>
+        </div>
+        <p className="card-subtitle">
+          In the hopefully not too distant future, when your miner finds a block, a full-screen congratulations overlay is shown. You can preview it here.
+        </p>
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={requestBlockFoundPreview}
+            className="btn-primary"
+          >
+            Preview overlay
+          </button>
         </div>
       </div>
 

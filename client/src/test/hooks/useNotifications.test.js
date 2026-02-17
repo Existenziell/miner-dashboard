@@ -23,6 +23,7 @@ describe('useNotifications', () => {
 
     expect(result.current.activeNotifications).toEqual([]);
     expect(result.current.blockFoundVisible).toBe(false);
+    expect(result.current.blockFoundSnapshot).toBe(null);
     expect(result.current.minerError).toBe(null);
     expect(result.current.networkError).toBe(null);
   });
@@ -55,17 +56,34 @@ describe('useNotifications', () => {
     expect(result.current.dismissNotifications).toBeDefined();
   });
 
-  it('dismissBlockFound sets blockFoundVisible to false', () => {
-    mockUseMiner.mockReturnValue({ data: null, refetch: vi.fn() });
+  it('sets blockFoundVisible and blockFoundSnapshot when block count increases', async () => {
+    mockUseMiner.mockReturnValue({ data: { totalFoundBlocks: 1 }, refetch: vi.fn() });
     const { result } = renderHook(() => useNotifications(null, null));
 
-    expect(result.current.blockFoundVisible).toBe(false);
+    await act(async () => {
+      await Promise.resolve(); // flush microtask from hook
+    });
+
+    expect(result.current.blockFoundVisible).toBe(true);
+    expect(result.current.blockFoundSnapshot).toEqual({ totalFoundBlocks: 1 });
+  });
+
+  it('dismissBlockFound sets blockFoundVisible to false and clears blockFoundSnapshot', async () => {
+    mockUseMiner.mockReturnValue({ data: { totalFoundBlocks: 1 }, refetch: vi.fn() });
+    const { result } = renderHook(() => useNotifications(null, null));
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(result.current.blockFoundVisible).toBe(true);
+    expect(result.current.blockFoundSnapshot).toEqual({ totalFoundBlocks: 1 });
 
     act(() => {
       result.current.dismissBlockFound();
     });
 
     expect(result.current.blockFoundVisible).toBe(false);
+    expect(result.current.blockFoundSnapshot).toBe(null);
   });
 
   it('passes through minerError and networkError', () => {

@@ -83,6 +83,48 @@ describe('api', () => {
       expect(fetchStub).toHaveBeenCalledWith('/api/network/status');
     });
 
+    it('returns mempool, previousBlock, previousBlock2, previousBlock3 when present', async () => {
+      const data = {
+        blockHeight: 900000,
+        difficulty: {},
+        fees: {},
+        prices: { USD: 50000 },
+        networkDifficulty: 1e12,
+        mempool: { count: 15000, vsize: 4000000, total_fee: 900000 },
+        previousBlock: {
+          id: '0000000000000000000123abc',
+          height: 900000,
+          timestamp: 1700000000,
+          tx_count: 2500,
+          size: 1500000,
+          weight: 4000000,
+          extras: { pool: { name: 'Foundry USA' }, reward: 625000000 },
+        },
+        previousBlock2: {
+          id: '0000000000000000000456def',
+          height: 899999,
+          timestamp: 1699999500,
+          tx_count: 2100,
+          size: 1400000,
+          weight: 3990000,
+        },
+        previousBlock3: {
+          id: '0000000000000000000789abc',
+          height: 899998,
+          timestamp: 1699999000,
+          tx_count: 2000,
+          size: 1300000,
+          weight: 3980000,
+        },
+      };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(data) });
+      const result = await fetchNetworkStatus();
+      expect(result.mempool).toEqual(data.mempool);
+      expect(result.previousBlock).toEqual(data.previousBlock);
+      expect(result.previousBlock2).toEqual(data.previousBlock2);
+      expect(result.previousBlock3).toEqual(data.previousBlock3);
+    });
+
     it('throws when not ok', async () => {
       fetchStub.mockResolvedValueOnce({ ok: false, status: 502 });
       await expect(fetchNetworkStatus()).rejects.toThrow('Network API error: 502');

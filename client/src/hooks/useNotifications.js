@@ -28,6 +28,7 @@ export function useNotifications(minerError, networkError) {
   const [dismissedIds, setDismissedIds] = useState(() => new Set());
   const [activeNotifications, setActiveNotifications] = useState([]);
   const [blockFoundVisible, setBlockFoundVisible] = useState(false);
+  const [blockFoundSnapshot, setBlockFoundSnapshot] = useState(null);
 
   // Update sticky from evaluated and compute displayed list (all in one effect to avoid cascading setState)
   useEffect(() => {
@@ -48,19 +49,25 @@ export function useNotifications(minerError, networkError) {
     });
   }, []);
 
-  // Block found: show banner when block count increases
+  // Block found: show overlay when block count increases
   useEffect(() => {
     if (!miner) return;
     const raw = miner.totalFoundBlocks ?? miner.foundBlocks;
     const count = typeof raw === 'number' ? raw : (miner.blockFound ? 1 : 0);
     const prev = prevBlockCountRef.current;
     if (typeof count === 'number' && count > 0 && (prev == null || count > prev)) {
-      queueMicrotask(() => setBlockFoundVisible(true));
+      queueMicrotask(() => {
+        setBlockFoundSnapshot({ totalFoundBlocks: count });
+        setBlockFoundVisible(true);
+      });
     }
     prevBlockCountRef.current = count;
   }, [miner]);
 
-  const dismissBlockFound = useCallback(() => setBlockFoundVisible(false), []);
+  const dismissBlockFound = useCallback(() => {
+    setBlockFoundVisible(false);
+    setBlockFoundSnapshot(null);
+  }, []);
 
   return {
     minerError,
@@ -68,6 +75,7 @@ export function useNotifications(minerError, networkError) {
     activeNotifications,
     dismissNotifications,
     blockFoundVisible,
+    blockFoundSnapshot,
     dismissBlockFound,
   };
 }

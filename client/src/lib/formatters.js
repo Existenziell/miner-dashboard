@@ -54,6 +54,17 @@ export function formatBytes(bytes) {
 }
 
 /**
+ * Format block weight (weight units) as MW (million WU).
+ */
+export function formatWeight(wu) {
+  if (wu == null || !Number.isFinite(wu)) return '--';
+  const n = Number(wu);
+  if (n >= 1e6) return `${(n / 1e6).toFixed(2)} MW`;
+  if (n >= 1e3) return `${(n / 1e3).toFixed(2)} KW`;
+  return `${n} WU`;
+}
+
+/**
  * Format large numbers with commas.
  */
 export function formatNumber(num) {
@@ -90,6 +101,22 @@ export function formatBestDiff(diff) {
   if (diff >= 1e6) return `${(diff / 1e6).toFixed(2)}M`;
   if (diff >= 1e3) return `${(diff / 1e3).toFixed(2)}K`;
   return formatNumber(diff);
+}
+
+/**
+ * Format Unix timestamp as relative time (e.g. "5 min ago", "1 hour ago").
+ */
+export function formatTimeAgo(unixTs) {
+  if (unixTs == null || !Number.isFinite(Number(unixTs))) return '--';
+  const sec = Math.floor(Date.now() / 1000) - Number(unixTs);
+  if (sec < 0) return 'just now';
+  if (sec < 60) return `${sec} sec ago`;
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} min ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} hour${hr !== 1 ? 's' : ''} ago`;
+  const d = Math.floor(hr / 24);
+  return `${d} day${d !== 1 ? 's' : ''} ago`;
 }
 
 /**

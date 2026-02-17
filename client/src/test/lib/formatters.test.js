@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RESET_REASONS } from '@/lib/constants.js';
 import {
   formatBestDiff,
@@ -10,7 +10,9 @@ import {
   formatPrice,
   formatResetReason,
   formatTemp,
+  formatTimeAgo,
   formatUptime,
+  formatWeight,
 } from '@/lib/formatters.js';
 
 describe('formatHashrate', () => {
@@ -85,6 +87,54 @@ describe('formatBytes', () => {
     expect(formatBytes(1024)).toBe('1.02 KB');
     expect(formatBytes(7020736)).toBe('7.02 MB');
     expect(formatBytes(1e9)).toBe('1.00 GB');
+  });
+});
+
+describe('formatWeight', () => {
+  it('returns "--" for null or undefined', () => {
+    expect(formatWeight(null)).toBe('--');
+    expect(formatWeight(undefined)).toBe('--');
+  });
+  it('formats WU, KW, MW', () => {
+    expect(formatWeight(500)).toBe('500 WU');
+    expect(formatWeight(4000)).toBe('4.00 KW');
+    expect(formatWeight(4000000)).toBe('4.00 MW');
+  });
+});
+
+describe('formatTimeAgo', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-01-15T12:00:00Z'));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+  it('returns "--" for null or invalid', () => {
+    expect(formatTimeAgo(null)).toBe('--');
+    expect(formatTimeAgo(undefined)).toBe('--');
+    expect(formatTimeAgo(NaN)).toBe('--');
+  });
+  it('returns "0 sec ago" for current time, "just now" for future', () => {
+    const now = Math.floor(new Date('2025-01-15T12:00:00Z').getTime() / 1000);
+    expect(formatTimeAgo(now)).toBe('0 sec ago');
+    expect(formatTimeAgo(now + 10)).toBe('just now');
+  });
+  it('returns "X sec ago" for under 60s', () => {
+    const ts = Math.floor(new Date('2025-01-15T11:59:55Z').getTime() / 1000);
+    expect(formatTimeAgo(ts)).toBe('5 sec ago');
+  });
+  it('returns "X min ago" for under 1 hour', () => {
+    const ts = Math.floor(new Date('2025-01-15T11:55:00Z').getTime() / 1000);
+    expect(formatTimeAgo(ts)).toBe('5 min ago');
+  });
+  it('returns "X hour(s) ago" for under 24 hours', () => {
+    const ts = Math.floor(new Date('2025-01-15T10:00:00Z').getTime() / 1000);
+    expect(formatTimeAgo(ts)).toBe('2 hours ago');
+  });
+  it('returns "X day(s) ago" for 24+ hours', () => {
+    const ts = Math.floor(new Date('2025-01-14T12:00:00Z').getTime() / 1000);
+    expect(formatTimeAgo(ts)).toBe('1 day ago');
   });
 });
 
