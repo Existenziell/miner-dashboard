@@ -68,7 +68,7 @@ export function TabAppearance() {
                 type="button"
                 onClick={gauges.saveGaugesSection}
                 disabled={!gauges.hasGaugeChanges || status.saving || (status.message?.type === 'success' && status.message?.section === 'gauges')}
-                className="btn-ghost-sm min-w-[5.5rem]"
+                className="btn-ghost-sm"
                 aria-disabled={!gauges.hasGaugeChanges || status.saving}
               >
                 Save
@@ -171,7 +171,7 @@ export function TabAppearance() {
                 type="button"
                 onClick={charts.saveChartsSection}
                 disabled={!charts.hasChartChanges || status.saving || (status.message?.type === 'success' && status.message?.section === 'charts')}
-                className="btn-ghost-sm min-w-[5.5rem]"
+                className="btn-ghost-sm"
                 aria-disabled={!charts.hasChartChanges || status.saving}
               >
                 Save
@@ -272,7 +272,7 @@ export function TabAppearance() {
                 type="button"
                 onClick={accent.saveAccentSection}
                 disabled={!accent.hasAccentChanges || status.saving || (status.message?.type === 'success' && status.message?.section === 'accent')}
-                className="btn-ghost-sm min-w-[5.5rem]"
+                className="btn-ghost-sm"
                 aria-disabled={!accent.hasAccentChanges || status.saving}
               >
                 Save
