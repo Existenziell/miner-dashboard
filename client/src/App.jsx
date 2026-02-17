@@ -1,8 +1,10 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useConfig } from '@/context/ConfigContext';
 import { MinerProvider, useMiner } from '@/context/MinerContext';
+import { useLeaveSettingsGuard } from '@/hooks/useLeaveSettingsGuard';
 import { useNetworkData } from '@/hooks/useNetworkData';
 import { getTabFromUrl, setTabInUrl } from '@/lib/tabUrl';
+import { ConfirmModal } from '@/components/ConfirmModal';
 import Charts from '@/components/dashboard/Charts';
 import MinerSettings from '@/components/dashboard/MinerSettings';
 import MinerShares from '@/components/dashboard/MinerShares';
@@ -23,6 +25,7 @@ function PageFallback({ message }) {
 
 export default function App() {
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
+  const [settingsHasPending, setSettingsHasPending] = useState(false);
   const setActiveTab = useCallback((tab, options) => {
     setActiveTabState(tab);
     setTabInUrl(tab, options);
@@ -36,26 +39,36 @@ export default function App() {
 
   return (
     <MinerProvider pausePolling={activeTab === 'settings'}>
-      <AppContent activeTab={activeTab} onTabChange={setActiveTab} />
+      <AppContent
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        settingsHasPending={settingsHasPending}
+        onSettingsPendingChange={setSettingsHasPending}
+      />
     </MinerProvider>
   );
 }
 
-function AppContent({ activeTab, onTabChange }) {
+function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPendingChange }) {
   const { config } = useConfig();
   const { data: minerData, error: minerError, historyHashrate, historyTemperature, historyPower } = useMiner();
   const { data: network, error: networkError } = useNetworkData(config.pollNetworkIntervalMs);
+  const { onTabChange: guardedTabChange, showLeaveConfirm, confirmLeave, cancelLeave } = useLeaveSettingsGuard(
+    activeTab,
+    onTabChange,
+    settingsHasPending
+  );
 
   return (
     <div className="min-h-screen bg-surface dark:bg-surface-dark text-normal">
-      <Header activeTab={activeTab} onTabChange={onTabChange} />
+      <Header activeTab={activeTab} onTabChange={guardedTabChange} />
 
       <main className="max-w-7xl mx-auto px-6 pb-6 pt-4 space-y-4">
         <Notifications minerError={minerError} networkError={networkError} />
 
         {activeTab === 'settings' ? (
           <Suspense fallback={<PageFallback message="Loading settings…" />}>
-            <SettingsPage />
+            <SettingsPage onPendingChange={onSettingsPendingChange} />
           </Suspense>
         ) : activeTab === 'docs' ? (
           <Suspense fallback={<PageFallback message="Loading docs…" />}>
@@ -107,6 +120,15 @@ function AppContent({ activeTab, onTabChange }) {
       </main>
 
       <Footer />
+
+      <ConfirmModal
+        open={showLeaveConfirm}
+        onClose={cancelLeave}
+        title="Leave settings?"
+        description="You have unsaved changes. Leave anyway? Your changes will not be saved."
+        confirmLabel="Leave"
+        onConfirm={confirmLeave}
+      />
     </div>
   );
 }

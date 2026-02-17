@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppearanceProvider } from '@/context/AppearanceContext';
 import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
@@ -20,12 +20,13 @@ import { TabMiner } from '@/components/settings/TabMiner';
 import { TabPools } from '@/components/settings/TabPools';
 import { TabSetup } from '@/components/settings/TabSetup';
 
-export default function SettingsPage({ onError }) {
+export default function SettingsPage({ onError, onPendingChange }) {
   const { data: miner, refetch } = useMiner();
   const { config, refetch: refetchConfig } = useConfig();
   const [settingsSubTab, setSettingsSubTab] = useState(getSettingsSectionFromUrl);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
   const [showShutdownConfirm, setShowShutdownConfirm] = useState(false);
+  const [pendingSectionSwitch, setPendingSectionSwitch] = useState(null);
 
   useEffect(() => {
     const onPopState = () => setSettingsSubTab(getSettingsSectionFromUrl());
@@ -39,6 +40,44 @@ export default function SettingsPage({ onError }) {
   const wifiForm = useMinerWifi(miner, refetch, onError);
   const poolsForm = useMinerPools(miner, refetch, onError);
   const minerSettingsValue = { device: deviceForm, wifi: wifiForm, pools: poolsForm };
+
+  const currentSectionHasPending = useMemo(() => {
+    switch (settingsSubTab) {
+      case 'setup':
+        return setupForm.status.hasChanges || (miner && wifiForm.status.hasChanges);
+      case 'miner':
+        return deviceForm.status.hasChanges;
+      case 'pools':
+        return poolsForm.status.hasChanges;
+      case 'appearance':
+        return appearanceForm.status.hasChanges;
+      case 'firmware':
+      default:
+        return false;
+    }
+  }, [
+    settingsSubTab,
+    setupForm.status.hasChanges,
+    miner,
+    wifiForm.status.hasChanges,
+    deviceForm.status.hasChanges,
+    poolsForm.status.hasChanges,
+    appearanceForm.status.hasChanges,
+  ]);
+
+  const anySectionHasPending =
+    setupForm.status.hasChanges ||
+    (miner && wifiForm.status.hasChanges) ||
+    deviceForm.status.hasChanges ||
+    poolsForm.status.hasChanges ||
+    appearanceForm.status.hasChanges;
+
+  useEffect(() => {
+    if (onPendingChange) {
+      onPendingChange(anySectionHasPending);
+      return () => onPendingChange(false);
+    }
+  }, [anySectionHasPending, onPendingChange]);
 
   const activeErrorMessage =
     settingsSubTab === 'miner' ? deviceForm.message : settingsSubTab === 'pools' ? poolsForm.message : null;
@@ -59,9 +98,38 @@ export default function SettingsPage({ onError }) {
   }, [settingsSubTab, activeErrorMessage?.type, activeErrorMessage?.text, clearActiveMessage]);
 
   const handleTabChange = (id) => {
+    if (id === settingsSubTab) return;
+    if (currentSectionHasPending) {
+      setPendingSectionSwitch(id);
+      return;
+    }
     setSettingsSubTab(id);
     setSettingsSectionInUrl(id);
   };
+
+  const revertSection = useCallback(
+    (section) => {
+      switch (section) {
+        case 'setup':
+          setupForm.actions.revert();
+          if (miner) wifiForm.actions.revert();
+          break;
+        case 'miner':
+          deviceForm.actions.revert();
+          break;
+        case 'pools':
+          poolsForm.actions.revert();
+          break;
+        case 'appearance':
+          appearanceForm.actions.revert();
+          break;
+        case 'firmware':
+        default:
+          break;
+      }
+    },
+    [miner, setupForm.actions, wifiForm.actions, deviceForm.actions, poolsForm.actions, appearanceForm.actions]
+  );
 
   const goToSetupTab = () => {
     setSettingsSubTab('setup');
@@ -111,6 +179,21 @@ export default function SettingsPage({ onError }) {
             tab if the dashboard cannot reach the miner.
           </div>
         )}
+        <ConfirmModal
+          open={pendingSectionSwitch != null}
+          onClose={() => setPendingSectionSwitch(null)}
+          title="Unsaved changes"
+          description="This section has unsaved changes. Switch anyway? Your changes will not be saved."
+          confirmLabel="Switch"
+          onConfirm={() => {
+            if (pendingSectionSwitch != null) {
+              revertSection(settingsSubTab);
+              setSettingsSubTab(pendingSectionSwitch);
+              setSettingsSectionInUrl(pendingSectionSwitch);
+              setPendingSectionSwitch(null);
+            }
+          }}
+        />
       </div>
     );
   }
@@ -252,6 +335,22 @@ export default function SettingsPage({ onError }) {
         </form>
         );
       })()}
+
+      <ConfirmModal
+        open={pendingSectionSwitch != null}
+        onClose={() => setPendingSectionSwitch(null)}
+        title="Unsaved changes"
+        description="This section has unsaved changes. Switch anyway? Your changes will not be saved."
+        confirmLabel="Switch"
+        onConfirm={() => {
+          if (pendingSectionSwitch != null) {
+            revertSection(settingsSubTab);
+            setSettingsSubTab(pendingSectionSwitch);
+            setSettingsSectionInUrl(pendingSectionSwitch);
+            setPendingSectionSwitch(null);
+          }
+        }}
+      />
     </div>
   );
 }
