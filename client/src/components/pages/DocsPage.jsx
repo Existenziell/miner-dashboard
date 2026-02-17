@@ -1,4 +1,5 @@
 import { SOLO_POOLS } from '@/lib/constants';
+import AppLink from '@/components/AppLink';
 
 export default function DocsPage() {
   return (
@@ -8,8 +9,15 @@ export default function DocsPage() {
         <div className="doc-prose">
           <p className="doc-body">
             This app monitors a <strong>NerdQaxe++</strong>-compatible ASIC miner and the Bitcoin network in real time. It shows hashrate, temperature, power, shares, and network stats.
-            Set the miner IP and expected hashrate in <a href="/?tab=settings&section=setup" className="link">Setup</a> so gauges and alerts are adapted to your miner capabilities. 
-            For API endpoints and server config, see the <a href="/?tab=api" className="link">API</a> tab.
+            Set the miner IP and expected hashrate in{' '}
+            <AppLink href="/?tab=settings&section=setup" className="link">
+              Setup
+            </AppLink>{' '}
+            so gauges and alerts are adapted to your miner capabilities. For API endpoints and server config, see the{' '}
+            <AppLink href="/?tab=api" className="link">
+              API
+            </AppLink>{' '}
+            tab.
           </p>
         </div>
       </section>
@@ -76,7 +84,11 @@ export default function DocsPage() {
             <li><strong>Network</strong>: Miner and dashboard host must reach the pool's Stratum server (and optionally mempool.space for network stats).</li>
           </ul>
           <p className="doc-body">
-            Set the miner's IP in Settings → Setup (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
+            Set the miner&apos;s IP in{' '}
+            <AppLink href="/?tab=settings&section=setup" className="link">
+              Settings → Setup
+            </AppLink>{' '}
+            (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
           </p>
           <p className="doc-body">
             <a href="https://github.com/shufps/qaxe" target="_blank" rel="noopener noreferrer" className="link">NerdQ Hardware Repository</a>

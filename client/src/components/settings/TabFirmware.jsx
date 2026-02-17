@@ -217,7 +217,7 @@ export function TabFirmware() {
           </div>
         </div>
         <div className="space-y-4">
-          <Field label="Current version">
+          <Field label="Current version" hint="The version currently installed on the device.">
             <span className="text-normal text-sm font-medium">{currentVersion}</span>
           </Field>
           <Field label="Select release" hint="Choose a release to install. Checksum is verified before flashing.">
@@ -267,10 +267,10 @@ export function TabFirmware() {
               </label>
             </div>
           </Field>
-          <Field label="Published">
+          <Field label="Published" hint="The date and time the release was published on GitHub.">
             <span className="text-normal text-sm">{published}</span>
           </Field>
-          <Field label="Filename">
+          <Field label="Filename" hint="The name of the firmware file.">
             <span className="text-normal text-sm font-mono break-all">{filename}</span>
           </Field>
           {selectedRelease?.html_url && (

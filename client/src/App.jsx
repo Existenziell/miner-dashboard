@@ -23,9 +23,9 @@ function PageFallback({ message }) {
 
 export default function App() {
   const [activeTab, setActiveTabState] = useState(getTabFromUrl);
-  const setActiveTab = useCallback((tab) => {
+  const setActiveTab = useCallback((tab, options) => {
     setActiveTabState(tab);
-    setTabInUrl(tab);
+    setTabInUrl(tab, options);
   }, []);
 
   useEffect(() => {

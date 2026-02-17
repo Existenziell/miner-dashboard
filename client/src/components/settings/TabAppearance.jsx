@@ -284,7 +284,7 @@ export function TabAppearance() {
           Main color for buttons, gauges, and highlights. Darker shade is derived automatically.
         </p>
         <div className="space-y-4">
-          <Field label="Accent color">
+          <Field label="Accent color" hint="Click to select a color or enter a hex value.">
             <div className="flex items-center gap-2 max-w-96">
               <input
                 type="color"

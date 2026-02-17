@@ -83,6 +83,12 @@ describe('tabUrl', () => {
       expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=appearance');
     });
 
+    it('sets tab=settings and section=setup when options.section is provided', () => {
+      const { replaceState } = mockWindow({ href: 'http://localhost/?tab=docs', pathname: '/', storedSettingsSection: 'appearance' });
+      setTabInUrl('settings', { section: 'setup' });
+      expect(replaceState).toHaveBeenCalledWith({ tab: 'settings' }, '', '/?tab=settings&section=setup');
+    });
+
     it('sets tab=docs in URL', () => {
       const { replaceState } = mockWindow({ href: 'http://localhost/', pathname: '/' });
       setTabInUrl('docs');

@@ -28,7 +28,7 @@ export function getTabFromUrl() {
   return 'dashboard';
 }
 
-export function setTabInUrl(tab) {
+export function setTabInUrl(tab, options) {
   const url = new URL(window.location.href);
   if (tab === 'dashboard') {
     url.searchParams.delete('tab');
@@ -36,9 +36,16 @@ export function setTabInUrl(tab) {
   } else {
     url.searchParams.set('tab', tab);
     if (tab === 'settings') {
-      const currentSection = url.searchParams.get('section');
-      if (!VALID_SETTINGS_SECTIONS.has(currentSection)) {
-        url.searchParams.set('section', getStoredSettingsSection());
+      const explicitSection = options?.section != null && VALID_SETTINGS_SECTIONS.has(options.section)
+        ? options.section
+        : null;
+      if (explicitSection) {
+        url.searchParams.set('section', explicitSection);
+      } else {
+        const currentSection = url.searchParams.get('section');
+        if (!VALID_SETTINGS_SECTIONS.has(currentSection)) {
+          url.searchParams.set('section', getStoredSettingsSection());
+        }
       }
     } else {
       url.searchParams.delete('section');

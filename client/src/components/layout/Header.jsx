@@ -1,4 +1,5 @@
 import { useTheme } from '@/context/ThemeContext';
+import AppLink from '@/components/AppLink';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 
 const TABS = [
@@ -15,9 +16,9 @@ export default function Header({ activeTab, onTabChange }) {
         <header className="header-bar">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <a href="/">
+                    <AppLink href="/" aria-label="Go to dashboard">
                         <img src="/favicon/favicon.svg" alt="Solo Mining Dashboard Logo" className="w-10 h-10 dark:invert" />
-                    </a>
+                    </AppLink>
                     <h1 className="text-xl font-bold text-normal">Solo Mining Dashboard</h1>
                     <nav className="flex gap-1 ml-4">
                         {TABS.map((tab) => (
