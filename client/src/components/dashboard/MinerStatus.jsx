@@ -1,6 +1,6 @@
 import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
-import { LOW_HEAP_INT_THRESHOLD_BYTES } from '@/lib/constants';
+import { LOW_HEAP_INT_THRESHOLD_BYTES, MINER_IP_PLACEHOLDER } from '@/lib/constants';
 import { formatBytes, formatResetReason, formatUptime } from '@/lib/formatters';
 import Image from '@/components/Image';
 
@@ -58,7 +58,7 @@ export default function MinerStatus() {
       status: data.wifiStatus != null ? (wifiConnected ? 'connected' : 'disconnected') : null,
     },
     { label: 'Hostname', value: data.hostname || '--' },
-    { label: 'IP Address', value: data.hostip || data.ipv4 || '192.168.1.3' },
+    { label: 'IP Address', value: data.hostip || data.ipv4 || MINER_IP_PLACEHOLDER },
     { label: 'MAC', value: data.macAddr || '--' },
   ];
 

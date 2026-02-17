@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  LOGS_MAX_LINES,
+  LOGS_RECONNECT_DELAY_MS,
+  LOGS_RECONNECT_MAX_ATTEMPTS,
+} from '@/lib/constants';
 import { stripAnsi } from '@/lib/stripAnsi';
-
-const MAX_LINES = 2000;
-const RECONNECT_DELAY_MS = 3000;
-const RECONNECT_MAX_ATTEMPTS = 5;
 
 function getLogsWsUrl() {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -30,7 +31,7 @@ export default function RealtimeLogs() {
     if (!cleaned) return;
     setLines((prev) => {
       const next = [...prev, cleaned];
-      if (next.length > MAX_LINES) return next.slice(-MAX_LINES);
+      if (next.length > LOGS_MAX_LINES) return next.slice(-LOGS_MAX_LINES);
       return next;
     });
   }, []);
@@ -65,11 +66,11 @@ export default function RealtimeLogs() {
       const reason = event.reason || 'Connection closed';
       setStatus('closed');
       setStatusMessage(reason);
-      if (reconnectAttemptRef.current < RECONNECT_MAX_ATTEMPTS && loggingActiveRef.current) {
+      if (reconnectAttemptRef.current < LOGS_RECONNECT_MAX_ATTEMPTS && loggingActiveRef.current) {
         reconnectTimerRef.current = setTimeout(() => {
           reconnectAttemptRef.current += 1;
           connectRef.current();
-        }, RECONNECT_DELAY_MS);
+        }, LOGS_RECONNECT_DELAY_MS);
       }
     };
 

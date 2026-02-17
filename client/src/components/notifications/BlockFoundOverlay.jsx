@@ -2,13 +2,18 @@ import { useEffect, useId, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { fetchNetworkStatus } from '@/lib/api';
 import {
+  BLOCK_FOUND_CONFETTI_DURATION_MS,
+  BLOCK_FOUND_CONFETTI_FIRST_BURST_DELAY_MS,
+  BLOCK_FOUND_CONFETTI_OPTIONS,
+  BLOCK_FOUND_CONFETTI_SECOND_BURST_DELAY_MS,
+  MEMPOOL_BASE_URL,
+} from '@/lib/constants';
+import {
   formatBytes,
   formatNumber,
   formatTimeAgo,
   formatWeight,
 } from '@/lib/formatters';
-
-const MEMPOOL_BLOCK_URL = 'https://mempool.space/block/';
 
 /**
  * Full-screen overlay when the miner finds a block.
@@ -37,43 +42,24 @@ export default function BlockFoundOverlay({ onDismiss, blockFoundSnapshot, block
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reducedMotion) return;
 
-    const duration = 6000; // 6 seconds of side showers
-    const end = Date.now() + duration;
+    const end = Date.now() + BLOCK_FOUND_CONFETTI_DURATION_MS;
+    const { sideLeft, sideRight, firstBurst, secondBurst } = BLOCK_FOUND_CONFETTI_OPTIONS;
 
     const frame = () => {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-      });
+      confetti({ ...sideLeft, origin: { x: 0 } });
+      confetti({ ...sideRight, origin: { x: 1 } });
       if (Date.now() < end) {
         requestAnimationFrame(frame);
       }
     };
     frame();
 
-    // Bigger bursts from center at start and mid-way
     const t1 = setTimeout(() => {
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-    }, 200);
+      confetti({ ...firstBurst, origin: { y: 0.6 } });
+    }, BLOCK_FOUND_CONFETTI_FIRST_BURST_DELAY_MS);
     const t2 = setTimeout(() => {
-      confetti({
-        particleCount: 50,
-        spread: 80,
-        origin: { y: 0.5, x: 0.5 },
-      });
-    }, 2500);
+      confetti({ ...secondBurst, origin: { y: 0.5, x: 0.5 } });
+    }, BLOCK_FOUND_CONFETTI_SECOND_BURST_DELAY_MS);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -135,7 +121,7 @@ export default function BlockFoundOverlay({ onDismiss, blockFoundSnapshot, block
               <div className="flex justify-between text-sm gap-4 mb-1 items-center">
                 <span className="text-muted dark:text-muted-dark shrink-0">Block ID</span>
                 <a
-                  href={`${MEMPOOL_BLOCK_URL}${block.id}`}
+                  href={`${MEMPOOL_BASE_URL}/block/${block.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-accent hover:underline truncate font-mono text-xs"

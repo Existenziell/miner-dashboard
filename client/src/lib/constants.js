@@ -39,6 +39,34 @@ export const CHART_HISTORY_TMP = 'md.chart.tmp.data';
 export const CHART_HISTORY_PW = 'md.chart.pw.data';
 export const SETTINGS_SECTION_KEY = 'md.settings.section';
 
+// —— External URLs (Mempool) ———————————————————————————————————————————————————
+export const MEMPOOL_BASE_URL = 'https://mempool.space';
+
+// —— Bitcoin / network ——————————————————————————————————————————————————————————
+export const BITCOIN_HALVING_INTERVAL_BLOCKS = 210_000;
+export const BITCOIN_LAST_HALVING_HEIGHT = 840_000;
+
+// —— UI (overlays / block found) ————————————————————————————————————————————————
+export const BLOCK_FOUND_CONFETTI_DURATION_MS = 6000;
+export const BLOCK_FOUND_CONFETTI_FIRST_BURST_DELAY_MS = 200;
+export const BLOCK_FOUND_CONFETTI_SECOND_BURST_DELAY_MS = 2500;
+/** Confetti options (particleCount, angle, spread) for block-found overlay. Origin is set per call. */
+export const BLOCK_FOUND_CONFETTI_OPTIONS = {
+  sideLeft: { particleCount: 3, angle: 60, spread: 55 },
+  sideRight: { particleCount: 3, angle: 120, spread: 55 },
+  firstBurst: { particleCount: 80, spread: 70 },
+  secondBurst: { particleCount: 50, spread: 80 },
+};
+
+// —— UI (defaults / placeholders) ——————————————————————————————————————————————
+export const MINER_IP_PLACEHOLDER = '192.168.1.3';
+export const CURL_EXAMPLE_ORIGIN_FALLBACK = 'http://localhost:8000';
+
+// —— Logs (WebSocket) —————————————————————————————————————————————————────────——
+export const LOGS_MAX_LINES = 2000;
+export const LOGS_RECONNECT_DELAY_MS = 3000;
+export const LOGS_RECONNECT_MAX_ATTEMPTS = 5;
+
 // —— UI (gauges) & metric ranges ——————————————————————————————————————————————
 export const GAUGE_RADIUS = 48; // Gauge arc radius (viewBox units)
 export const METRIC_RANGES = DASHBOARD_DEFAULTS.metricRanges;

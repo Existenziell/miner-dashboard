@@ -7,6 +7,7 @@ import {
 } from 'shared/schemas/minerApi';
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import { useSetupContext } from '@/context/SetupContext';
+import { MINER_IP_PLACEHOLDER } from '@/lib/constants';
 import { Field } from '@/components/settings/Field';
 import { PendingChanges, PendingIndicator } from '@/components/settings/PendingChanges';
 
@@ -33,7 +34,7 @@ export function TabSetup({ minerReachable }) {
                 type="text"
                 value={connection.minerIp}
                 onChange={(e) => connection.setMinerIp(e.target.value)}
-                placeholder="192.168.1.3"
+                placeholder={MINER_IP_PLACEHOLDER}
                 className="input"
                 aria-label="Miner IP"
               />

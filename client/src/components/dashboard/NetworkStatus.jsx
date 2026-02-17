@@ -1,4 +1,9 @@
 import {
+  BITCOIN_HALVING_INTERVAL_BLOCKS,
+  BITCOIN_LAST_HALVING_HEIGHT,
+  MEMPOOL_BASE_URL,
+} from '@/lib/constants';
+import {
   formatBytes,
   formatDifficulty,
   formatNumber,
@@ -6,8 +11,6 @@ import {
   formatTimeAgo,
   formatWeight,
 } from '@/lib/formatters';
-
-const MEMPOOL_BLOCK_URL = 'https://mempool.space/block/';
 
 function BlockCard({ label, block }) {
   if (!block) return null;
@@ -21,7 +24,7 @@ function BlockCard({ label, block }) {
         <div className="text-lg font-bold text-normal">{formatNumber(height)}</div>
         {id && (
           <a
-            href={`${MEMPOOL_BLOCK_URL}${id}`}
+            href={`${MEMPOOL_BASE_URL}/block/${id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-accent hover:underline shrink-0 truncate max-w-[50%]"
@@ -76,13 +79,11 @@ export default function NetworkStatus({ data }) {
     : '--';
   const diffProgressPct = difficulty?.progressPercent;
 
-  const HALVING_INTERVAL = 210_000;
-  const LAST_HALVING = 840_000;
   const halvingPct = blockHeight != null
-    ? ((blockHeight - LAST_HALVING) / HALVING_INTERVAL) * 100
+    ? ((blockHeight - BITCOIN_LAST_HALVING_HEIGHT) / BITCOIN_HALVING_INTERVAL_BLOCKS) * 100
     : null;
   const blocksUntilHalving = blockHeight != null
-    ? LAST_HALVING + HALVING_INTERVAL - blockHeight
+    ? BITCOIN_LAST_HALVING_HEIGHT + BITCOIN_HALVING_INTERVAL_BLOCKS - blockHeight
     : null;
 
   const adjustedTimeAvg = difficulty?.adjustedTimeAvg;

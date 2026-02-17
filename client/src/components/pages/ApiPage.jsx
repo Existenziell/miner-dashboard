@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
 import { fetchMinerAsic, fetchNetworkStatus } from '@/lib/api';
+import { CURL_EXAMPLE_ORIGIN_FALLBACK } from '@/lib/constants';
 import RealtimeLogs from '@/components/logs/RealtimeLogs';
 
 function ResponseCard({ title, path, data, error, loading }) {
@@ -223,7 +224,7 @@ export default function ApiPage() {
             {CURL_EXAMPLES.map(({ path, curl }) => (
               <div key={path} className="flex flex-wrap gap-x-2 items-baseline">
                 <span className="text-terminal-prompt select-none shrink-0">$</span>
-                <code className="break-all">{origin ? curl(origin) : curl('http://localhost:3000')}</code>
+                <code className="break-all">{origin ? curl(origin) : curl(CURL_EXAMPLE_ORIGIN_FALLBACK)}</code>
               </div>
             ))}
           </div>
