@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useConfig } from '@/context/ConfigContext';
 import { useMiner } from '@/context/MinerContext';
 import { LOW_HEAP_INT_THRESHOLD_BYTES, MINER_IP_PLACEHOLDER } from '@/lib/constants';
-import { formatBytes, formatResetReason, formatUptime } from '@/lib/formatters';
+import { formatBytes, formatResetReason, formatUptime, obfuscateMac } from '@/lib/formatters';
 import Image from '@/components/Image';
 
 function ConnectionIndicator({ connected }) {
@@ -21,7 +22,18 @@ function ItemGrid({ items }) {
           <div className="stat-label">{item.label}</div>
           <div className="mt-0.5 truncate flex items-center gap-2">
             {item.status != null && <ConnectionIndicator connected={item.status === 'connected'} />}
-            <span className="stat-value">{item.value}</span>
+            {item.onClick ? (
+              <button
+                type="button"
+                onClick={item.onClick}
+                className="stat-value text-left focus:outline-none cursor-pointer"
+                title={item.title}
+              >
+                {item.value}
+              </button>
+            ) : (
+              <span className="stat-value">{item.value}</span>
+            )}
           </div>
           {item.warning && (
             <div className="text-xs text-warning dark:text-warning-dark mt-0.5">
@@ -37,7 +49,13 @@ function ItemGrid({ items }) {
 export default function MinerStatus() {
   const { config } = useConfig();
   const { data, error: minerError, loading: minerLoading } = useMiner();
+  const [macObfuscated, setMacObfuscated] = useState(false);
   if (!data) return null;
+
+  const macAddr = data.macAddr || '';
+  const macDisplayValue = macAddr
+    ? (macObfuscated ? obfuscateMac(macAddr) : macAddr)
+    : '--';
 
   const deviceItems = [
     { label: 'Device', value: data.deviceModel || data.ASICModel || '--' },
@@ -59,7 +77,14 @@ export default function MinerStatus() {
     },
     { label: 'Hostname', value: data.hostname || '--' },
     { label: 'IP Address', value: data.hostip || data.ipv4 || MINER_IP_PLACEHOLDER },
-    { label: 'MAC', value: data.macAddr || '--' },
+    {
+      label: 'MAC',
+      value: macDisplayValue,
+      ...(macAddr && {
+        onClick: () => setMacObfuscated((v) => !v),
+        title: macObfuscated ? 'Click to show full MAC address' : 'Click to obfuscate MAC address',
+      }),
+    },
   ];
 
   const hasHeap = data.freeHeap != null || data.freeHeapInt != null || data.runningPartition != null;

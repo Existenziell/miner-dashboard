@@ -1,4 +1,5 @@
 import { useMiner } from '@/context/MinerContext';
+import { formatStratumUser } from '@/lib/formatters';
 import { getPoolInfo } from '@/lib/poolUtils';
 
 function SettingRow({ label, value, highlight, truncate, href }) {
@@ -67,7 +68,7 @@ export default function MinerSettings() {
         <div className="space-y-0.5">
           <SettingRow label="Name" value={primary.name} href={primary.webUrl} />
           <SettingRow label="URL" value={data.stratumURL ? `${data.stratumURL}:${data.stratumPort || ''}` : '--'} />
-          <SettingRow label="Worker" value={primaryWorker || '--'} truncate />
+          <SettingRow label="Worker" value={primaryWorker ? formatStratumUser(primaryWorker) : '--'} truncate />
           <SettingRow label="Pool Difficulty" value={poolData?.poolDifficulty ?? data.stratumDifficulty ?? data.poolDifficulty ?? '--'} />
           <SettingRow label="TLS" value={data.stratumTLS ? 'Enabled' : 'Disabled'} />
         </div>
@@ -89,7 +90,7 @@ export default function MinerSettings() {
         <div className="space-y-0.5">
           <SettingRow label="Name" value={fallback.name === '--' ? 'Not configured' : fallback.name} href={fallback.webUrl} />
           <SettingRow label="URL" value={data.fallbackStratumURL ? `${data.fallbackStratumURL}:${data.fallbackStratumPort || ''}` : '--'} />
-          <SettingRow label="Worker" value={fallbackWorker || '--'} truncate />
+          <SettingRow label="Worker" value={fallbackWorker ? formatStratumUser(fallbackWorker) : '--'} truncate />
           <SettingRow label="TLS" value={data.fallbackStratumTLS ? 'Enabled' : 'Disabled'} />
         </div>
       </div>

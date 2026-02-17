@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   MAX_STRATUM_PASSWORD_LENGTH,
   MAX_STRATUM_PORT,
@@ -10,6 +11,7 @@ import {
   POOL_MODE_OPTIONS,
   SOLO_POOLS,
 } from '@/lib/constants';
+import { formatStratumUser } from '@/lib/formatters';
 import { IconSwap } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';
 import { PendingIndicator } from '@/components/settings/PendingChanges';
@@ -17,6 +19,8 @@ import { PendingIndicator } from '@/components/settings/PendingChanges';
 export function TabPools({ miner }) {
   const { pools } = useMinerSettingsContext();
   const { mode, primary, fallback, status, validation, actions } = pools;
+  const [primaryStratumUserFocused, setPrimaryStratumUserFocused] = useState(false);
+  const [fallbackStratumUserFocused, setFallbackStratumUserFocused] = useState(false);
   const {
     primaryStratumUserError,
     fallbackStratumUserError,
@@ -139,8 +143,10 @@ export function TabPools({ miner }) {
             <Field label="Worker / payout address" hint="Bitcoin address or pool username.">
               <input
                 type="text"
-                value={primary.primaryStratumUser}
+                value={primaryStratumUserFocused ? primary.primaryStratumUser : formatStratumUser(primary.primaryStratumUser)}
                 onChange={(e) => primary.setPrimaryStratumUser(e.target.value)}
+                onFocus={() => setPrimaryStratumUserFocused(true)}
+                onBlur={() => setPrimaryStratumUserFocused(false)}
                 placeholder="bc1q..."
                 maxLength={MAX_STRATUM_USER_LENGTH}
                 className={`input ${primaryStratumUserError ? 'input-danger' : ''}`}
@@ -290,8 +296,10 @@ export function TabPools({ miner }) {
             <Field label="Worker / payout address" hint="Bitcoin address or pool username.">
               <input
                 type="text"
-                value={fallback.fallbackStratumUser}
+                value={fallbackStratumUserFocused ? fallback.fallbackStratumUser : formatStratumUser(fallback.fallbackStratumUser)}
                 onChange={(e) => fallback.setFallbackStratumUser(e.target.value)}
+                onFocus={() => setFallbackStratumUserFocused(true)}
+                onBlur={() => setFallbackStratumUserFocused(false)}
                 placeholder="bc1q..."
                 maxLength={MAX_STRATUM_USER_LENGTH}
                 className={`input ${fallbackStratumUserError ? 'input-danger' : ''}`}

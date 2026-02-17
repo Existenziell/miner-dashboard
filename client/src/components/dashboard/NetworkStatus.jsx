@@ -6,6 +6,7 @@ import {
 import {
   formatBytes,
   formatDifficulty,
+  formatHash,
   formatNumber,
   formatPrice,
   formatTimeAgo,
@@ -30,7 +31,7 @@ function BlockCard({ label, block }) {
             className="text-sm text-accent hover:underline shrink-0 truncate max-w-[50%]"
             title={id}
           >
-            {id.slice(0, 12)}…
+            {formatHash(id)}
           </a>
         )}
       </div>

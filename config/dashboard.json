@@ -27,8 +27,8 @@
     "power"
   ],
   "chartVisible": {
-    "power": false,
-    "temperature": false,
+    "power": true,
+    "temperature": true,
     "hashrate": true
   },
   "metricRanges": {

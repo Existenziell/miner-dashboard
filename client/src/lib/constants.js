@@ -163,7 +163,7 @@ export const SOLO_POOLS = [
     fee: '0.9%',
     registration: 'No signup',
     region: 'Global',
-    workerFormat: 'username.worker (register first)',
+    workerFormat: 'user.worker (account)',
     notes: '0.9% solo fee.',
   },
   {

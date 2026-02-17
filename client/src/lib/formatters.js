@@ -127,3 +127,41 @@ export function formatResetReason(raw) {
   if (!raw) return '--';
   return RESET_REASONS[raw] ?? raw;
 }
+
+/**
+ * Format a hash as a string of the first 3 and last 6 characters.
+ */
+export function formatHash(id) {
+  if (id == null) return '--';
+  return `${id.slice(0, 3)}...${id.slice(-6)}`;
+}
+
+/**
+ * Obfuscate only the address (first segment) of a Stratum user string.
+ * Handles: Address, Address.Worker, Address.RIG_ID, user.worker, etc.
+ */
+export function formatStratumUser(user) {
+  if (user == null || String(user).trim() === '') return '--';
+  const s = String(user).trim();
+  const idx = s.indexOf('.');
+  const addressPart = idx === -1 ? s : s.slice(0, idx);
+  const suffix = idx === -1 ? '' : s.slice(idx);
+
+  if (addressPart.length <= 10) return addressPart + suffix;
+  const obfuscated = `${addressPart.slice(0, 4)}...${addressPart.slice(-6)}`;
+  return obfuscated + suffix;
+}
+
+/**
+ * Obfuscate a MAC address to first octet + **:**:**:**:** + last octet.
+ * Accepts colon or hyphen-separated format (e.g. AC:A7:04:1F:F6:6C -> AC:**:**:**:**:6C).
+ * Always returns colon-separated form when obfuscating.
+ */
+export function obfuscateMac(mac) {
+  if (mac == null || String(mac).trim() === '') return '--';
+  const s = String(mac).trim();
+  const sep = s.includes('-') ? '-' : ':';
+  const octets = s.split(sep).filter(Boolean);
+  if (octets.length !== 6) return s;
+  return `${octets[0]}:00:00:00:00:${octets[5]}`;
+}

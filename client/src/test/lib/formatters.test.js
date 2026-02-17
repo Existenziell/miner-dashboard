@@ -4,15 +4,18 @@ import {
   formatBestDiff,
   formatBytes,
   formatDifficulty,
+  formatHash,
   formatHashrate,
   formatNumber,
   formatPower,
   formatPrice,
   formatResetReason,
+  formatStratumUser,
   formatTemp,
   formatTimeAgo,
   formatUptime,
   formatWeight,
+  obfuscateMac,
 } from '@/lib/formatters.js';
 
 describe('formatHashrate', () => {
@@ -210,5 +213,59 @@ describe('formatResetReason', () => {
   });
   it('returns raw string for unknown reason', () => {
     expect(formatResetReason('UNKNOWN.KEY')).toBe('UNKNOWN.KEY');
+  });
+});
+
+describe('formatHash', () => {
+  it('returns "--" for null or undefined', () => {
+    expect(formatHash(null)).toBe('--');
+    expect(formatHash(undefined)).toBe('--');
+  });
+  it('formats hash with first 3 and last 6 characters', () => {
+    expect(formatHash('00000000000000000000cd73f237ce14202ea861a829f32e450b55c5f424be4f')).toBe('000...24be4f');
+  });
+});
+
+describe('formatStratumUser', () => {
+  it('returns "--" for null, undefined, or empty string', () => {
+    expect(formatStratumUser(null)).toBe('--');
+    expect(formatStratumUser(undefined)).toBe('--');
+    expect(formatStratumUser('')).toBe('--');
+  });
+  it('returns "--" for whitespace-only string', () => {
+    expect(formatStratumUser('   ')).toBe('--');
+  });
+  it('obfuscates address only (no dot): first 4 + ... + last 6', () => {
+    expect(formatStratumUser('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfj5x4qhf')).toBe('bc1q...5x4qhf');
+  });
+  it('obfuscates address and keeps suffix for Address.Worker', () => {
+    expect(formatStratumUser('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfj5x4qhf.worker1')).toBe('bc1q...5x4qhf.worker1');
+  });
+  it('obfuscates address and keeps full suffix for Address.Worker.RIG_ID', () => {
+    expect(formatStratumUser('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfj5x4qhf.Worker.RIG_ID')).toBe('bc1q...5x4qhf.Worker.RIG_ID');
+  });
+  it('shows address part in full when length <= 10', () => {
+    expect(formatStratumUser('short')).toBe('short');
+    expect(formatStratumUser('user.worker')).toBe('user.worker');
+  });
+  it('obfuscates long single segment (no suffix)', () => {
+    expect(formatStratumUser('1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2')).toBe('1BvB...JaNVN2');
+  });
+});
+
+describe('obfuscateMac', () => {
+  it('returns "--" for null, undefined, or empty string', () => {
+    expect(obfuscateMac(null)).toBe('--');
+    expect(obfuscateMac(undefined)).toBe('--');
+    expect(obfuscateMac('')).toBe('--');
+  });
+  it('obfuscates colon-separated MAC to first and last octet', () => {
+    expect(obfuscateMac('AC:A7:04:1F:F6:6C')).toBe('AC:00:00:00:00:6C');
+  });
+  it('obfuscates hyphen-separated MAC and returns colon-separated', () => {
+    expect(obfuscateMac('AC-A7-04-1F-F6-6C')).toBe('AC:00:00:00:00:6C');
+  });
+  it('returns original string when not 6 octets', () => {
+    expect(obfuscateMac('AC:A7:04')).toBe('AC:A7:04');
   });
 });
