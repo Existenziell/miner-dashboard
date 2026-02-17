@@ -3,7 +3,6 @@ import {
   MAX_HOSTNAME_LENGTH,
   MAX_WIFI_PASSWORD_LENGTH,
   MAX_WIFI_SSID_LENGTH,
-  MIN_WIFI_PASSWORD_LENGTH,
 } from 'shared/schemas/minerApi';
 import { useMinerSettingsContext } from '@/context/MinerSettingsContext';
 import { useSetupContext } from '@/context/SetupContext';
@@ -126,7 +125,7 @@ export function TabSetup({ minerReachable }) {
           <>
             <form onSubmit={(e) => { e.preventDefault(); wifiActions.save(); }} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
+                <Field label="Hostname" hint="Device hostname on the network.">
                   <input
                     type="text"
                     value={wifi.hostname}
@@ -162,7 +161,7 @@ export function TabSetup({ minerReachable }) {
                     </p>
                   )}
                 </Field>
-                <Field label="WiFi Password" hint={`Leave blank to keep current password. When set, ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters.`}>
+                <Field label="WiFi Password" hint={`Leave blank to keep current password.`}>
                   <input
                     type="password"
                     value={wifi.wifiPassword}
