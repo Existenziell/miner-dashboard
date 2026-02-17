@@ -124,96 +124,96 @@ export function TabSetup({ minerReachable }) {
           </p>
         ) : (
           <>
-        <form onSubmit={(e) => { e.preventDefault(); wifiActions.save(); }} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
-              <input
-                type="text"
-                value={wifi.hostname}
-                onChange={(e) => wifi.setHostname(e.target.value.toLowerCase())}
-                placeholder="bitaxe"
-                maxLength={MAX_HOSTNAME_LENGTH}
-                className={`input ${hostnameError ? 'input-danger' : ''}`}
-                aria-label="Hostname"
-                aria-invalid={!!hostnameError}
-                aria-describedby={hostnameError ? 'setup-hostname-error' : undefined}
-              />
-              {hostnameError && (
-                <p id="setup-hostname-error" className="text-danger text-xs mt-1" role="alert">
-                  {hostnameError}
+            <form onSubmit={(e) => { e.preventDefault(); wifiActions.save(); }} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Field label="Hostname" hint="Device hostname on the network (alphanumeric and hyphens).">
+                  <input
+                    type="text"
+                    value={wifi.hostname}
+                    onChange={(e) => wifi.setHostname(e.target.value.toLowerCase())}
+                    placeholder="bitaxe"
+                    maxLength={MAX_HOSTNAME_LENGTH}
+                    className={`input ${hostnameError ? 'input-danger' : ''}`}
+                    aria-label="Hostname"
+                    aria-invalid={!!hostnameError}
+                    aria-describedby={hostnameError ? 'setup-hostname-error' : undefined}
+                  />
+                  {hostnameError && (
+                    <p id="setup-hostname-error" className="text-danger text-xs mt-1" role="alert">
+                      {hostnameError}
+                    </p>
+                  )}
+                </Field>
+                <Field label="WiFi Network (SSID)" hint="Network name to connect to.">
+                  <input
+                    type="text"
+                    value={wifi.wifiSsid}
+                    onChange={(e) => wifi.setWifiSsid(e.target.value)}
+                    placeholder="WiFi Network (SSID)"
+                    maxLength={MAX_WIFI_SSID_LENGTH}
+                    className={`input ${wifiSsidError ? 'input-danger' : ''}`}
+                    aria-label="WiFi Network (SSID)"
+                    aria-invalid={!!wifiSsidError}
+                    aria-describedby={wifiSsidError ? 'setup-wifi-ssid-error' : undefined}
+                  />
+                  {wifiSsidError && (
+                    <p id="setup-wifi-ssid-error" className="text-danger text-xs mt-1" role="alert">
+                      {wifiSsidError}
+                    </p>
+                  )}
+                </Field>
+                <Field label="WiFi Password" hint={`Leave blank to keep current password. When set, ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters.`}>
+                  <input
+                    type="password"
+                    value={wifi.wifiPassword}
+                    onChange={(e) => wifi.setWifiPassword(e.target.value)}
+                    placeholder="WiFi Password"
+                    maxLength={MAX_WIFI_PASSWORD_LENGTH}
+                    className={`input ${wifiPasswordError ? 'input-danger' : ''}`}
+                    aria-label="WiFi Password"
+                    aria-invalid={!!wifiPasswordError}
+                    aria-describedby={wifiPasswordError ? 'setup-wifi-password-error' : undefined}
+                  />
+                  {wifiPasswordError && (
+                    <p id="setup-wifi-password-error" className="text-danger text-xs mt-1" role="alert">
+                      {wifiPasswordError}
+                    </p>
+                  )}
+                </Field>
+                <p className="text-muted text-sm max-w-prose">
+                  Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
                 </p>
-              )}
-            </Field>
-            <Field label="WiFi Network (SSID)" hint="Network name to connect to.">
-              <input
-                type="text"
-                value={wifi.wifiSsid}
-                onChange={(e) => wifi.setWifiSsid(e.target.value)}
-                placeholder="WiFi Network (SSID)"
-                maxLength={MAX_WIFI_SSID_LENGTH}
-                className={`input ${wifiSsidError ? 'input-danger' : ''}`}
-                aria-label="WiFi Network (SSID)"
-                aria-invalid={!!wifiSsidError}
-                aria-describedby={wifiSsidError ? 'setup-wifi-ssid-error' : undefined}
+              </div>
+              <PendingChanges
+                changes={wifiStatus.changes}
+                onReset={wifiActions.revert}
+                title="Pending changes"
               />
-              {wifiSsidError && (
-                <p id="setup-wifi-ssid-error" className="text-danger text-xs mt-1" role="alert">
-                  {wifiSsidError}
-                </p>
-              )}
-            </Field>
-            <Field label="WiFi Password" hint={`Leave blank to keep current password. When set, ${MIN_WIFI_PASSWORD_LENGTH}–${MAX_WIFI_PASSWORD_LENGTH} characters.`}>
-              <input
-                type="password"
-                value={wifi.wifiPassword}
-                onChange={(e) => wifi.setWifiPassword(e.target.value)}
-                placeholder="WiFi Password"
-                maxLength={MAX_WIFI_PASSWORD_LENGTH}
-                className={`input ${wifiPasswordError ? 'input-danger' : ''}`}
-                aria-label="WiFi Password"
-                aria-invalid={!!wifiPasswordError}
-                aria-describedby={wifiPasswordError ? 'setup-wifi-password-error' : undefined}
-              />
-              {wifiPasswordError && (
-                <p id="setup-wifi-password-error" className="text-danger text-xs mt-1" role="alert">
-                  {wifiPasswordError}
-                </p>
-              )}
-            </Field>
-          </div>
-          <p className="text-muted text-xs mt-5">
-            Changing the WiFi network or password can disconnect the miner from your current network. You may lose access to the dashboard until you reach the miner on its new address.
-          </p>
-          <PendingChanges
-            changes={wifiStatus.changes}
-            onReset={wifiActions.revert}
-            title="Pending changes"
-          />
-          <div className="flex flex-wrap items-center gap-4 mt-4">
-            {wifiStatus.hasChanges && !wifiValidation.isFormValid && (
-              <span className="text-danger text-sm" role="alert">
-                Fix the errors above to save.
-              </span>
-            )}
-            <button
-              type="submit"
-              disabled={wifiStatus.saving || !wifiStatus.hasChanges || !wifiValidation.isFormValid}
-              className="btn-primary"
-            >
-              {wifiStatus.saving ? 'Saving…' : 'Save settings'}
-            </button>
-            {wifiStatus.message?.type === 'success' && (
-              <span role="status" className="message-success">
-                <span>Saved successfully</span>
-              </span>
-            )}
-            {wifiStatus.message?.type === 'error' && (
-              <span role="alert" className="message-warning">
-                {wifiStatus.message.text}
-              </span>
-            )}
-          </div>
-        </form>
+              <div className="flex flex-wrap items-center gap-4 mt-4">
+                {wifiStatus.hasChanges && !wifiValidation.isFormValid && (
+                  <span className="text-danger text-sm" role="alert">
+                    Fix the errors above to save.
+                  </span>
+                )}
+                <button
+                  type="submit"
+                  disabled={wifiStatus.saving || !wifiStatus.hasChanges || !wifiValidation.isFormValid}
+                  className="btn-primary"
+                >
+                  {wifiStatus.saving ? 'Saving…' : 'Save settings'}
+                </button>
+                {wifiStatus.message?.type === 'success' && (
+                  <span role="status" className="message-success">
+                    <span>Saved successfully</span>
+                  </span>
+                )}
+                {wifiStatus.message?.type === 'error' && (
+                  <span role="alert" className="message-warning">
+                    {wifiStatus.message.text}
+                  </span>
+                )}
+              </div>
+            </form>
           </>
         )}
       </div>
