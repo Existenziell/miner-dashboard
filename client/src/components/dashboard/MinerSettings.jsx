@@ -1,20 +1,16 @@
 import { useMiner } from '@/context/MinerContext';
 import { formatStratumUser } from '@/lib/formatters';
 import { getPoolInfo } from '@/lib/poolUtils';
+import AppLink from '@/components/AppLink';
 
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (
     <div className="flex justify-between items-start gap-4 py-1">
       <span className="text-muted text-xs shrink-0">{label}</span>
       {href ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`text-sm text-right ${truncate ? 'truncate max-w-[250px]' : ''}`}
-        >
+        <AppLink href={href} external className={`text-sm text-right ${truncate ? 'truncate max-w-[250px]' : ''}`}>
           {value}
-        </a>
+        </AppLink>
       ) : (
         <span
           className={`text-sm text-right ${highlight ? 'text-accent font-medium' : 'text-normal'} ${truncate ? 'truncate max-w-[250px]' : ''}`}

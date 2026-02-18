@@ -1,3 +1,4 @@
+import AppLink from '@/components/AppLink';
 const FOOTER_LINKS = [
   { href: 'https://bitcoindev.info/', label: 'BitcoinDev' },
   { href: 'https://mempool.space/', label: 'mempool.space' },
@@ -11,14 +12,13 @@ export default function Footer() {
         {FOOTER_LINKS.map((link) => (
           <span key={link.href}>
             {' · '}
-            <a
+            <AppLink
               href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted hover:text-normal transition-colors"
+              className="text-muted"
+              external
             >
               {link.label}
-            </a>
+            </AppLink>
           </span>
         ))}
       </div>

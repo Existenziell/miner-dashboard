@@ -13,7 +13,9 @@ import {
   formatNumber,
   formatTimeAgo,
   formatWeight,
+  formatHash,
 } from '@/lib/formatters';
+import AppLink from '@/components/AppLink';
 
 /**
  * Full-screen overlay when the miner finds a block.
@@ -119,15 +121,14 @@ export default function BlockFoundOverlay({ onDismiss, blockFoundSnapshot, block
             )}
             {block.id && (
               <div className="flex justify-between text-sm gap-4 mb-1 items-center">
-                <span className="text-muted dark:text-muted-dark shrink-0">Block ID</span>
-                <a
+                <span className="text-muted dark:text-muted-dark shrink-0">Block Hash</span>
+                <AppLink
                   href={`${MEMPOOL_BASE_URL}/block/${block.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline truncate font-mono text-xs"
+                  external
+                  className="font-mono text-xs"
                 >
-                  {block.id.slice(0, 12)}…
-                </a>
+                  {formatHash(block.id)}
+                </AppLink>
               </div>
             )}
             {block.timestamp != null && (

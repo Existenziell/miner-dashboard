@@ -12,6 +12,7 @@ import {
   formatTimeAgo,
   formatWeight,
 } from '@/lib/formatters';
+import AppLink from '@/components/AppLink';
 
 function BlockCard({ label, block }) {
   if (!block) return null;
@@ -24,15 +25,14 @@ function BlockCard({ label, block }) {
       <div className="flex items-center justify-between gap-2">
         <div className="text-lg font-bold text-normal">{formatNumber(height)}</div>
         {id && (
-          <a
+          <AppLink
             href={`${MEMPOOL_BASE_URL}/block/${id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-accent hover:underline shrink-0 truncate max-w-[50%]"
+            external
+            className="text-xs font-mono text-accent"
             title={id}
           >
             {formatHash(id)}
-          </a>
+          </AppLink>
         )}
       </div>
       <div className="mt-1.5 space-y-0.5 text-sm">

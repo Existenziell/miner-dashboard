@@ -7,6 +7,7 @@ import {
   flashFirmwareFile,
 } from '@/lib/api';
 import { formatPublished, pickFirmwareAsset } from '@/lib/firmwareUtils';
+import AppLink from '@/components/AppLink';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { IconCheckmark, IconDownload } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';
@@ -273,9 +274,9 @@ export function TabFirmware() {
           </Field>
           {selectedRelease?.html_url && (
             <p>
-              <a href={selectedRelease.html_url} target="_blank" rel="noopener noreferrer" className="text-accent text-sm">
+              <AppLink href={selectedRelease.html_url} external className="text-sm">
                 View complete changelog
-              </a>
+              </AppLink>
             </p>
           )}
           <div className="flex flex-wrap items-center gap-3 pt-2">

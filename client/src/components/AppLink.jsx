@@ -33,11 +33,12 @@ function parseTabTargetFromHref(href) {
   return { tab, section };
 }
 
-export default function AppLink({ href, onClick, target, ...props }) {
+export default function AppLink({ href, onClick, target, external = false, rel, ...props }) {
   return (
     <a
       href={href}
-      target={target}
+      target={external ? (target ?? '_blank') : target}
+      rel={external ? 'noopener noreferrer' : (rel ?? 'internal')}
       onClick={(e) => {
         onClick?.(e);
         if (!shouldInterceptClick(e, target)) return;

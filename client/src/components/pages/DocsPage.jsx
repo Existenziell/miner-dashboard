@@ -11,11 +11,11 @@ export default function DocsPage() {
           <p className="doc-body">
             This app monitors a <strong>NerdQaxe++</strong>-compatible ASIC miner and the Bitcoin network in real time. It shows hashrate, temperature, power, shares, and network stats.
             Set the miner IP and expected hashrate in{' '}
-            <AppLink href="/?tab=settings&section=setup" className="link">
+            <AppLink href="/?tab=settings&section=setup">
               Setup
             </AppLink>{' '}
             so gauges and alerts are adapted to your miner capabilities. For API endpoints and server config, see the{' '}
-            <AppLink href="/?tab=api" className="link">
+            <AppLink href="/?tab=api">
               API
             </AppLink>{' '}
             tab.
@@ -54,9 +54,9 @@ export default function DocsPage() {
               {SOLO_POOLS.map((pool) => (
                 <tr key={pool.identifier}>
                   <td className="doc-td doc-td--compact">
-                    <a href={pool.webUrl} target="_blank" rel="noopener noreferrer" className="link">
+                    <AppLink href={pool.webUrl} external>
                       {pool.name}
-                    </a>
+                    </AppLink>
                   </td>
                   <td className="doc-td doc-td--compact"><code className="code-inline">{pool.stratumHost}</code></td>
                   <td className="doc-td doc-td--compact">{pool.port}</td>
@@ -87,13 +87,13 @@ export default function DocsPage() {
           </ul>
           <p className="doc-body">
             Set the miner&apos;s IP in{' '}
-            <AppLink href="/?tab=settings&section=setup" className="link">
+            <AppLink href="/?tab=settings&section=setup">
               Settings → Setup
             </AppLink>{' '}
             (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
           </p>
           <p className="doc-body">
-            <a href="https://github.com/shufps/qaxe" target="_blank" rel="noopener noreferrer" className="link">NerdQ Hardware Repository</a>
+            <AppLink href="https://github.com/shufps/qaxe" external>NerdQ Hardware Repository</AppLink>
           </p>
         </div>
         <Image src="/images/asic.jpg" alt="BM1370 ASIC" className="my-4" />
