@@ -40,7 +40,7 @@ describe('useNotifications', () => {
     );
   });
 
-  it('dismissNotifications can be called and updates dismissed state', () => {
+  it('dismissNotifications hides notifications when called', () => {
     const miner = { temp: 61 };
     mockUseMiner.mockReturnValue({ data: miner, refetch: vi.fn() });
     const { result } = renderHook(() => useNotifications(null, null));
@@ -52,8 +52,7 @@ describe('useNotifications', () => {
       result.current.dismissNotifications();
     });
 
-    // Notifications that are still in evaluated may remain visible by design
-    expect(result.current.dismissNotifications).toBeDefined();
+    expect(result.current.activeNotifications).toEqual([]);
   });
 
   it('sets blockFoundVisible and blockFoundSnapshot when block count increases', async () => {

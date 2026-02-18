@@ -3,14 +3,13 @@ import { useMiner } from '@/context/MinerContext';
 import { evaluateNotifications } from '@/lib/notificationRules';
 
 // Merge evaluated (current) + sticky (ever seen); keep in list until user dismisses (no expiry)
-// If a notification is currently in evaluated (re-triggered), show it again even if previously dismissed
+// When user dismisses, hide those notifications until next page load (no re-show while still in evaluated)
 function buildDisplayed(evaluated, sticky, dismissedIds) {
-  const evaluatedIds = new Set(evaluated.map((a) => a.id));
   const byId = new Map(evaluated.map((a) => [a.id, a]));
   for (const [id, entry] of Object.entries(sticky)) {
     if (!byId.has(id)) byId.set(id, entry);
   }
-  return [...byId.values()].filter((a) => !dismissedIds.has(a.id) || evaluatedIds.has(a.id));
+  return [...byId.values()].filter((a) => !dismissedIds.has(a.id));
 }
 
 /**
