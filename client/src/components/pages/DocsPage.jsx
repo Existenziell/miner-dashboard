@@ -85,15 +85,38 @@ export default function DocsPage() {
             <li><strong>Cooling</strong>: Good airflow and ambient temperature to keep ASIC and VR temps within safe limits (monitor via this dashboard).</li>
             <li><strong>Network</strong>: Miner and dashboard host must reach the pool's Stratum server (and optionally mempool.space for network stats).</li>
           </ul>
+
+          <h3 className="doc-subheading">Solo miner families</h3>
           <p className="doc-body">
-            Set the miner&apos;s IP in{' '}
-            <AppLink href="/?tab=settings&section=setup">
-              Settings → Setup
-            </AppLink>{' '}
-            (or <code className="code-inline">.env</code>) so the backend can poll status and show hashrate, temperature, power, and fan data.
+            Many compatible devices use <strong>ESP-Miner</strong> or <strong>AxeOS</strong> firmware and expose the same web API. They fall into a few families:
           </p>
+          <ul className="doc-list">
+            <li><strong>Bitaxe</strong>: Single BM1370 ASIC, ~1 TH/s; often used as a USB-style, low-power solo miner.</li>
+            <li><strong>NerdQaxe / Qaxe line</strong>: Multi-ASIC boards: NerdQaxe+ (4× BM1368, 2.4 TH/s), NerdQaxe++ (4× BM1370, 4.8 TH/s), Qaxe (4× BM1366, ~1.8 TH/s), QAxe+ (4× BM1368, 2.4 TH/s). Higher hashrate, typically desktop-style with dedicated PSU and cooling.</li>
+            <li><strong>USB miners</strong>: Plug-and-play, USB-powered or USB-sized devices (e.g. Bitaxe and similar single-ASIC units); low wattage, easy to run from a PC or power brick.</li>
+          </ul>
+          <div className="overflow-x-auto doc-table-wrap">
+            <p className="doc-lead-in">Compatible devices (same API):</p>
+            <table className="doc-table">
+              <thead>
+                <tr>
+                  <th className="doc-th">Device</th>
+                  <th className="doc-th">ASIC</th>
+                  <th className="doc-th">Hashrate</th>
+                  <th className="doc-th">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td className="doc-td">Bitaxe</td><td className="doc-td">1× BM1370</td><td className="doc-td">~1 TH/s</td><td className="doc-td">USB-style</td></tr>
+                <tr><td className="doc-td">NerdQaxe+</td><td className="doc-td">4× BM1368</td><td className="doc-td">2.4 TH/s</td><td className="doc-td">—</td></tr>
+                <tr><td className="doc-td">NerdQaxe++</td><td className="doc-td">4× BM1370</td><td className="doc-td">4.8 TH/s</td><td className="doc-td">—</td></tr>
+                <tr><td className="doc-td">Qaxe</td><td className="doc-td">4× BM1366</td><td className="doc-td">~1.8 TH/s</td><td className="doc-td">—</td></tr>
+                <tr><td className="doc-td">QAxe+</td><td className="doc-td">4× BM1368</td><td className="doc-td">2.4 TH/s</td><td className="doc-td">—</td></tr>
+              </tbody>
+            </table>
+          </div>
           <p className="doc-body">
-            <AppLink href="https://github.com/shufps/qaxe" external>NerdQ Hardware Repository</AppLink>
+            See the <AppLink href="https://github.com/shufps/qaxe" external>NerdQ Hardware Repository</AppLink> for boards, firmware, and compatibility details.
           </p>
         </div>
         <Image src="/images/asic.jpg" alt="BM1370 ASIC" className="my-4" />
