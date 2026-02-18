@@ -7,7 +7,7 @@ import {
   flashFirmwareFile,
 } from '@/lib/api';
 import { formatPublished, pickFirmwareAsset } from '@/lib/firmwareUtils';
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { IconCheckmark, IconDownload } from '@/components/Icons';
 import { Field } from '@/components/settings/Field';

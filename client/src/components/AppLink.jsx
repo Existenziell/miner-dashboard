@@ -33,7 +33,7 @@ function parseTabTargetFromHref(href) {
   return { tab, section };
 }
 
-export default function AppLink({ href, onClick, target, external = false, rel, ...props }) {
+export function AppLink({ href, onClick, target, external = false, rel, ...props }) {
   return (
     <a
       href={href}

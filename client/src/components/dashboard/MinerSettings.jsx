@@ -1,7 +1,7 @@
 import { useMiner } from '@/context/MinerContext';
 import { formatStratumUser } from '@/lib/formatters';
 import { getPoolInfo } from '@/lib/poolUtils';
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 
 function SettingRow({ label, value, highlight, truncate, href }) {
   return (

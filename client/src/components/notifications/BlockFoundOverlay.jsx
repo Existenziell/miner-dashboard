@@ -15,7 +15,7 @@ import {
   formatWeight,
   formatHash,
 } from '@/lib/formatters';
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 
 /**
  * Full-screen overlay when the miner finds a block.

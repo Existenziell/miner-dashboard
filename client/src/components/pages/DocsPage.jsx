@@ -1,5 +1,5 @@
 import { SOLO_POOLS } from '@/lib/constants';
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 import Image from '@/components/Image';
 
 export default function DocsPage() {

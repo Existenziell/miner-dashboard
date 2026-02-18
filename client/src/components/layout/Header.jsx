@@ -1,5 +1,5 @@
 import { useTheme } from '@/context/ThemeContext';
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 
 const TABS = [

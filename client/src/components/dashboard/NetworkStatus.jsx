@@ -12,7 +12,7 @@ import {
   formatTimeAgo,
   formatWeight,
 } from '@/lib/formatters';
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 
 function BlockCard({ label, block }) {
   if (!block) return null;

@@ -11,6 +11,7 @@ import { useMinerWifi } from '@/hooks/useMinerWifi';
 import { useSetup } from '@/hooks/useSetup';
 import { MESSAGE_AUTO_DISMISS_MS } from '@/lib/constants';
 import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl';
+import { AppLink } from '@/components/AppLink';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { PendingChanges } from '@/components/settings/PendingChanges';
 import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
@@ -131,11 +132,6 @@ export default function SettingsPage({ onError, onPendingChange }) {
     [miner, setupForm.actions, wifiForm.actions, deviceForm.actions, poolsForm.actions, appearanceForm.actions]
   );
 
-  const goToSetupTab = () => {
-    setSettingsSubTab('setup');
-    setSettingsSectionInUrl('setup');
-  };
-
   if (!miner) {
     return (
       <div className="space-y-4">
@@ -155,27 +151,27 @@ export default function SettingsPage({ onError, onPendingChange }) {
         {settingsSubTab === 'miner' && (
           <div className="card p-8 text-center text-muted">
             Connect to the miner to change device settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToSetupTab} className="text-link">
+            <AppLink href="/?tab=settings&section=setup">
               Setup
-            </button>{' '}
+            </AppLink>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
         )}
         {settingsSubTab === 'pools' && (
           <div className="card p-8 text-center text-muted">
             Connect to the miner to change pool settings. Set Miner IP in the{' '}
-            <button type="button" onClick={goToSetupTab} className="text-link">
+            <AppLink href="/?tab=settings&section=setup">
               Setup
-            </button>{' '}
+            </AppLink>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
         )}
         {settingsSubTab === 'firmware' && (
           <div className="card p-8 text-center text-muted">
             Connect to the miner to update firmware. Set Miner IP in the{' '}
-            <button type="button" onClick={goToSetupTab} className="text-link">
+            <AppLink href="/?tab=settings&section=setup">
               Setup
-            </button>{' '}
+            </AppLink>{' '}
             tab if the dashboard cannot reach the miner.
           </div>
         )}

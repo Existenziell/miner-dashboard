@@ -1,4 +1,4 @@
-import AppLink from '@/components/AppLink';
+import { AppLink } from '@/components/AppLink';
 const FOOTER_LINKS = [
   { href: 'https://bitcoindev.info/', label: 'BitcoinDev' },
   { href: 'https://mempool.space/', label: 'mempool.space' },
