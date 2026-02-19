@@ -173,7 +173,7 @@ export default function NetworkStatus({ data }) {
       {/* Second row: Current block (mempool), Previous blocks */}
       {blockHeight != null && (
         <div className="card">
-          <div className="stat-label mb-1">Current block</div>
+          <div className="stat-label mb-1">Next block</div>
           <div className="text-lg font-bold text-normal">{formatNumber(blockHeight + 1)}</div>
           <div className="mt-1.5 space-y-0.5 text-sm">
             <div className="flex justify-between text-muted">
@@ -191,9 +191,9 @@ export default function NetworkStatus({ data }) {
           </div>
         </div>
       )}
-      <BlockCard label="Previous block" block={previousBlock} />
-      <BlockCard label="2 blocks ago" block={previousBlock2} />
-      <BlockCard label="3 blocks ago" block={previousBlock3} />
+      <BlockCard label="Latest block" block={previousBlock} />
+      <BlockCard label="Previous block" block={previousBlock2} />
+      <BlockCard label="2 blocks ago" block={previousBlock3} />
     </div>
   );
 }

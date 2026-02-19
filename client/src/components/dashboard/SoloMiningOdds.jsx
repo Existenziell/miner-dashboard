@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useMiner } from '@/context/MinerContext';
 import { ODDS_COLLAPSED_KEY } from '@/lib/constants';
 import {
@@ -22,16 +22,16 @@ const HASHRATE_PRESETS = [
   { value: 200, label: '200 TH/s' },
 ];
 
-const CUSTOM_VALUE = 'custom';
+const MODE_CUSTOM = 'custom';
+const MODE_CURRENT = 'current';
 
 export default function SoloMiningOdds({ network }) {
   const { data: minerData } = useMiner();
   const [collapsed, setCollapsed] = useState(() =>
     typeof localStorage !== 'undefined' && localStorage.getItem(ODDS_COLLAPSED_KEY) === 'true'
   );
-  const [presetKey, setPresetKey] = useState(CUSTOM_VALUE);
+  const [selection, setSelection] = useState(MODE_CURRENT);
   const [customTh, setCustomTh] = useState('');
-  const [initializedFromMiner, setInitializedFromMiner] = useState(false);
 
   const toggleCollapsed = () => {
     setCollapsed((prev) => {
@@ -43,26 +43,14 @@ export default function SoloMiningOdds({ network }) {
     });
   };
 
+  const minerTh = minerData?.hashRate != null ? minerData.hashRate / 1000 : null;
   const thPerSec =
-    presetKey === CUSTOM_VALUE
-      ? parseFloat(customTh, 10)
-      : Number(presetKey);
+    selection === MODE_CURRENT && Number.isFinite(minerTh) && minerTh > 0
+      ? minerTh
+      : selection !== MODE_CUSTOM && typeof selection === 'number' && Number.isFinite(selection)
+        ? selection
+        : parseFloat(customTh, 10);
   const validTh = Number.isFinite(thPerSec) && thPerSec > 0;
-
-  useEffect(() => {
-    if (initializedFromMiner || !minerData?.hashRate) return;
-    const minerTh = minerData.hashRate / 1000;
-    const match = HASHRATE_PRESETS.find((p) => Math.abs(p.value - minerTh) < 0.01);
-    queueMicrotask(() => {
-      if (match) {
-        setPresetKey(match.value);
-      } else {
-        setPresetKey(CUSTOM_VALUE);
-        setCustomTh(minerTh > 0 ? Number(minerTh).toFixed(2) : '');
-      }
-      setInitializedFromMiner(true);
-    });
-  }, [minerData?.hashRate, initializedFromMiner]);
 
   const networkDifficulty = network?.networkDifficulty ?? null;
   const blockTimeMs = network?.difficulty?.adjustedTimeAvg ?? null;
@@ -89,6 +77,7 @@ export default function SoloMiningOdds({ network }) {
       </div>
       {!collapsed && (
       <div className="space-y-4">
+        <p className="card-subtitle">Compute solo mining odds based on hashrate and the current network difficulty.</p>
         <div>
           <label htmlFor="solo-odds-hashrate" className="stat-label block mb-1">
             Hashrate (TH/s)
@@ -96,28 +85,28 @@ export default function SoloMiningOdds({ network }) {
           <div className="flex flex-wrap gap-2 items-center">
             <select
               id="solo-odds-preset"
-              aria-label="Hashrate preset"
-              value={presetKey === CUSTOM_VALUE ? CUSTOM_VALUE : String(presetKey)}
+              aria-label="Hashrate source"
+              value={typeof selection === 'number' ? String(selection) : selection}
               onChange={(e) => {
                 const v = e.target.value;
-                if (v === CUSTOM_VALUE) {
-                  setPresetKey(CUSTOM_VALUE);
+                if (v === MODE_CURRENT || v === MODE_CUSTOM) {
+                  setSelection(v);
                 } else {
                   const n = parseFloat(v, 10);
-                  setPresetKey(Number.isFinite(n) ? n : CUSTOM_VALUE);
-                  if (Number.isFinite(n)) setCustomTh(String(n));
+                  setSelection(Number.isFinite(n) ? n : MODE_CURRENT);
                 }
               }}
               className="rounded-md border border-edge dark:border-edge-dark bg-surface dark:bg-surface-dark text-normal dark:text-normal-dark px-3 py-2 min-w-40 focus:outline-none focus:ring-2 focus:ring-accent"
             >
+              <option value={MODE_CURRENT}>Current (miner hashrate)</option>
               {HASHRATE_PRESETS.map((p) => (
                 <option key={p.value} value={String(p.value)}>
                   {p.label}
                 </option>
               ))}
-              <option value={CUSTOM_VALUE}>Custom</option>
+              <option value={MODE_CUSTOM}>Custom</option>
             </select>
-            {presetKey === CUSTOM_VALUE && (
+            {selection === MODE_CUSTOM && (
               <input
                 id="solo-odds-hashrate"
                 type="number"
