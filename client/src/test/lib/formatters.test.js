@@ -6,7 +6,9 @@ import {
   formatDifficulty,
   formatHash,
   formatHashrate,
+  formatLoadAvg,
   formatNumber,
+  formatPercent,
   formatPower,
   formatPrice,
   formatResetReason,
@@ -77,6 +79,33 @@ describe('formatPower', () => {
   it('formats watts with one decimal', () => {
     expect(formatPower(100)).toBe('100.0 W');
     expect(formatPower(99.5)).toBe('99.5 W');
+  });
+});
+
+describe('formatLoadAvg', () => {
+  it('returns "--" for null, undefined, or invalid array', () => {
+    expect(formatLoadAvg(null)).toBe('--');
+    expect(formatLoadAvg(undefined)).toBe('--');
+    expect(formatLoadAvg([])).toBe('--');
+    expect(formatLoadAvg([1, 2])).toBe('--');
+  });
+  it('formats 1/5/15 min load as "a / b / c"', () => {
+    expect(formatLoadAvg([1.25, 1.1, 0.9])).toBe('1.25 / 1.10 / 0.90');
+    expect(formatLoadAvg([0, 0, 0])).toBe('0.00 / 0.00 / 0.00');
+  });
+});
+
+describe('formatPercent', () => {
+  it('returns "--" for null, undefined, or non-finite', () => {
+    expect(formatPercent(null)).toBe('--');
+    expect(formatPercent(undefined)).toBe('--');
+    expect(formatPercent(NaN)).toBe('--');
+  });
+  it('formats percentage with one decimal', () => {
+    expect(formatPercent(0)).toBe('0.0%');
+    expect(formatPercent(50)).toBe('50.0%');
+    expect(formatPercent(99.5)).toBe('99.5%');
+    expect(formatPercent(100)).toBe('100.0%');
   });
 });
 

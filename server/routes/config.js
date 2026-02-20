@@ -225,6 +225,10 @@ router.patch('/', (req, res) => {
     const e = validateNumber(body.pollNetworkIntervalMs, 5000, 600_000, 'pollNetworkIntervalMs');
     if (e) errors.push(e);
   }
+  if (body.pollSystemIntervalMs !== undefined) {
+    const e = validateNumber(body.pollSystemIntervalMs, 1000, 300_000, 'pollSystemIntervalMs');
+    if (e) errors.push(e);
+  }
   const mrErr = validateMetricRanges(body.metricRanges);
   if (mrErr) errors.push(mrErr);
   const orderErr = validateMetricOrder(body.metricOrder);

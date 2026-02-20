@@ -65,6 +65,7 @@ export default function ApiPage() {
   const clientSettings = [
     { name: 'pollMinerIntervalMs', source: 'dashboard config', value: `${config.pollMinerIntervalMs}`, description: 'Miner status poll interval (ms)' },
     { name: 'pollNetworkIntervalMs', source: 'dashboard config', value: `${config.pollNetworkIntervalMs}`, description: 'Network status poll interval (ms)' },
+    { name: 'pollSystemIntervalMs', source: 'dashboard config', value: `${config.pollSystemIntervalMs}`, description: 'System (host) metrics poll interval (ms)' },
     { name: 'BASE', source: 'api.js', value: "'' (same-origin)", description: 'Base URL for API requests' },
   ];
   const [asic, setAsic] = useState(null);

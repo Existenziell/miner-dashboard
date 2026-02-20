@@ -23,10 +23,10 @@ export function TabSetup({ minerReachable }) {
       <div className="card">
         <div className="card-header-wrapper">
           <div className="card-header mb-4">
-            <h3 className="card-header-title">Miner Settings<PendingIndicator hasPending={status.changes?.length > 0} /></h3>
+            <h3 className="card-header-title">Miner Settings<PendingIndicator hasPending={status.hasMinerSettingsChanges} /></h3>
           </div>
         </div>
-        <form onSubmit={actions.save} className="space-y-4">
+        <form onSubmit={actions.saveMinerSettings} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Miner IP" hint="Miner IP. Leave empty to use .env MINER_IP.">
               <input
@@ -53,6 +53,42 @@ export function TabSetup({ minerReachable }) {
                 aria-label="Expected hashrate (GH/s)"
               />
             </Field>
+          </div>
+          <PendingChanges
+            changes={status.minerSettingsChanges}
+            onReset={actions.revertMinerSettings}
+            title="Pending changes"
+          />
+          <div className="flex flex-wrap items-center gap-4 mt-4">
+            <button
+              type="submit"
+              disabled={status.saving || !status.hasMinerSettingsChanges}
+              className="btn-primary"
+            >
+              {status.saving ? 'Saving…' : 'Save settings'}
+            </button>
+            {status.message?.type === 'success' && (
+              <span role="status" className="message-success">
+                <span>{status.message.text}</span>
+              </span>
+            )}
+            {status.message?.type === 'error' && (
+              <span role="alert" className="message-warning">
+                {status.message.text}
+              </span>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header mb-4">
+            <h3 className="card-header-title">Polling<PendingIndicator hasPending={status.hasPollingChanges} /></h3>
+          </div>
+        </div>
+        <form onSubmit={actions.savePolling} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field
               label="Miner poll interval (ms)"
               hint="How often the dashboard fetches miner status."
@@ -83,16 +119,31 @@ export function TabSetup({ minerReachable }) {
                 aria-label="Network poll interval (ms)"
               />
             </Field>
+            <Field
+              label="System poll interval (ms)"
+              hint="How often to fetch host system metrics (CPU, memory)."
+              suffix={`(= ${(connection.pollSystemMs / 1000).toFixed(1)} sec)`}
+            >
+              <input
+                type="number"
+                min={1000}
+                max={300000}
+                value={connection.pollSystemMs}
+                onChange={(e) => connection.setPollSystemMs(Number(e.target.value) || DASHBOARD_DEFAULTS.pollSystemIntervalMs)}
+                className="input"
+                aria-label="System poll interval (ms)"
+              />
+            </Field>
           </div>
           <PendingChanges
-            changes={status.changes}
-            onReset={actions.revert}
+            changes={status.pollingChanges}
+            onReset={actions.revertPolling}
             title="Pending changes"
           />
           <div className="flex flex-wrap items-center gap-4 mt-4">
             <button
               type="submit"
-              disabled={status.saving || !status.hasChanges}
+              disabled={status.saving || !status.hasPollingChanges}
               className="btn-primary"
             >
               {status.saving ? 'Saving…' : 'Save settings'}

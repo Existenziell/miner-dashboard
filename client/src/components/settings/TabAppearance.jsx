@@ -77,7 +77,7 @@ export function TabAppearance() {
             <div className="flex items-center gap-3 ml-auto">
               {status.message?.type === 'success' && status.message?.section === 'gauges' && (
                 <span role="status" className="message-success text-sm">
-                  Saved successfully
+                  Saved
                 </span>
               )}
               <button
@@ -180,7 +180,7 @@ export function TabAppearance() {
             <div className="flex items-center gap-3 ml-auto">
               {status.message?.type === 'success' && status.message?.section === 'charts' && (
                 <span role="status" className="message-success text-sm">
-                  Saved successfully
+                  Saved
                 </span>
               )}
               <button

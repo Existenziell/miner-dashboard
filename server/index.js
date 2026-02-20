@@ -10,6 +10,7 @@ import configRoutes from './routes/config.js';
 import firmwareRoutes from './routes/firmware.js';
 import minerRoutes from './routes/miner.js';
 import networkRoutes from './routes/network.js';
+import systemRoutes from './routes/system.js';
 import { attachLogsWebSocket } from './wsLogsProxy.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,6 +24,7 @@ app.use('/api/config', configRoutes);
 app.use('/api/firmware', firmwareRoutes);
 app.use('/api/miner', minerRoutes);
 app.use('/api/network', networkRoutes);
+app.use('/api/system', systemRoutes);
 
 // In production, serve the built client
 if (process.env.NODE_ENV === 'production') {

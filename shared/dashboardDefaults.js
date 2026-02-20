@@ -7,6 +7,7 @@ export const DASHBOARD_DEFAULTS = {
   defaultExpectedHashrateGh: 6000,
   pollMinerIntervalMs: 10_000,
   pollNetworkIntervalMs: 60_000,
+  pollSystemIntervalMs: 20_000,
   accentColor: '#06b6d4',
   chartColors: {
     power: { power: '#d946ef', currentA: '#06b6d4' },

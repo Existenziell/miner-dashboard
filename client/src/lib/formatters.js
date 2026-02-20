@@ -33,6 +33,23 @@ export function formatTemp(temp) {
 }
 
 /**
+ * Format load average (1, 5, 15 min) as "1m / 5m / 15m".
+ */
+export function formatLoadAvg(loadAvg) {
+  if (loadAvg == null || !Array.isArray(loadAvg) || loadAvg.length < 3) return '--';
+  const [a, b, c] = loadAvg;
+  return `${Number(a).toFixed(2)} / ${Number(b).toFixed(2)} / ${Number(c).toFixed(2)}`;
+}
+
+/**
+ * Format a percentage (0–100).
+ */
+export function formatPercent(pct) {
+  if (pct == null || !Number.isFinite(pct)) return '--';
+  return `${Number(pct).toFixed(1)}%`;
+}
+
+/**
  * Format power in watts.
  */
 export function formatPower(watts) {

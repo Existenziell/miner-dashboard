@@ -8,6 +8,7 @@ export function useSetup(config, refetchConfig, onError) {
   const [expectedHashrateGh, setExpectedHashrateGh] = useState(config.defaultExpectedHashrateGh);
   const [pollMinerMs, setPollMinerMs] = useState(config.pollMinerIntervalMs);
   const [pollNetworkMs, setPollNetworkMs] = useState(config.pollNetworkIntervalMs);
+  const [pollSystemMs, setPollSystemMs] = useState(config.pollSystemIntervalMs);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -17,20 +18,10 @@ export function useSetup(config, refetchConfig, onError) {
     setExpectedHashrateGh(config.defaultExpectedHashrateGh);
     setPollMinerMs(config.pollMinerIntervalMs);
     setPollNetworkMs(config.pollNetworkIntervalMs);
+    setPollSystemMs(config.pollSystemIntervalMs);
   }, [config]);
 
-  const hasChanges =
-    minerIp !== config.minerIp ||
-    expectedHashrateGh !== config.defaultExpectedHashrateGh ||
-    pollMinerMs !== config.pollMinerIntervalMs ||
-    pollNetworkMs !== config.pollNetworkIntervalMs;
-
-  const hasDefaultsDiff =
-    expectedHashrateGh !== DASHBOARD_DEFAULTS.defaultExpectedHashrateGh ||
-    pollMinerMs !== DASHBOARD_DEFAULTS.pollMinerIntervalMs ||
-    pollNetworkMs !== DASHBOARD_DEFAULTS.pollNetworkIntervalMs;
-
-  const changes = useMemo(() => {
+  const minerSettingsChanges = useMemo(() => {
     const list = [];
     if (minerIp !== config.minerIp) {
       list.push({ label: 'Miner IP', from: config.minerIp || '—', to: minerIp.trim() || '—' });
@@ -42,6 +33,11 @@ export function useSetup(config, refetchConfig, onError) {
         to: `${expectedHashrateGh} GH/s`,
       });
     }
+    return list;
+  }, [config.minerIp, config.defaultExpectedHashrateGh, minerIp, expectedHashrateGh]);
+
+  const pollingChanges = useMemo(() => {
+    const list = [];
     if (pollMinerMs !== config.pollMinerIntervalMs) {
       list.push({
         label: 'Miner poll interval',
@@ -56,17 +52,48 @@ export function useSetup(config, refetchConfig, onError) {
         to: `${pollNetworkMs} ms`,
       });
     }
+    if (pollSystemMs !== config.pollSystemIntervalMs) {
+      list.push({
+        label: 'System poll interval',
+        from: `${config.pollSystemIntervalMs} ms`,
+        to: `${pollSystemMs} ms`,
+      });
+    }
     return list;
-  }, [config.minerIp, config.defaultExpectedHashrateGh, config.pollMinerIntervalMs, config.pollNetworkIntervalMs, minerIp, expectedHashrateGh, pollMinerMs, pollNetworkMs]);
+  }, [config.pollMinerIntervalMs, config.pollNetworkIntervalMs, config.pollSystemIntervalMs, pollMinerMs, pollNetworkMs, pollSystemMs]);
 
-  const revert = useCallback(() => {
+  const hasMinerSettingsChanges = minerSettingsChanges.length > 0;
+  const hasPollingChanges = pollingChanges.length > 0;
+  const hasChanges = hasMinerSettingsChanges || hasPollingChanges;
+
+  const changes = useMemo(
+    () => [...minerSettingsChanges, ...pollingChanges],
+    [minerSettingsChanges, pollingChanges]
+  );
+
+  const hasDefaultsDiff =
+    expectedHashrateGh !== DASHBOARD_DEFAULTS.defaultExpectedHashrateGh ||
+    pollMinerMs !== DASHBOARD_DEFAULTS.pollMinerIntervalMs ||
+    pollNetworkMs !== DASHBOARD_DEFAULTS.pollNetworkIntervalMs ||
+    pollSystemMs !== DASHBOARD_DEFAULTS.pollSystemIntervalMs;
+
+  const revertMinerSettings = useCallback(() => {
     setMinerIp(config.minerIp);
     setExpectedHashrateGh(config.defaultExpectedHashrateGh);
+  }, [config.minerIp, config.defaultExpectedHashrateGh]);
+
+  const revertPolling = useCallback(() => {
     setPollMinerMs(config.pollMinerIntervalMs);
     setPollNetworkMs(config.pollNetworkIntervalMs);
-  }, [config]);
+    setPollSystemMs(config.pollSystemIntervalMs);
+  }, [config.pollMinerIntervalMs, config.pollNetworkIntervalMs, config.pollSystemIntervalMs]);
 
-  const save = useCallback(
+  const revert = useCallback(() => {
+    revertMinerSettings();
+    revertPolling();
+  }, [revertMinerSettings, revertPolling]);
+
+  const saveMinerSettings = useCallback(
     async (e) => {
       e?.preventDefault();
       setMessage(null);
@@ -75,8 +102,6 @@ export function useSetup(config, refetchConfig, onError) {
         await patchDashboardConfig({
           minerIp: minerIp.trim(),
           defaultExpectedHashrateGh: Number(expectedHashrateGh),
-          pollMinerIntervalMs: Number(pollMinerMs),
-          pollNetworkIntervalMs: Number(pollNetworkMs),
         });
         await refetchConfig();
         setMessage({ type: 'success', text: 'Settings saved.' });
@@ -87,7 +112,30 @@ export function useSetup(config, refetchConfig, onError) {
         setSaving(false);
       }
     },
-    [minerIp, expectedHashrateGh, pollMinerMs, pollNetworkMs, refetchConfig, onError]
+    [minerIp, expectedHashrateGh, refetchConfig, onError]
+  );
+
+  const savePolling = useCallback(
+    async (e) => {
+      e?.preventDefault();
+      setMessage(null);
+      setSaving(true);
+      try {
+        await patchDashboardConfig({
+          pollMinerIntervalMs: Number(pollMinerMs),
+          pollNetworkIntervalMs: Number(pollNetworkMs),
+          pollSystemIntervalMs: Number(pollSystemMs),
+        });
+        await refetchConfig();
+        setMessage({ type: 'success', text: 'Settings saved.' });
+      } catch (err) {
+        setMessage({ type: 'error', text: err.message });
+        onError?.(err);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [pollMinerMs, pollNetworkMs, pollSystemMs, refetchConfig, onError]
   );
 
   const resetToDefaults = useCallback(async () => {
@@ -99,11 +147,13 @@ export function useSetup(config, refetchConfig, onError) {
         defaultExpectedHashrateGh: Number(DASHBOARD_DEFAULTS.defaultExpectedHashrateGh),
         pollMinerIntervalMs: Number(DASHBOARD_DEFAULTS.pollMinerIntervalMs),
         pollNetworkIntervalMs: Number(DASHBOARD_DEFAULTS.pollNetworkIntervalMs),
+        pollSystemIntervalMs: Number(DASHBOARD_DEFAULTS.pollSystemIntervalMs),
       });
       await refetchConfig();
       setExpectedHashrateGh(DASHBOARD_DEFAULTS.defaultExpectedHashrateGh);
       setPollMinerMs(DASHBOARD_DEFAULTS.pollMinerIntervalMs);
       setPollNetworkMs(DASHBOARD_DEFAULTS.pollNetworkIntervalMs);
+      setPollSystemMs(DASHBOARD_DEFAULTS.pollSystemIntervalMs);
       setShowResetConfirm(false);
       setMessage({ type: 'success', text: 'Settings reset to default values.' });
     } catch (err) {
@@ -130,10 +180,16 @@ export function useSetup(config, refetchConfig, onError) {
       setPollMinerMs,
       pollNetworkMs,
       setPollNetworkMs,
+      pollSystemMs,
+      setPollSystemMs,
     },
     status: {
       changes,
       hasChanges,
+      hasMinerSettingsChanges,
+      hasPollingChanges,
+      minerSettingsChanges,
+      pollingChanges,
       hasDefaultsDiff,
       saving,
       message,
@@ -143,7 +199,10 @@ export function useSetup(config, refetchConfig, onError) {
     },
     actions: {
       revert,
-      save,
+      revertMinerSettings,
+      revertPolling,
+      saveMinerSettings,
+      savePolling,
       resetToDefaults,
     },
   };

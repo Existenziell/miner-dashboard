@@ -12,6 +12,7 @@ import MinerShares from '@/components/dashboard/MinerShares';
 import MinerStatus from '@/components/dashboard/MinerStatus';
 import NetworkStatus from '@/components/dashboard/NetworkStatus';
 import SoloMiningOdds from '@/components/dashboard/SoloMiningOdds';
+import SystemStatus from '@/components/dashboard/SystemStatus';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import Notifications from '@/components/notifications/Notifications';
@@ -136,6 +137,9 @@ function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPend
               </div>
               {!networkCollapsed && <NetworkStatus data={network} />}
             </div>
+
+            {/* System (host) status */}
+            <SystemStatus />
 
             {/* Solo mining odds */}
             <SoloMiningOdds network={network} />

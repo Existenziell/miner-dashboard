@@ -87,6 +87,12 @@ export async function fetchNetworkStatus() {
   return res.json();
 }
 
+export async function fetchSystemStatus() {
+  const res = await fetch(`${BASE}/api/system/status`);
+  if (!res.ok) throw new Error(`System API error: ${res.status}`);
+  return res.json();
+}
+
 export async function patchMinerSettings(settings) {
   const { success, payload, error } = parseMinerSettings(settings);
   if (!success) {

@@ -8,6 +8,7 @@ import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 export const DEFAULT_EXPECTED_HASHRATE_GH = DASHBOARD_DEFAULTS.defaultExpectedHashrateGh;
 export const POLL_MINER_INTERVAL_MS = DASHBOARD_DEFAULTS.pollMinerIntervalMs;
 export const POLL_NETWORK_INTERVAL_MS = DASHBOARD_DEFAULTS.pollNetworkIntervalMs;
+export const SYSTEM_POLL_INTERVAL_MS = DASHBOARD_DEFAULTS.pollSystemIntervalMs;
 export const LOW_HEAP_INT_THRESHOLD_BYTES = 50 * 1024; // 50 KB
 export const MESSAGE_AUTO_DISMISS_MS = 5_000;
 

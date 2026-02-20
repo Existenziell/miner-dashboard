@@ -106,15 +106,19 @@ describe('useAppearance', () => {
     expect(result.current.status.message).toEqual({ type: 'success', text: 'Appearance saved.' });
   });
 
-  it('returns metricOrder from config and setMetricOrder updates order', () => {
+  it('returns metricOrder from config and setMetricOrder updates order', async () => {
     const metricOrder = ['power', 'hashrate', 'efficiency', 'temp', 'fanRpm', 'current', 'frequency', 'voltage'];
     const config = { metricRanges: {}, metricOrder, accentColor: '#6366f1', chartColors: {} };
+    mockPatchDashboardConfig.mockResolvedValue({});
+    refetchConfig.mockResolvedValue(undefined);
     const { result } = renderHook(() => useAppearance(config, refetchConfig, onError));
 
     expect(result.current.gauges.metricOrder).toEqual(metricOrder);
 
-    act(() => {
+    await act(async () => {
       result.current.gauges.setMetricOrder(['hashrate', 'power', 'efficiency', 'temp', 'fanRpm', 'current', 'frequency', 'voltage']);
+      await Promise.resolve();
+      await Promise.resolve();
     });
 
     expect(result.current.gauges.metricOrder[0]).toBe('hashrate');
@@ -122,15 +126,19 @@ describe('useAppearance', () => {
     expect(result.current.status.hasChanges).toBe(true);
   });
 
-  it('returns chartOrder from config and setChartOrder updates order', () => {
+  it('returns chartOrder from config and setChartOrder updates order', async () => {
     const chartOrder = ['power', 'hashrate', 'temperature'];
     const config = { metricRanges: {}, metricOrder: [], chartOrder, accentColor: '#6366f1', chartColors: {} };
+    mockPatchDashboardConfig.mockResolvedValue({});
+    refetchConfig.mockResolvedValue(undefined);
     const { result } = renderHook(() => useAppearance(config, refetchConfig, onError));
 
     expect(result.current.charts.chartOrder).toEqual(chartOrder);
 
-    act(() => {
+    await act(async () => {
       result.current.charts.setChartOrder(['hashrate', 'temperature', 'power']);
+      await Promise.resolve();
+      await Promise.resolve();
     });
 
     expect(result.current.charts.chartOrder[0]).toBe('hashrate');

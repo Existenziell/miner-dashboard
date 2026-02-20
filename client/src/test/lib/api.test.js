@@ -9,6 +9,7 @@ import {
   fetchMinerAsic,
   fetchMinerInfo,
   fetchNetworkStatus,
+  fetchSystemStatus,
   patchDashboardConfig,
   patchMinerSettings,
   restartMiner,
@@ -128,6 +129,21 @@ describe('api', () => {
     it('throws when not ok', async () => {
       fetchStub.mockResolvedValueOnce({ ok: false, status: 502 });
       await expect(fetchNetworkStatus()).rejects.toThrow('Network API error: 502');
+    });
+  });
+
+  describe('fetchSystemStatus', () => {
+    it('calls /api/system/status and returns JSON on success', async () => {
+      const data = { loadAvg: [1, 0.5, 0.3], cpuCount: 4, uptimeSeconds: 3600 };
+      fetchStub.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(data) });
+      const result = await fetchSystemStatus();
+      expect(result).toEqual(data);
+      expect(fetchStub).toHaveBeenCalledWith('/api/system/status');
+    });
+
+    it('throws when not ok', async () => {
+      fetchStub.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(fetchSystemStatus()).rejects.toThrow('System API error: 500');
     });
   });
 

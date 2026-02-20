@@ -441,6 +441,7 @@ export function useAppearance(config, refetchConfig, onError) {
     setMetricOrder(order);
     patchDashboardConfig({ metricOrder: order })
       .then(() => refetchConfig())
+      .then(() => setMessage({ type: 'success', text: 'Saved', section: 'gauges' }))
       .catch((err) => {
         onError?.(err);
       });
@@ -451,6 +452,7 @@ export function useAppearance(config, refetchConfig, onError) {
     setChartOrder(order);
     patchDashboardConfig({ chartOrder: order })
       .then(() => refetchConfig())
+      .then(() => setMessage({ type: 'success', text: 'Saved', section: 'charts' }))
       .catch((err) => {
         onError?.(err);
       });
@@ -471,6 +473,7 @@ export function useAppearance(config, refetchConfig, onError) {
       const next = { ...prev, [metricId]: value };
       patchDashboardConfig({ gaugeVisible: next })
         .then(() => refetchConfig())
+        .then(() => setMessage({ type: 'success', text: 'Saved', section: 'gauges' }))
         .catch((err) => {
           onError?.(err);
         });
@@ -483,6 +486,7 @@ export function useAppearance(config, refetchConfig, onError) {
       const next = { ...prev, [chartId]: value };
       patchDashboardConfig({ chartVisible: next })
         .then(() => refetchConfig())
+        .then(() => setMessage({ type: 'success', text: 'Saved', section: 'charts' }))
         .catch((err) => {
           onError?.(err);
         });
