@@ -40,6 +40,7 @@ export function useAppearance(config, refetchConfig, onError) {
   const [minerImageFilename, setMinerImageFilename] = useState(
     () => config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? ''
   );
+  const [minerImagePreviewKey, setMinerImagePreviewKey] = useState(() => Date.now());
   const [saving, setSaving] = useState(false);
   const [savingSection, setSavingSection] = useState(null); // 'gauges' | 'charts' | 'accent' | 'minerImage' | null
   const [message, setMessage] = useState(null);
@@ -74,6 +75,7 @@ export function useAppearance(config, refetchConfig, onError) {
     setMinerImageVisible(config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible);
     setMinerImageFile(config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? '');
     setMinerImageFilename(config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? '');
+    setMinerImagePreviewKey(Date.now());
   }, [config.minerImageVisible, config.minerImageFile, config.minerImageFilename]);
 
   const effectiveAccent = normalizeHex(accentColor, DASHBOARD_DEFAULTS.accentColor);
@@ -533,6 +535,7 @@ export function useAppearance(config, refetchConfig, onError) {
       minerImageVisible,
       minerImageFile,
       minerImageFilename,
+      minerImagePreviewKey,
       setMinerImageVisible,
       setMinerImageFile,
       setMinerImageFilename,

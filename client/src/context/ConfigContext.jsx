@@ -45,12 +45,14 @@ function buildAccentOverrideCSS(accent) {
 
 export function ConfigProvider({ children }) {
   const [config, setConfig] = useState(() => ({ ...DASHBOARD_DEFAULTS }));
+  const [minerImageCacheBuster, setMinerImageCacheBuster] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const refetch = useCallback(async () => {
     try {
       const data = await fetchDashboardConfig();
       setConfig(data);
+      setMinerImageCacheBuster(Date.now());
     } catch {
       setConfig({ ...DASHBOARD_DEFAULTS });
     } finally {
@@ -93,6 +95,7 @@ export function ConfigProvider({ children }) {
     setConfig,
     refetch,
     loading,
+    minerImageCacheBuster,
   };
 
   return (

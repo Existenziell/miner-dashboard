@@ -47,7 +47,7 @@ function ItemGrid({ items }) {
 }
 
 export default function MinerStatus() {
-  const { config } = useConfig();
+  const { config, minerImageCacheBuster } = useConfig();
   const { data, error: minerError, loading: minerLoading } = useMiner();
   const [macObfuscated, setMacObfuscated] = useState(false);
   if (!data) return null;
@@ -153,7 +153,7 @@ export default function MinerStatus() {
             {statusContent}
           </div>
           <div className="lg:pt-0 flex justify-center lg:justify-end">
-            <Image src="/api/config/miner-image" />
+            <Image src={`/api/config/miner-image?v=${minerImageCacheBuster}`} />
           </div>
         </div>
       ) : (

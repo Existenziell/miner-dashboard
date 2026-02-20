@@ -414,7 +414,7 @@ export function TabAppearance() {
                 <div className="flex flex-row gap-2">
                   <img
                     key={minerImage.minerImageFile}
-                    src="/api/config/miner-image"
+                    src={`/api/config/miner-image?v=${minerImage.minerImagePreviewKey}`}
                     alt="Miner preview"
                     className="h-auto max-h-32 max-w-[200px] rounded object-contain"
                   />
