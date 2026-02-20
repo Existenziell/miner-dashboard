@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { DASHBOARD_DEFAULTS } from 'shared/dashboardDefaults';
 import { useConfig } from '@/context/ConfigContext';
 import { MinerProvider, useMiner } from '@/context/MinerContext';
 import { useLeaveSettingsGuard } from '@/hooks/useLeaveSettingsGuard';
@@ -74,6 +75,8 @@ function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPend
     settingsHasPending
   );
 
+  const sectionVisible = config.sectionVisible ?? DASHBOARD_DEFAULTS.sectionVisible ?? {};
+
   return (
     <div className="min-h-screen bg-surface dark:bg-surface-dark text-normal">
       <Header activeTab={activeTab} onTabChange={guardedTabChange} />
@@ -116,33 +119,37 @@ function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPend
             )}
 
             {/* Settings and shares */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <MinerShares />
-              <MinerSettings />
-            </div>
+            {(sectionVisible.shares || sectionVisible.poolSettings) && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {sectionVisible.shares && <MinerShares />}
+                {sectionVisible.poolSettings && <MinerSettings />}
+              </div>
+            )}
 
             {/* Network status */}
-            <div className={`card${networkCollapsed ? ' card--collapsed' : ''}`}>
-              <div className="card-header-wrapper">
-                <button
-                  type="button"
-                  onClick={toggleNetworkCollapsed}
-                  className={`card-header cursor-pointer border-0 focus:outline-none w-full flex items-center justify-between gap-2${networkCollapsed ? ' rounded-b-md' : ''}`}
-                  aria-expanded={!networkCollapsed}
-                  aria-label={`Bitcoin Network, ${networkCollapsed ? 'Expand' : 'Collapse'}`}
-                >
-                  <h3 className="card-header-title">Bitcoin Network</h3>
-                  <span className="text-muted text-sm shrink-0">{networkCollapsed ? 'Expand' : 'Collapse'}</span>
-                </button>
+            {sectionVisible.bitcoinNetwork && (
+              <div className={`card${networkCollapsed ? ' card--collapsed' : ''}`}>
+                <div className="card-header-wrapper">
+                  <button
+                    type="button"
+                    onClick={toggleNetworkCollapsed}
+                    className={`card-header cursor-pointer border-0 focus:outline-none w-full flex items-center justify-between gap-2${networkCollapsed ? ' rounded-b-md' : ''}`}
+                    aria-expanded={!networkCollapsed}
+                    aria-label={`Bitcoin Network, ${networkCollapsed ? 'Expand' : 'Collapse'}`}
+                  >
+                    <h3 className="card-header-title">Bitcoin Network</h3>
+                    <span className="text-muted text-sm shrink-0">{networkCollapsed ? 'Expand' : 'Collapse'}</span>
+                  </button>
+                </div>
+                {!networkCollapsed && <NetworkStatus data={network} />}
               </div>
-              {!networkCollapsed && <NetworkStatus data={network} />}
-            </div>
+            )}
 
             {/* System (host) status */}
-            <SystemStatus />
+            {sectionVisible.system && <SystemStatus />}
 
             {/* Solo mining odds */}
-            <SoloMiningOdds network={network} />
+            {sectionVisible.miningOdds && <SoloMiningOdds network={network} />}
           </>
         )}
       </main>

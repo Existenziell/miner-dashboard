@@ -103,6 +103,19 @@ function mergeChartVisible(fromFile) {
   return defaults;
 }
 
+const KNOWN_SECTIONS = new Set(Object.keys(DASHBOARD_DEFAULTS.sectionVisible || {}));
+
+function mergeSectionVisible(fromFile) {
+  const defaults = Object.fromEntries([...KNOWN_SECTIONS].map((id) => [id, true]));
+  if (!fromFile || typeof fromFile !== 'object') return defaults;
+  for (const id of KNOWN_SECTIONS) {
+    if (typeof fromFile[id] === 'boolean') {
+      defaults[id] = fromFile[id];
+    }
+  }
+  return defaults;
+}
+
 function mergeWithDefaults(fileObj) {
   if (!fileObj || typeof fileObj !== 'object') return { ...DASHBOARD_DEFAULTS };
   const metricRanges = deepMergeMetricRanges(
@@ -117,6 +130,7 @@ function mergeWithDefaults(fileObj) {
   const chartOrder = mergeChartOrder(fileObj.chartOrder);
   const gaugeVisible = mergeGaugeVisible(fileObj.gaugeVisible);
   const chartVisible = mergeChartVisible(fileObj.chartVisible);
+  const sectionVisible = mergeSectionVisible(fileObj.sectionVisible);
   return {
     ...DASHBOARD_DEFAULTS,
     ...fileObj,
@@ -126,6 +140,7 @@ function mergeWithDefaults(fileObj) {
     chartOrder,
     gaugeVisible,
     chartVisible,
+    sectionVisible,
   };
 }
 

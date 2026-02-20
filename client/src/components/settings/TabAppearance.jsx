@@ -27,7 +27,15 @@ import { ThemePreviews } from '@/components/settings/ThemePreviews';
 export function TabAppearance() {
   const { mode, setMode } = useTheme();
   const { refetch: refetchConfig } = useConfig();
-  const { gauges, charts, accent, minerImage, status } = useAppearanceContext();
+  const { gauges, charts, accent, minerImage, sections, status } = useAppearanceContext();
+
+  const DASHBOARD_SECTION_OPTIONS = [
+    { id: 'shares', label: 'Shares & Performance' },
+    { id: 'bitcoinNetwork', label: 'Bitcoin Network' },
+    { id: 'system', label: 'System' },
+    { id: 'miningOdds', label: 'Mining Odds' },
+    { id: 'poolSettings', label: 'Pool & Settings' },
+  ];
 
   const order = gauges.metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);
   const metricDnd = useOrderDnd(order, gauges.setMetricOrder);
@@ -69,6 +77,43 @@ export function TabAppearance() {
           {status.message.text}
         </div>
       )}
+      {/* Dashboard sections visibility */}
+      <div className="card">
+        <div className="card-header-wrapper">
+          <div className="card-header mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="card-header-title">Dashboard sections</h3>
+            <div className="flex items-center gap-3 ml-auto">
+              {status.message?.type === 'success' && status.message?.section === 'sections' && (
+                <span role="status" className="message-success text-sm">
+                  Saved
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <p className="card-subtitle">
+            Show or hide sections on the dashboard.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            {DASHBOARD_SECTION_OPTIONS.map(({ id, label }) => (
+              <label key={id} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sections.sectionVisible[id] !== false}
+                  onChange={(e) => sections.setSectionVisible(id, e.target.checked)}
+                  className="checkbox-input"
+                  aria-label={`Show ${label} on dashboard`}
+                />
+                <span className="checkbox-box shrink-0" aria-hidden>
+                  <IconCheckmark className="checkbox-check" />
+                </span>
+                <span className="label">{label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
       {/* Metric ranges */}
       <div className="card">
         <div className="card-header-wrapper">

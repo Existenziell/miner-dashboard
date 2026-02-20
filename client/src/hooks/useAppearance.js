@@ -12,6 +12,7 @@ const defaultChartOrder = () =>
 
 const defaultGaugeVisible = () => deepCopy(DASHBOARD_DEFAULTS.gaugeVisible);
 const defaultChartVisible = () => deepCopy(DASHBOARD_DEFAULTS.chartVisible);
+const defaultSectionVisible = () => deepCopy(DASHBOARD_DEFAULTS.sectionVisible);
 
 export function useAppearance(config, refetchConfig, onError) {
   const [metricRanges, setMetricRanges] = useState(() => deepCopy(config.metricRanges));
@@ -41,6 +42,9 @@ export function useAppearance(config, refetchConfig, onError) {
     () => config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? ''
   );
   const [minerImagePreviewKey, setMinerImagePreviewKey] = useState(() => Date.now());
+  const [sectionVisible, setSectionVisibleState] = useState(() =>
+    deepCopy(config.sectionVisible ?? defaultSectionVisible())
+  );
   const [saving, setSaving] = useState(false);
   const [savingSection, setSavingSection] = useState(null); // 'gauges' | 'charts' | 'accent' | 'minerImage' | null
   const [message, setMessage] = useState(null);
@@ -77,6 +81,10 @@ export function useAppearance(config, refetchConfig, onError) {
     setMinerImageFilename(config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? '');
     setMinerImagePreviewKey(Date.now());
   }, [config.minerImageVisible, config.minerImageFile, config.minerImageFilename]);
+
+  useEffect(() => {
+    setSectionVisibleState(deepCopy(config.sectionVisible ?? defaultSectionVisible()));
+  }, [config.sectionVisible]);
 
   const effectiveAccent = normalizeHex(accentColor, DASHBOARD_DEFAULTS.accentColor);
   const configAccent = normalizeHex(config.accentColor ?? '', DASHBOARD_DEFAULTS.accentColor);
@@ -173,7 +181,8 @@ export function useAppearance(config, refetchConfig, onError) {
     setMinerImageVisible(config.minerImageVisible ?? DASHBOARD_DEFAULTS.minerImageVisible);
     setMinerImageFile(config.minerImageFile ?? DASHBOARD_DEFAULTS.minerImageFile ?? '');
     setMinerImageFilename(config.minerImageFilename ?? DASHBOARD_DEFAULTS.minerImageFilename ?? '');
-  }, [config.metricRanges, config.metricOrder, config.gaugeVisible, config.chartVisible, config.chartOrder, config.accentColor, config.chartColors, config.minerImageVisible, config.minerImageFile, config.minerImageFilename]);
+    setSectionVisibleState(deepCopy(config.sectionVisible ?? defaultSectionVisible()));
+  }, [config.metricRanges, config.metricOrder, config.gaugeVisible, config.chartVisible, config.chartOrder, config.accentColor, config.chartColors, config.minerImageVisible, config.minerImageFile, config.minerImageFilename, config.sectionVisible]);
 
   const save = useCallback(
     async (e) => {
@@ -243,6 +252,7 @@ export function useAppearance(config, refetchConfig, onError) {
         chartColors: deepCopy(DASHBOARD_DEFAULTS.chartColors),
         minerImageVisible: DASHBOARD_DEFAULTS.minerImageVisible ?? false,
         minerImageFile: DASHBOARD_DEFAULTS.minerImageFile ?? '',
+        sectionVisible: defaultSectionVisible(),
       });
       await refetchConfig();
       setMetricRanges(deepCopy(DASHBOARD_DEFAULTS.metricRanges));
@@ -254,6 +264,7 @@ export function useAppearance(config, refetchConfig, onError) {
       setChartColors(deepCopy(DASHBOARD_DEFAULTS.chartColors));
       setMinerImageVisible(DASHBOARD_DEFAULTS.minerImageVisible ?? false);
       setMinerImageFile(DASHBOARD_DEFAULTS.minerImageFile ?? '');
+      setSectionVisibleState(defaultSectionVisible());
       setResetConfirmSection(null);
       setMessage({ type: 'success', text: 'Appearance reset to default values.' });
     } catch (err) {
@@ -494,6 +505,19 @@ export function useAppearance(config, refetchConfig, onError) {
     });
   }, [refetchConfig, onError]);
 
+  const setSectionVisible = useCallback((sectionId, value) => {
+    setSectionVisibleState((prev) => {
+      const next = { ...prev, [sectionId]: value };
+      patchDashboardConfig({ sectionVisible: next })
+        .then(() => refetchConfig())
+        .then(() => setMessage({ type: 'success', text: 'Saved', section: 'sections' }))
+        .catch((err) => {
+          onError?.(err);
+        });
+      return next;
+    });
+  }, [refetchConfig, onError]);
+
   useEffect(() => {
     if (message?.type !== 'success') return;
     const t = setTimeout(() => setMessage(null), MESSAGE_AUTO_DISMISS_MS);
@@ -547,6 +571,10 @@ export function useAppearance(config, refetchConfig, onError) {
       hasMinerImageDefaultsDiff,
       saveMinerImageSection,
       resetMinerImageToDefaults,
+    },
+    sections: {
+      sectionVisible,
+      setSectionVisible,
     },
     status: {
       changes,

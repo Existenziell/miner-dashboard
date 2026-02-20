@@ -122,6 +122,18 @@ function validateChartVisible(value) {
   return null;
 }
 
+const KNOWN_SECTIONS = new Set(Object.keys(DASHBOARD_DEFAULTS.sectionVisible || {}));
+
+function validateSectionVisible(value) {
+  if (value === undefined) return null;
+  if (typeof value !== 'object' || value === null) return 'sectionVisible must be an object';
+  for (const key of Object.keys(value)) {
+    if (!KNOWN_SECTIONS.has(key)) return `sectionVisible: unknown section "${key}"`;
+    if (typeof value[key] !== 'boolean') return `sectionVisible.${key} must be a boolean`;
+  }
+  return null;
+}
+
 function validateMinerImageVisible(value) {
   if (value === undefined) return null;
   if (typeof value !== 'boolean') return 'minerImageVisible must be a boolean';
@@ -243,6 +255,8 @@ router.patch('/', (req, res) => {
   if (gaugeVisibleErr) errors.push(gaugeVisibleErr);
   const chartVisibleErr = validateChartVisible(body.chartVisible);
   if (chartVisibleErr) errors.push(chartVisibleErr);
+  const sectionVisibleErr = validateSectionVisible(body.sectionVisible);
+  if (sectionVisibleErr) errors.push(sectionVisibleErr);
   const minerImageVisibleErr = validateMinerImageVisible(body.minerImageVisible);
   if (minerImageVisibleErr) errors.push(minerImageVisibleErr);
   const minerImageFileErr = validateMinerImageFile(body.minerImageFile);

@@ -59,4 +59,11 @@ export const DASHBOARD_DEFAULTS = {
   minerImageVisible: true,
   minerImageFile: '',
   minerImageFilename: '',
+  sectionVisible: {
+    shares: true,
+    bitcoinNetwork: true,
+    system: true,
+    miningOdds: true,
+    poolSettings: true,
+  },
 };
