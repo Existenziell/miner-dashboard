@@ -273,7 +273,7 @@ html.high-contrast a {
 }
 
 .btn-tab {
-  @apply cursor-pointer px-3 py-1.5 rounded-md text-sm font-medium transition-colors;
+  @apply cursor-pointer px-1.5 py-1 md:px-3 md:py-1.5 rounded-md text-sm font-medium transition-colors;
 }
 
 .btn-tab-active {

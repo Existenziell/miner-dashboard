@@ -14,7 +14,7 @@ import { getSettingsSectionFromUrl, setSettingsSectionInUrl } from '@/lib/tabUrl
 import { AppLink } from '@/components/AppLink';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { PendingChanges } from '@/components/settings/PendingChanges';
-import { SettingsTabBar } from '@/components/settings/SettingsTabBar';
+import { SettingsTabNav } from '@/components/settings/SettingsTabNav';
 import { TabAppearance } from '@/components/settings/TabAppearance';
 import { TabFirmware } from '@/components/settings/TabFirmware';
 import { TabMiner } from '@/components/settings/TabMiner';
@@ -135,7 +135,7 @@ export default function SettingsPage({ onError, onPendingChange }) {
   if (!miner) {
     return (
       <div className="space-y-4">
-        <SettingsTabBar currentTab={settingsSubTab} onTabChange={handleTabChange} />
+        <SettingsTabNav currentTab={settingsSubTab} onTabChange={handleTabChange} />
         {settingsSubTab === 'setup' && (
           <SetupProvider value={setupForm}>
             <MinerSettingsProvider value={minerSettingsValue}>
@@ -196,7 +196,7 @@ export default function SettingsPage({ onError, onPendingChange }) {
 
   return (
     <div className="space-y-4">
-      <SettingsTabBar currentTab={settingsSubTab} onTabChange={handleTabChange} />
+      <SettingsTabNav currentTab={settingsSubTab} onTabChange={handleTabChange} />
 
       {settingsSubTab === 'setup' && (
         <SetupProvider value={setupForm}>

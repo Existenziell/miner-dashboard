@@ -1,13 +1,8 @@
 import { useTheme } from '@/context/ThemeContext';
 import { AppLink } from '@/components/AppLink';
+import { MAIN_TABS } from '@/components/layout/mainTabs';
+import TabNav from '@/components/layout/TabNav';
 import ThemeToggle from '@/components/layout/ThemeToggle';
-
-const TABS = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'settings', label: 'Settings' },
-    { id: 'api', label: 'API' },
-    { id: 'docs', label: 'Docs' },
-];
 
 export default function Header({ activeTab, onTabChange }) {
     const { mode, cycle } = useTheme();
@@ -16,23 +11,17 @@ export default function Header({ activeTab, onTabChange }) {
         <header className="header-bar">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <AppLink href="/" aria-label="Go to dashboard">
-                        <img src="/favicon/favicon.svg" alt="Solo Mining Dashboard Logo" className="w-10 h-10 dark:invert" />
+                    <AppLink href="/" aria-label="Go to dashboard" className="hidden md:block">
+                        <img src="/favicon/favicon.svg" alt="Solo Mining Dashboard Logo" className="w-10 h-10 dark:invert flex-shrink-0" />
                     </AppLink>
-                    <h1 className="text-xl font-bold text-normal">Solo Mining Dashboard</h1>
-                    <nav className="flex gap-1 ml-4">
-                        {TABS.map((tab) => (
-                            <button
-                                key={tab.id}
-                                type="button"
-                                onClick={() => onTabChange(tab.id)}
-                                aria-current={activeTab === tab.id ? 'page' : undefined}
-                                className={`btn-tab ${activeTab === tab.id ? 'btn-tab-active' : 'btn-tab-inactive'}`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </nav>
+                    <h1 className="text-xl font-bold text-normal hidden md:block">Solo Mining Dashboard</h1>
+                    <TabNav
+                        tabs={MAIN_TABS}
+                        activeTab={activeTab}
+                        onTabChange={onTabChange}
+                        ariaLabel="Main navigation"
+                        className="flex gap-1 ml-2 md:ml-4"
+                    />
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                     <ThemeToggle mode={mode} onCycle={cycle} />

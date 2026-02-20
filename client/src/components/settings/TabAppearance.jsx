@@ -95,7 +95,7 @@ export function TabAppearance() {
           <p className="card-subtitle">
             Show or hide sections on the dashboard.
           </p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col md:flex-row flex-wrap gap-4">
             {DASHBOARD_SECTION_OPTIONS.map(({ id, label }) => (
               <label key={id} className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -164,7 +164,7 @@ export function TabAppearance() {
                   <div
                     key={metric}
                     ref={(el) => { metricDnd.cellRefs.current[i] = el; }}
-                    className="w-[240px] min-h-[150px] shrink-0"
+                    className="w-full md:w-[240px] min-h-[150px] shrink-0"
                   >
                     <MetricRanges
                       metric={metric}
