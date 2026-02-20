@@ -28,8 +28,8 @@
     "power"
   ],
   "chartVisible": {
-    "power": false,
-    "temperature": false,
+    "power": true,
+    "temperature": true,
     "hashrate": true
   },
   "metricRanges": {
@@ -87,5 +87,12 @@
   },
   "minerImageVisible": true,
   "minerImageFile": "miner-image.jpg",
-  "minerImageFilename": "NerdQaxe.jpg"
+  "minerImageFilename": "NerdQaxe.jpg",
+  "sectionVisible": {
+    "shares": true,
+    "bitcoinNetwork": true,
+    "system": true,
+    "miningOdds": true,
+    "poolSettings": true
+  }
 }
