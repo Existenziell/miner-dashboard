@@ -18,7 +18,7 @@ export default function MinerShares() {
     <div className="card">
       <div className="card-header-wrapper">
         <div className="card-header">
-          <h3 className="card-header-title">Shares & Performance</h3>
+          <h3 className="card-header-title">Pool Shares</h3>
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

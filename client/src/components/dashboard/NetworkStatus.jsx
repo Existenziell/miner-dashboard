@@ -69,7 +69,7 @@ function BlockCard({ label, block }) {
   );
 }
 
-export default function NetworkStatus({ data }) {
+export default function NetworkStatus({ data, showBlocksRow = true }) {
   if (!data) return null;
 
   const { blockHeight, difficulty, fees, prices, networkDifficulty, mempool, previousBlock, previousBlock2, previousBlock3 } = data;
@@ -171,7 +171,7 @@ export default function NetworkStatus({ data }) {
       </div>
 
       {/* Second row: Current block (mempool), Previous blocks */}
-      {blockHeight != null && (
+      {showBlocksRow && blockHeight != null && (
         <div className="card">
           <div className="stat-label mb-1">Next block</div>
           <div className="text-lg font-bold text-normal">{formatNumber(blockHeight + 1)}</div>
@@ -191,9 +191,9 @@ export default function NetworkStatus({ data }) {
           </div>
         </div>
       )}
-      <BlockCard label="Latest block" block={previousBlock} />
-      <BlockCard label="Previous block" block={previousBlock2} />
-      <BlockCard label="2 blocks ago" block={previousBlock3} />
+      {showBlocksRow && <BlockCard label="Latest block" block={previousBlock} />}
+      {showBlocksRow && <BlockCard label="Previous block" block={previousBlock2} />}
+      {showBlocksRow && <BlockCard label="2 blocks ago" block={previousBlock3} />}
     </div>
   );
 }

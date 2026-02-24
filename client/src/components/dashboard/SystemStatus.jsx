@@ -67,7 +67,7 @@ export default function SystemStatus() {
     <div className="card">
       <div className="card-header-wrapper">
         <div className="card-header">
-          <h2 className="card-header-title">System</h2>
+          <h2 className="card-header-title">Host System</h2>
           {error ? (
             <span className="flex items-center gap-1.5 text-danger dark:text-danger-dark text-sm">
               Unavailable

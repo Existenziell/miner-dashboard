@@ -62,6 +62,7 @@ export const DASHBOARD_DEFAULTS = {
   sectionVisible: {
     shares: true,
     bitcoinNetwork: true,
+    bitcoinNetworkBlocks: true,
     system: true,
     miningOdds: true,
     poolSettings: true,

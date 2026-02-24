@@ -30,11 +30,12 @@ export function TabAppearance() {
   const { gauges, charts, accent, minerImage, sections, status } = useAppearanceContext();
 
   const DASHBOARD_SECTION_OPTIONS = [
-    { id: 'shares', label: 'Shares & Performance' },
+    { id: 'poolSettings', label: 'Pool Settings' },
+    { id: 'shares', label: 'Pool Shares' },
     { id: 'bitcoinNetwork', label: 'Bitcoin Network' },
-    { id: 'system', label: 'System' },
+    { id: 'bitcoinNetworkBlocks', label: 'Bitcoin Blocks' },
+    { id: 'system', label: 'Host System' },
     { id: 'miningOdds', label: 'Mining Odds' },
-    { id: 'poolSettings', label: 'Pool & Settings' },
   ];
 
   const order = gauges.metricOrder ?? DASHBOARD_DEFAULTS.metricOrder ?? Object.keys(DASHBOARD_DEFAULTS.metricRanges);

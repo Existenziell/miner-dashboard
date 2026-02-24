@@ -141,7 +141,7 @@ function AppContent({ activeTab, onTabChange, settingsHasPending, onSettingsPend
                     <span className="text-muted text-sm shrink-0">{networkCollapsed ? 'Expand' : 'Collapse'}</span>
                   </button>
                 </div>
-                {!networkCollapsed && <NetworkStatus data={network} />}
+                {!networkCollapsed && <NetworkStatus data={network} showBlocksRow={sectionVisible.bitcoinNetworkBlocks !== false} />}
               </div>
             )}
 
