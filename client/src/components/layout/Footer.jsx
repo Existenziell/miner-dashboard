@@ -2,6 +2,7 @@ import { AppLink } from '@/components/AppLink';
 const FOOTER_LINKS = [
   { href: 'https://bitcoindev.info/', label: 'BitcoinDev' },
   { href: 'https://mempool.space/', label: 'mempool.space' },
+  { href: 'http://dashboard.local:8002', label: 'Node Monitor' },
 ];
 
 export default function Footer() {
